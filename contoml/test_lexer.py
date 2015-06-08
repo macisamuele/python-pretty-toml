@@ -42,11 +42,11 @@ valid_tokens = {
         ('1.0 fwef', '1.0'),
         ('3.1415 g4g', '3.1415'),
         ('-0.01 433re', '-0.01'),
-        ('5e+2_2ersdvf', '5e+2_2'),
-        ('1e6ewe23', '1e6'),
-        ('-2E-2.23rf23', '-2E-2'),
-        ('6.626e-34+234f', '6.626e-34'),
-        ('9_224_617.445_991_228_313f1ewer 23f4h = nonesense', '9_224_617.445_991_228_313'),
+        ('5e+2_2 ersdvf', '5e+2_2'),
+        ('1e6 ewe23', '1e6'),
+        ('-2E-2.2 3 rf23', '-2E-2'),
+        ('6.626e-34 +234f', '6.626e-34'),
+        ('9_224_617.445_991_228_313 f1ewer 23f4h = nonesense', '9_224_617.445_991_228_313'),
         ('1e1_000 2346f,ef2!!', '1e1_000'),
     ),
     TOKEN_TYPE_BOOLEAN: (
@@ -77,6 +77,9 @@ valid_tokens = {
     TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET: (
         (']] item=3', ']]'),
     ),
+    # TOKEN_TYPE_BARE_STRING: (
+    #     ('key another', 'key'),
+    # )
 }
 
 # A mapping from a token type to a sequence of (source, matched_text) pairs that shouldn't result from consuming the

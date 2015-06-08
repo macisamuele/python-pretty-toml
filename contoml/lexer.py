@@ -8,6 +8,7 @@ TOKEN_TYPE_MULTILINE_STRING = '90-multiline_string'
 TOKEN_TYPE_LITERAL_STRING = '90-literal_string'
 TOKEN_TYPE_MULTILINE_LITERAL_STRING = '90-multiline_literal_string'
 TOKEN_TYPE_WHITESPACE = '90-whitespace'
+TOKEN_TYPE_BARE_STRING = '50-bare_string'
 TOKEN_TYPE_INTEGER = '00-int'
 TOKEN_TYPE_FLOAT = '01-float'
 TOKEN_TYPE_BOOLEAN = '00-bool'
@@ -27,6 +28,7 @@ _LEXICAL_SPECS = (
     (TOKEN_TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
     (TOKEN_TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
     (TOKEN_TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),
+    (TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
     (TOKEN_TYPE_WHITESPACE, re.compile('^(\s+)', re.DOTALL)),                       # Can span multiple lines
     (TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
     (TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
@@ -81,6 +83,8 @@ class Token:
         """
         return self._source_substring
 
+    def __repr__(self):
+        return "{}: {}".format(self.type, self.source_substring)
 
 def _next_token(source):
     """
@@ -102,5 +106,50 @@ def _next_token(source):
         maximal_munch_length = max(len(token.source_substring) for token in matches)
         maximal_munches = [token for token in matches if len(token.source_substring) == maximal_munch_length]
 
-        return sorted(maximal_munches, key=lambda x: token.type)[0]   # Return the first in sorting by priority
+        return sorted(maximal_munches, key=lambda x: x.type)[0]   # Return the first in sorting by priority
+
+
+class LexerError:
+
+    def __init__(self, message):
+        self._message = message
+
+    def __repr__(self):
+        return "{}".format(self._message)
+
+
+def tokenize(source):
+    """
+    Tokenizes the input TOML source into a stream of tokens.
+
+    Raises a LexerError when it fails recognize another token while not at the end of the source.
+    """
+
+    source = source.replace('\r\n', '\n')
+
+    next_row = 1
+    next_col = 1
+    next_index = 0
+
+    while next_index < len(source):
+
+        new_token = _next_token(source[next_index:])
+
+        if not new_token:
+            raise LexerError("failed to read the next token at ({}, {}): {}".format(
+                next_row, next_col, source[next_index:]))
+
+        # Set the col and row on the new token
+        new_token = Token(new_token.type, new_token.source_substring, next_col, next_row)
+
+        # Advance the index, row and col count
+        next_index += len(new_token.source_substring)
+        for c in new_token.source_substring:
+            if c == '\n':
+                next_row += 1
+                next_col = 1
+            else:
+                next_col += 1
+
+        yield new_token
 
