@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from lexer import _next_token
 from lexer import *
 
@@ -15,6 +17,7 @@ valid_tokens = {
             r'"I\'m a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF." "some other string" = 42',
             r'"I\'m a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF."'
         ),
+        ('"ʎǝʞ" key', '"ʎǝʞ"'),
     ),
     TOKEN_TYPE_MULTILINE_STRING: (
         ('"""\nRoses are red\nViolets are blue""" """other text"""', '"""\nRoses are red\nViolets are blue"""'),
@@ -27,6 +30,12 @@ valid_tokens = {
             "'''\nThe first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n''' '''some other\n\n\t string'''",
             "'''\nThe first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n'''"
         ),
+    ),
+    TOKEN_TYPE_DATE: (
+        ('1979-05-27 5345', '1979-05-27'),
+        ('1979-05-27T07:32:00Z something', '1979-05-27T07:32:00Z'),
+        ('1979-05-27T00:32:00-07:00 ommm', '1979-05-27T00:32:00-07:00'),
+        ('1979-05-27T00:32:00.999999-07:00 2346', '1979-05-27T00:32:00.999999-07:00'),
     ),
     TOKEN_TYPE_WHITESPACE: (
         (' \t\n \r  some_text', ' \t\n \r  '),
@@ -77,9 +86,16 @@ valid_tokens = {
     TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET: (
         (']] item=3', ']]'),
     ),
-    # TOKEN_TYPE_BARE_STRING: (
-    #     ('key another', 'key'),
-    # )
+    TOKEN_TYPE_BARE_STRING: (
+        ('key another', 'key'),
+        ('bare_key 2fews', 'bare_key'),
+        ('bare-key kfcw', 'bare-key'),
+    ),
+    TOKEN_TYPE_OPT_DOT: (
+        ('."another key"', '.'),
+        ('.subname', '.'),
+
+    )
 }
 
 # A mapping from a token type to a sequence of (source, matched_text) pairs that shouldn't result from consuming the
