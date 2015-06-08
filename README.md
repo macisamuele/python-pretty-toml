@@ -1,3 +1,6 @@
 # Consistent TOML for Python
 
-A TOML serializer/deserializer for Python with a consistent pretty printer that preserves comments and listed order of table mappings too!
+A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python that preserves formatting and comments during a deserialize/update/serialize job.
+
+## Usage ##
+*TODO*
