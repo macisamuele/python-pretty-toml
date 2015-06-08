@@ -3,6 +3,12 @@ from contoml.lexer import *
 
 # A mapping from token types to a sequence of pairs of (source_text, expected_matched_text)
 valid_tokens = {
+    TOKEN_TYPE_COMMENT: (
+        (
+            '# My very insightful comment about the state of the universe\n# And now for something completely different!',
+            '# My very insightful comment about the state of the universe',
+        ),
+    ),
     TOKEN_TYPE_STRING: (
         ('"a valid hug3 text" "some other string" = 42', '"a valid hug3 text"'),
         (
@@ -64,7 +70,13 @@ valid_tokens = {
     ),
     TOKEN_TYPE_OP_ASSIGNMENT: (
         ('== 42', '='),
-    )
+    ),
+    TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET: (
+        ('[[array.of.tables]]', '[['),
+    ),
+    TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET: (
+        (']] item=3', ']]'),
+    ),
 }
 
 # A mapping from a token type to a sequence of (source, matched_text) pairs that shouldn't result from consuming the
@@ -80,6 +92,9 @@ invalid_tokens = {
     TOKEN_TYPE_BOOLEAN: (
         ('True', 'True'),
         ('True', 'true'),
+    ),
+    TOKEN_TYPE_FLOAT: (
+        ('', ''),
     )
 }
 
@@ -91,7 +106,9 @@ def test_valid_tokenizing():
             assert token_data, "Failed to tokenize: {}\nExpected: {}\nOut of: {}\nGot nothing!".format(token_type, expected_match, source)
 
             recognized_type, matched_text = token_data
-            assert recognized_type == token_type
+            assert recognized_type == token_type, \
+                "Expected type: {}\nOut of: {}\nThat matched: {}\nOf type: {}".format(
+                    token_type, source, matched_text, recognized_type)
             assert matched_text == expected_match
 
 
