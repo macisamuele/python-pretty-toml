@@ -42,6 +42,10 @@ valid_tokens = {
         ('6.626e-34+234f', '6.626e-34'),
         ('9_224_617.445_991_228_313f1ewer 23f4h = nonesense', '9_224_617.445_991_228_313'),
         ('1e1_000 2346f,ef2!!', '1e1_000'),
+    ),
+    TOKEN_TYPE_BOOLEAN: (
+        ('false business = true', 'false'),
+        ('true true', 'true'),
     )
 }
 
@@ -55,6 +59,10 @@ invalid_tokens = {
     TOKEN_TYPE_STRING: (
         ('"""', '"""'),
     ),
+    TOKEN_TYPE_BOOLEAN: (
+        ('True', 'True'),
+        ('True', 'true'),
+    )
 }
 
 def test_valid_tokenizing():

@@ -10,6 +10,7 @@ TOKEN_TYPE_MULTILINE_LITERAL_STRING = '99-multiline_literal_string'
 TOKEN_TYPE_WHITESPACE = '99-whitespace'
 TOKEN_TYPE_INTEGER = '00-int'
 TOKEN_TYPE_FLOAT = '01-float'
+TOKEN_TYPE_BOOLEAN = '00-bool'
 
 # Pairs of TOKEN_TYPE and Token spec in RegExp.
 _LEXICAL_SPECS = (
@@ -20,6 +21,7 @@ _LEXICAL_SPECS = (
     (TOKEN_TYPE_WHITESPACE, re.compile('^(\s+)', re.DOTALL)),                       # Can span multiple lines
     (TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
     (TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))*(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
+    (TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
 )
 
 def consume_token(source):
