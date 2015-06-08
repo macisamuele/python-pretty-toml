@@ -1,5 +1,5 @@
-
-from contoml.lexer import *
+from lexer import _next_token
+from lexer import *
 
 # A mapping from token types to a sequence of pairs of (source_text, expected_matched_text)
 valid_tokens = {
@@ -102,19 +102,19 @@ def test_valid_tokenizing():
     for token_type in valid_tokens:
         for (source, expected_match) in valid_tokens[token_type]:
 
-            token_data = consume_token(source)
-            assert token_data, "Failed to tokenize: {}\nExpected: {}\nOut of: {}\nGot nothing!".format(token_type, expected_match, source)
+            token = _next_token(source)
+            assert token, "Failed to tokenize: {}\nExpected: {}\nOut of: {}\nGot nothing!".format(
+                token_type, expected_match, source)
 
-            recognized_type, matched_text = token_data
-            assert recognized_type == token_type, \
+            assert token.type == token_type, \
                 "Expected type: {}\nOut of: {}\nThat matched: {}\nOf type: {}".format(
-                    token_type, source, matched_text, recognized_type)
-            assert matched_text == expected_match
+                    token_type, source, token.source_substring, token.type)
+            assert token.source_substring == expected_match
 
 
 def test_invalid_tokenizing():
     for token_type in invalid_tokens:
         for source, expected_match in invalid_tokens[token_type]:
-            token_data = consume_token(source)
-            if token_data:
-                assert token_data[0] != token_type or token_data[1] != expected_match
+            token = _next_token(source)
+            if token:
+                assert not (token.type == token_type and token.source_substring == expected_match)

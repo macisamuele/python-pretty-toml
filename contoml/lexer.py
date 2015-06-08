@@ -1,4 +1,3 @@
-
 import re
 
 # Priority is encoded as the first two characters of each token type. The lower the sort order, the
@@ -42,24 +41,66 @@ _LEXICAL_SPECS = (
     (TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
 )
 
-def consume_token(source):
+
+class Token:
     """
-    Returns a (TOKEN_TYPE, matched_text) pair if could match a token at the beginning of the
-    given source text, or None if no token type could be matched.
+    A token/lexeme in a TOML source file.
+    """
+
+    def __init__(self, _type, source_substring, col=None, row=None):
+        self._source_substring = source_substring
+        self._type = _type
+        self._col = col
+        self._row = row
+
+    @property
+    def col(self):
+        """
+        Column number (1-indexed).
+        """
+        return self._col
+
+    @property
+    def row(self):
+        """
+        Row number (1-indexed).
+        """
+        return self._row
+
+    @property
+    def type(self):
+        """
+        One of of the TOKEN_TYPE_* constants.
+        """
+        return self._type
+
+    @property
+    def source_substring(self):
+        """
+        The substring of the initial source file containing this token.
+        """
+        return self._source_substring
+
+
+def _next_token(source):
+    """
+    Returns a single Token instance if could recognize one at the beginning of the
+    given source text, or None if no token type could be recognized.
     """
     matches = []
 
     for token_type, token_spec in _LEXICAL_SPECS:
         match = token_spec.search(source)
         if match:
-            matches.append((token_type, match.group(1)))
+            matches.append(Token(token_type, match.group(1)))
 
     if len(matches) == 1:
         return matches[0]
 
     elif len(matches) > 1:
         # Return the maximal-munch
-        maximal_munch_length = max(len(matched_text) for _, matched_text in matches)
-        maximal_munches = [match for match in matches if len(match[1]) == maximal_munch_length]
+        maximal_munch_length = max(len(token.source_substring) for token in matches)
+        maximal_munches = [token for token in matches if len(token.source_substring) == maximal_munch_length]
 
-        return sorted(maximal_munches, key=lambda x: x[0])[0]   # Return the first in sorting by priority
+        return sorted(maximal_munches, key=lambda x: token.type)[0]   # Return the first in sorting by priority
+
