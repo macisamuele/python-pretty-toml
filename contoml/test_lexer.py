@@ -46,6 +46,24 @@ valid_tokens = {
     TOKEN_TYPE_BOOLEAN: (
         ('false business = true', 'false'),
         ('true true', 'true'),
+    ),
+    TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET: (
+        ('[table_name]', '['),
+    ),
+    TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET: (
+        (']\nbusiness = awesome', ']'),
+    ),
+    TOKEN_TYPE_OP_CURLY_LEFT_BRACKET: (
+        ('{item_exists = no}', '{'),
+    ),
+    TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET: (
+        ('} moving on', '}'),
+    ),
+    TOKEN_TYPE_OP_COMMA: (
+        (',item2,item4', ','),
+    ),
+    TOKEN_TYPE_OP_ASSIGNMENT: (
+        ('== 42', '='),
     )
 }
 

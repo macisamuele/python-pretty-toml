@@ -11,6 +11,13 @@ TOKEN_TYPE_WHITESPACE = '99-whitespace'
 TOKEN_TYPE_INTEGER = '00-int'
 TOKEN_TYPE_FLOAT = '01-float'
 TOKEN_TYPE_BOOLEAN = '00-bool'
+TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET = '00-square_left_bracket'
+TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET = '00-square_right_bracket'
+TOKEN_TYPE_OP_CURLY_LEFT_BRACKET = '00-curly_left_bracket'
+TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET = '00-curly_right_bracket'
+TOKEN_TYPE_OP_ASSIGNMENT = '00-assign'
+TOKEN_TYPE_OP_COMMA = '00-comma'
+
 
 # Pairs of TOKEN_TYPE and Token spec in RegExp.
 _LEXICAL_SPECS = (
@@ -22,6 +29,12 @@ _LEXICAL_SPECS = (
     (TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
     (TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))*(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
     (TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
+    (TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
+    (TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),
+    (TOKEN_TYPE_OP_CURLY_LEFT_BRACKET, re.compile(r'^(\{)')),
+    (TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
+    (TOKEN_TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
+    (TOKEN_TYPE_OP_COMMA, re.compile(r'^(,)')),
 )
 
 def consume_token(source):
