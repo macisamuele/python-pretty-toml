@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from lexer import _next_token
-from lexer import *
+from .lexer import _next_token
+from .lexer import *
 
 # A mapping from token types to a sequence of pairs of (source_text, expected_matched_text)
 valid_tokens = {
