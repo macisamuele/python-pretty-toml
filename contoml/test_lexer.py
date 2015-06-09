@@ -38,7 +38,7 @@ valid_tokens = {
         ('1979-05-27T00:32:00.999999-07:00 2346', '1979-05-27T00:32:00.999999-07:00'),
     ),
     TOKEN_TYPE_WHITESPACE: (
-        (' \t\n \r  some_text', ' \t\n \r  '),
+        (' \t\n \r  some_text', ' '),
     ),
     TOKEN_TYPE_INTEGER: (
         ('+99 "number"', "+99"),
@@ -94,7 +94,9 @@ valid_tokens = {
     TOKEN_TYPE_OPT_DOT: (
         ('."another key"', '.'),
         ('.subname', '.'),
-
+    ),
+    TOKEN_TYPE_NEWLINE: (
+        ('\n\r \n', '\n'),
     )
 }
 
@@ -142,7 +144,7 @@ def test_invalid_tokenizing():
 def test_tokenizing_sample_file():
     source = open('sample.toml').read()
     # Number of valid tokens was manually verified
-    assert len(list(tokenize(source))) == 313
+    assert len(list(tokenize(source))) == 386
 
 
 def test_token_type_order():

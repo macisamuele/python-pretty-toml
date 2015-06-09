@@ -17,6 +17,7 @@ TOKEN_KIND_BOOLEAN = 'token-kind-bool'
 TOKEN_KIND_OPERATOR = 'token-kind-operator'
 TOKEN_KIND_WHITESPACE = 'token-kind-whitespace'
 TOKEN_KIND_DATE = 'token-kind-date'
+TOKEN_KIND_COMMENT = 'token-kind-comment'
 
 class TokenType:
     """
@@ -65,8 +66,9 @@ TOKEN_TYPE_STRING = TokenType(90, TOKEN_KIND_STRING)
 TOKEN_TYPE_MULTILINE_STRING = TokenType(90, TOKEN_KIND_STRING)
 TOKEN_TYPE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
 TOKEN_TYPE_MULTILINE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
-TOKEN_TYPE_WHITESPACE = TokenType(90, TOKEN_KIND_WHITESPACE)
-TOKEN_TYPE_COMMENT = TokenType(95, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_NEWLINE = TokenType(91, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_WHITESPACE = TokenType(93, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_COMMENT = TokenType(95, TOKEN_KIND_COMMENT)
 
 
 TokenSpec = namedtuple('TokenSpec', ('type', 're'))
@@ -82,7 +84,7 @@ _LEXICAL_SPECS = (
     TokenSpec(TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
     TokenSpec(TOKEN_TYPE_DATE, re.compile(
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
-    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile('^(\s+)', re.DOTALL)),                       # Can span multiple lines
+    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile('^(\s)', re.DOTALL)),                       # Can span multiple lines
     TokenSpec(TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
     TokenSpec(TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
     TokenSpec(TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
@@ -95,6 +97,7 @@ _LEXICAL_SPECS = (
     TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
     TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
     TokenSpec(TOKEN_TYPE_OPT_DOT, re.compile(r'^(\.)')),
+    TokenSpec(TOKEN_TYPE_NEWLINE, re.compile('^(\n|\r\n|\r)')),
 )
 
 
