@@ -137,3 +137,9 @@ def test_invalid_tokenizing():
             token = _next_token(source)
             if token:
                 assert not (token.type == token_type and token.source_substring == expected_match)
+
+
+def test_tokenizing_sample_file():
+    source = open('sample.toml').read()
+    # Number of valid tokens was manually verified
+    assert len(list(tokenize(source))) == 147
