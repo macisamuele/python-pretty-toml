@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .lexer import _next_token
+from .lexer import _munch_a_token
 from .lexer import *
 
 # A mapping from token types to a sequence of pairs of (source_text, expected_matched_text)
@@ -121,7 +121,7 @@ def test_valid_tokenizing():
     for token_type in valid_tokens:
         for (source, expected_match) in valid_tokens[token_type]:
 
-            token = _next_token(source)
+            token = _munch_a_token(source)
             assert token, "Failed to tokenize: {}\nExpected: {}\nOut of: {}\nGot nothing!".format(
                 token_type, expected_match, source)
 
@@ -134,7 +134,7 @@ def test_valid_tokenizing():
 def test_invalid_tokenizing():
     for token_type in invalid_tokens:
         for source, expected_match in invalid_tokens[token_type]:
-            token = _next_token(source)
+            token = _munch_a_token(source)
             if token:
                 assert not (token.type == token_type and token.source_substring == expected_match)
 
@@ -143,3 +143,12 @@ def test_tokenizing_sample_file():
     source = open('sample.toml').read()
     # Number of valid tokens was manually verified
     assert len(list(tokenize(source))) == 209
+
+
+def test_token_type_order():
+    type_a = TokenType(5, TOKEN_KIND_STRING)
+    type_b = TokenType(0, TOKEN_KIND_INTEGER)
+    type_c = TokenType(3, TOKEN_TYPE_COMMENT)
+
+    assert type_b < type_c < type_a
+    assert type_a > type_c > type_b

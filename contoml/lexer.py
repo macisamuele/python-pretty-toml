@@ -1,29 +1,64 @@
 from collections import namedtuple
 import re
 
+# A TokenKind is the abstract type of token, represented by one of the following enumerated values.
+TOKEN_KIND_STRING = 'token-kind-string'
+TOKEN_KIND_INTEGER = 'token-kind-integer'
+TOKEN_KIND_FLOAT = 'token-kind-float'
+TOKEN_KIND_BOOLEAN = 'token-kind-bool'
+TOKEN_KIND_OPERATOR = 'token-kind-operator'
+TOKEN_KIND_WHITESPACE = 'token-kind-whitespace'
+TOKEN_KIND_DATE = 'token-kind-date'
 
-# Priority is encoded as the first two characters of each token type. The lower the sort order, the
-# higher the priority.
-TOKEN_TYPE_BOOLEAN = '00-bool'
-TOKEN_TYPE_INTEGER = '00-int'
-TOKEN_TYPE_OP_COMMA = '00-comma'
-TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET = '00-square_left_bracket'
-TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET = '00-square_right_bracket'
-TOKEN_TYPE_OP_CURLY_LEFT_BRACKET = '00-curly_left_bracket'
-TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET = '00-curly_right_bracket'
-TOKEN_TYPE_OP_ASSIGNMENT = '00-assign'
-TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET = '00-double_square_left_bracket'
-TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET = '00-double_square_right_bracket'
-TOKEN_TYPE_FLOAT = '01-float'
-TOKEN_TYPE_DATE = '40-date'
-TOKEN_TYPE_OPT_DOT = '40-op_dot'
-TOKEN_TYPE_BARE_STRING = '50-bare_string'
-TOKEN_TYPE_STRING = '90-string'
-TOKEN_TYPE_MULTILINE_STRING = '90-multiline_string'
-TOKEN_TYPE_LITERAL_STRING = '90-literal_string'
-TOKEN_TYPE_MULTILINE_LITERAL_STRING = '90-multiline_literal_string'
-TOKEN_TYPE_WHITESPACE = '90-whitespace'
-TOKEN_TYPE_COMMENT = '95-comment'
+class TokenType:
+    """
+    A TokenType is a concrete type of a source token along with a defined priority and a higher-order kind.
+
+    The priority will be used in determining the tokenization behaviour of the lexer in the following manner:
+    whenever more than one token is recognizable as the next possible token and they are all of equal source
+    length, this priority is going to be used to break the tie by favoring the token type of the lowest priority
+    value. A TokenType instance is naturally ordered by its priority.
+    """
+
+    def __init__(self, priority, kind):
+        self._priority = priority
+        self._kind = kind
+
+    @property
+    def kind(self):
+        return self._kind
+
+    @property
+    def priority(self):
+        return self._priority
+
+    def __repr__(self):
+        return "{}-{}".format(self.priority, self._kind)
+
+    def __lt__(self, other):
+        return isinstance(other, TokenType) and self._priority < other.priority
+
+# Possible types of tokens
+TOKEN_TYPE_BOOLEAN = TokenType(0, TOKEN_KIND_BOOLEAN)
+TOKEN_TYPE_INTEGER = TokenType(0, TOKEN_KIND_INTEGER)
+TOKEN_TYPE_OP_COMMA = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_CURLY_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_ASSIGNMENT = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_FLOAT = TokenType(1, TOKEN_KIND_FLOAT)
+TOKEN_TYPE_DATE = TokenType(40, TOKEN_KIND_DATE)
+TOKEN_TYPE_OPT_DOT = TokenType(40, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_BARE_STRING = TokenType(50, TOKEN_KIND_STRING)
+TOKEN_TYPE_STRING = TokenType(90, TOKEN_KIND_STRING)
+TOKEN_TYPE_MULTILINE_STRING = TokenType(90, TOKEN_KIND_STRING)
+TOKEN_TYPE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
+TOKEN_TYPE_MULTILINE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
+TOKEN_TYPE_WHITESPACE = TokenType(90, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_COMMENT = TokenType(95, TOKEN_KIND_WHITESPACE)
 
 
 TokenSpec = namedtuple('TokenSpec', ('type', 're'))
@@ -94,31 +129,39 @@ class Token:
         """
         return self._source_substring
 
+    def __lt__(self, other):
+        return isinstance(other, Token) and self.type < other.type
+
     def __repr__(self):
         return "{}: {}".format(self.type, self.source_substring)
 
 
-def _next_token(source):
-    """
-    Returns a single Token instance if could recognize one at the beginning of the
-    given source text, or None if no token type could be recognized.
-    """
+def _next_token_candidates(source):
     matches = []
-
     for token_spec in _LEXICAL_SPECS:
         match = token_spec.re.search(source)
         if match:
             matches.append(Token(token_spec.type, match.group(1)))
+    return matches
 
-    if len(matches) == 1:
-        return matches[0]
+def _choose_from_next_token_candidates(candidates):
 
-    elif len(matches) > 1:
-        # Return the maximal-munch
-        maximal_munch_length = max(len(token.source_substring) for token in matches)
-        maximal_munches = [token for token in matches if len(token.source_substring) == maximal_munch_length]
+    if len(candidates) == 1:
+        return candidates[0]
+    elif len(candidates) > 1:
+        # Return the maximal-munch with ties broken by natural order of token type.
+        maximal_munch_length = max(len(token.source_substring) for token in candidates)
+        maximal_munches = [token for token in candidates if len(token.source_substring) == maximal_munch_length]
+        return sorted(maximal_munches)[0]   # Return the first in sorting by priority
 
-        return sorted(maximal_munches, key=lambda x: x.type)[0]   # Return the first in sorting by priority
+
+def _munch_a_token(source):
+    """
+    Munches a single Token instance if it could recognize one at the beginning of the
+    given source text, or None if no token type could be recognized.
+    """
+    candidates = _next_token_candidates(source)
+    return _choose_from_next_token_candidates(candidates)
 
 
 class LexerError:
@@ -146,7 +189,7 @@ def tokenize(source):
 
     while next_index < len(source):
 
-        new_token = _next_token(source[next_index:])
+        new_token = _munch_a_token(source[next_index:])
 
         if not new_token:
             raise LexerError("failed to read the next token at ({}, {}): {}".format(
