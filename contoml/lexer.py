@@ -8,6 +8,8 @@ from collections import namedtuple
 import re
 
 # A TokenKind is the abstract type of token, represented by one of the following enumerated values.
+from contoml import TOMLError
+
 TOKEN_KIND_STRING = 'token-kind-string'
 TOKEN_KIND_INTEGER = 'token-kind-integer'
 TOKEN_KIND_FLOAT = 'token-kind-float'
@@ -172,7 +174,7 @@ def _munch_a_token(source):
     return _choose_from_next_token_candidates(candidates)
 
 
-class LexerError:
+class LexerError(TOMLError):
 
     def __init__(self, message):
         self._message = message
