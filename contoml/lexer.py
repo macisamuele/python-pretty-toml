@@ -1,3 +1,9 @@
+
+"""
+A regular expression based Lexer for TOML.
+"""
+
+
 from collections import namedtuple
 import re
 
@@ -93,6 +99,8 @@ _LEXICAL_SPECS = (
 class Token:
     """
     A token/lexeme in a TOML source file.
+
+    A Token instance is naturally ordered by its type.
     """
 
     def __init__(self, _type, source_substring, col=None, row=None):
