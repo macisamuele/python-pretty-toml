@@ -64,3 +64,14 @@ trimmed in raw strings.
    All other whitespace
    is preserved.
 '''
+
+[[fruit]]
+  name = "apple"
+
+  [[fruit.variety]]
+    name = "red delicious"
+
+
+points = [ { x = 1, y = 2, z = 3 },
+           { x = 7, y = 8, z = 9 },
+           { x = 2, y = 4, z = 8 } ]

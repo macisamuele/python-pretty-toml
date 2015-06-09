@@ -142,7 +142,7 @@ def test_invalid_tokenizing():
 def test_tokenizing_sample_file():
     source = open('sample.toml').read()
     # Number of valid tokens was manually verified
-    assert len(list(tokenize(source))) == 209
+    assert len(list(tokenize(source))) == 313
 
 
 def test_token_type_order():
