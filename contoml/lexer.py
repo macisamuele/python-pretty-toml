@@ -85,7 +85,7 @@ _LEXICAL_SPECS = (
     TokenSpec(TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
     TokenSpec(TOKEN_TYPE_DATE, re.compile(
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
-    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile('^(\s)', re.DOTALL)),                       # Can span multiple lines
+    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile(r'^( |\t)', re.DOTALL)),
     TokenSpec(TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
     TokenSpec(TOKEN_TYPE_FLOAT,
               re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(\.[0-9_]+)?([eE](\+|-)?[0-9_]+)?)')),
@@ -99,7 +99,7 @@ _LEXICAL_SPECS = (
     TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
     TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
     TokenSpec(TOKEN_TYPE_OPT_DOT, re.compile(r'^(\.)')),
-    TokenSpec(TOKEN_TYPE_NEWLINE, re.compile('^(\n|\r\n|\r)')),
+    TokenSpec(TOKEN_TYPE_NEWLINE, re.compile('^(\n|\r\n)')),
 )
 
 
