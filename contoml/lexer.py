@@ -1,4 +1,6 @@
+from collections import namedtuple
 import re
+
 
 # Priority is encoded as the first two characters of each token type. The lower the sort order, the
 # higher the priority.
@@ -24,29 +26,32 @@ TOKEN_TYPE_WHITESPACE = '90-whitespace'
 TOKEN_TYPE_COMMENT = '95-comment'
 
 
-# Pairs of TOKEN_TYPE and Token spec in RegExp.
+TokenSpec = namedtuple('TokenSpec', ('type', 're'))
+
+
+# Specs of all the valid tokens
 _LEXICAL_SPECS = (
-    (TOKEN_TYPE_COMMENT, re.compile(r'^(#.*)\n')),
-    (TOKEN_TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|)")')),                       # Single line only
-    (TOKEN_TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
-    (TOKEN_TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
-    (TOKEN_TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),
-    (TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
-    (TOKEN_TYPE_DATE, re.compile(
+    TokenSpec(TOKEN_TYPE_COMMENT, re.compile(r'^(#.*)\n')),
+    TokenSpec(TOKEN_TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|)")')),                       # Single line only
+    TokenSpec(TOKEN_TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
+    TokenSpec(TOKEN_TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
+    TokenSpec(TOKEN_TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),
+    TokenSpec(TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
+    TokenSpec(TOKEN_TYPE_DATE, re.compile(
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
-    (TOKEN_TYPE_WHITESPACE, re.compile('^(\s+)', re.DOTALL)),                       # Can span multiple lines
-    (TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
-    (TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
-    (TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
-    (TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
-    (TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),
-    (TOKEN_TYPE_OP_CURLY_LEFT_BRACKET, re.compile(r'^(\{)')),
-    (TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
-    (TOKEN_TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
-    (TOKEN_TYPE_OP_COMMA, re.compile(r'^(,)')),
-    (TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
-    (TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
-    (TOKEN_TYPE_OPT_DOT, re.compile(r'^(\.)')),
+    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile('^(\s+)', re.DOTALL)),                       # Can span multiple lines
+    TokenSpec(TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
+    TokenSpec(TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
+    TokenSpec(TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
+    TokenSpec(TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
+    TokenSpec(TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),
+    TokenSpec(TOKEN_TYPE_OP_CURLY_LEFT_BRACKET, re.compile(r'^(\{)')),
+    TokenSpec(TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
+    TokenSpec(TOKEN_TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
+    TokenSpec(TOKEN_TYPE_OP_COMMA, re.compile(r'^(,)')),
+    TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
+    TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
+    TokenSpec(TOKEN_TYPE_OPT_DOT, re.compile(r'^(\.)')),
 )
 
 
@@ -100,10 +105,10 @@ def _next_token(source):
     """
     matches = []
 
-    for token_type, token_spec in _LEXICAL_SPECS:
-        match = token_spec.search(source)
+    for token_spec in _LEXICAL_SPECS:
+        match = token_spec.re.search(source)
         if match:
-            matches.append(Token(token_type, match.group(1)))
+            matches.append(Token(token_spec.type, match.group(1)))
 
     if len(matches) == 1:
         return matches[0]
@@ -132,6 +137,7 @@ def tokenize(source):
     Raises a LexerError when it fails recognize another token while not at the end of the source.
     """
 
+    # Newlines are going to be normalized to UNIX newlines.
     source = source.replace('\r\n', '\n')
 
     next_row = 1
