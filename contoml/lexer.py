@@ -29,9 +29,10 @@ class TokenType:
     value. A TokenType instance is naturally ordered by its priority.
     """
 
-    def __init__(self, priority, kind):
+    def __init__(self, name, priority, kind):
         self._priority = priority
         self._kind = kind
+        self._name = name
 
     @property
     def kind(self):
@@ -42,33 +43,33 @@ class TokenType:
         return self._priority
 
     def __repr__(self):
-        return "{}-{}".format(self.priority, self._kind)
+        return "{}-{}".format(self.priority, self._name)
 
     def __lt__(self, other):
         return isinstance(other, TokenType) and self._priority < other.priority
 
 # Possible types of tokens
-TOKEN_TYPE_BOOLEAN = TokenType(0, TOKEN_KIND_BOOLEAN)
-TOKEN_TYPE_INTEGER = TokenType(0, TOKEN_KIND_INTEGER)
-TOKEN_TYPE_OP_COMMA = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_OP_CURLY_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_OP_ASSIGNMENT = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET = TokenType(0, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_FLOAT = TokenType(1, TOKEN_KIND_FLOAT)
-TOKEN_TYPE_DATE = TokenType(40, TOKEN_KIND_DATE)
-TOKEN_TYPE_OPT_DOT = TokenType(40, TOKEN_KIND_OPERATOR)
-TOKEN_TYPE_BARE_STRING = TokenType(50, TOKEN_KIND_STRING)
-TOKEN_TYPE_STRING = TokenType(90, TOKEN_KIND_STRING)
-TOKEN_TYPE_MULTILINE_STRING = TokenType(90, TOKEN_KIND_STRING)
-TOKEN_TYPE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
-TOKEN_TYPE_MULTILINE_LITERAL_STRING = TokenType(90, TOKEN_KIND_STRING)
-TOKEN_TYPE_NEWLINE = TokenType(91, TOKEN_KIND_WHITESPACE)
-TOKEN_TYPE_WHITESPACE = TokenType(93, TOKEN_KIND_WHITESPACE)
-TOKEN_TYPE_COMMENT = TokenType(95, TOKEN_KIND_COMMENT)
+TOKEN_TYPE_BOOLEAN = TokenType('boolean', 0, TOKEN_KIND_BOOLEAN)
+TOKEN_TYPE_INTEGER = TokenType('integer', 0, TOKEN_KIND_INTEGER)
+TOKEN_TYPE_OP_COMMA = TokenType('comma', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET = TokenType('square_left_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET = TokenType('square_right_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_CURLY_LEFT_BRACKET = TokenType('curly_left_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET = TokenType('curly_right_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_OP_ASSIGNMENT = TokenType('assignment', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET = TokenType('double_square_left_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET = TokenType('double_square_right_bracket', 0, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_FLOAT = TokenType('float', 1, TOKEN_KIND_FLOAT)
+TOKEN_TYPE_DATE = TokenType('date', 40, TOKEN_KIND_DATE)
+TOKEN_TYPE_OPT_DOT = TokenType('dot', 40, TOKEN_KIND_OPERATOR)
+TOKEN_TYPE_BARE_STRING = TokenType('bare_string', 50, TOKEN_KIND_STRING)
+TOKEN_TYPE_STRING = TokenType('string', 90, TOKEN_KIND_STRING)
+TOKEN_TYPE_MULTILINE_STRING = TokenType('multiline_string', 90, TOKEN_KIND_STRING)
+TOKEN_TYPE_LITERAL_STRING = TokenType('literal_string', 90, TOKEN_KIND_STRING)
+TOKEN_TYPE_MULTILINE_LITERAL_STRING = TokenType('multiline_literal_string', 90, TOKEN_KIND_STRING)
+TOKEN_TYPE_NEWLINE = TokenType('newline', 91, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_WHITESPACE = TokenType('whitespace', 93, TOKEN_KIND_WHITESPACE)
+TOKEN_TYPE_COMMENT = TokenType('comment', 95, TOKEN_KIND_COMMENT)
 
 
 TokenSpec = namedtuple('TokenSpec', ('type', 're'))
@@ -86,7 +87,7 @@ _LEXICAL_SPECS = (
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
     TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile('^(\s)', re.DOTALL)),                       # Can span multiple lines
     TokenSpec(TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
-    TokenSpec(TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
+    TokenSpec(TOKEN_TYPE_FLOAT, re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(\.[0-9_]+)?([eE](\+|-)?[1-9_]+)?)')),
     TokenSpec(TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
     TokenSpec(TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
     TokenSpec(TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),

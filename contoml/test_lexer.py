@@ -148,9 +148,9 @@ def test_tokenizing_sample_file():
 
 
 def test_token_type_order():
-    type_a = TokenType(5, TOKEN_KIND_STRING)
-    type_b = TokenType(0, TOKEN_KIND_INTEGER)
-    type_c = TokenType(3, TOKEN_TYPE_COMMENT)
+    type_a = TokenType('a', 5, TOKEN_KIND_STRING)
+    type_b = TokenType('b', 0, TOKEN_KIND_INTEGER)
+    type_c = TokenType('c', 3, TOKEN_TYPE_COMMENT)
 
     assert type_b < type_c < type_a
     assert type_a > type_c > type_b
