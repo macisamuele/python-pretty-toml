@@ -4,37 +4,36 @@ A regular expression based Lexer/tokenizer for TOML.
 """
 
 from collections import namedtuple
-from tokens import *
 import re
-from contoml import TOMLError
+from contoml import TOMLError, tokens
 
 TokenSpec = namedtuple('TokenSpec', ('type', 're'))
 
 # Specs of all the valid tokens
 _LEXICAL_SPECS = (
-    TokenSpec(TOKEN_TYPE_COMMENT, re.compile(r'^(#.*)\n')),
-    TokenSpec(TOKEN_TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|)")')),                       # Single line only
-    TokenSpec(TOKEN_TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
-    TokenSpec(TOKEN_TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
-    TokenSpec(TOKEN_TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),
-    TokenSpec(TOKEN_TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
-    TokenSpec(TOKEN_TYPE_DATE, re.compile(
+    TokenSpec(tokens.TYPE_COMMENT, re.compile(r'^(#.*)\n')),
+    TokenSpec(tokens.TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|)")')),                       # Single line only
+    TokenSpec(tokens.TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
+    TokenSpec(tokens.TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
+    TokenSpec(tokens.TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),
+    TokenSpec(tokens.TYPE_BARE_STRING, re.compile(r'^([A-Za-z0-9_-]+)')),
+    TokenSpec(tokens.TYPE_DATE, re.compile(
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
-    TokenSpec(TOKEN_TYPE_WHITESPACE, re.compile(r'^( |\t)', re.DOTALL)),
-    TokenSpec(TOKEN_TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
-    TokenSpec(TOKEN_TYPE_FLOAT,
+    TokenSpec(tokens.TYPE_WHITESPACE, re.compile(r'^( |\t)', re.DOTALL)),
+    TokenSpec(tokens.TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
+    TokenSpec(tokens.TYPE_FLOAT,
               re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(\.[0-9_]+)?([eE](\+|-)?[0-9_]+)?)')),
-    TokenSpec(TOKEN_TYPE_BOOLEAN, re.compile(r'^(true|false)')),
-    TokenSpec(TOKEN_TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
-    TokenSpec(TOKEN_TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),
-    TokenSpec(TOKEN_TYPE_OP_CURLY_LEFT_BRACKET, re.compile(r'^(\{)')),
-    TokenSpec(TOKEN_TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
-    TokenSpec(TOKEN_TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
-    TokenSpec(TOKEN_TYPE_OP_COMMA, re.compile(r'^(,)')),
-    TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
-    TokenSpec(TOKEN_TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
-    TokenSpec(TOKEN_TYPE_OPT_DOT, re.compile(r'^(\.)')),
-    TokenSpec(TOKEN_TYPE_NEWLINE, re.compile('^(\n|\r\n)')),
+    TokenSpec(tokens.TYPE_BOOLEAN, re.compile(r'^(true|false)')),
+    TokenSpec(tokens.TYPE_OP_SQUARE_LEFT_BRACKET, re.compile(r'^(\[)')),
+    TokenSpec(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET, re.compile(r'^(\])')),
+    TokenSpec(tokens.TYPE_OP_CURLY_LEFT_BRACKET, re.compile(r'^(\{)')),
+    TokenSpec(tokens.TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
+    TokenSpec(tokens.TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
+    TokenSpec(tokens.TYPE_OP_COMMA, re.compile(r'^(,)')),
+    TokenSpec(tokens.TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
+    TokenSpec(tokens.TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
+    TokenSpec(tokens.TYPE_OPT_DOT, re.compile(r'^(\.)')),
+    TokenSpec(tokens.TYPE_NEWLINE, re.compile('^(\n|\r\n)')),
 )
 
 def _next_token_candidates(source):
@@ -42,7 +41,7 @@ def _next_token_candidates(source):
     for token_spec in _LEXICAL_SPECS:
         match = token_spec.re.search(source)
         if match:
-            matches.append(Token(token_spec.type, match.group(1)))
+            matches.append(tokens.Token(token_spec.type, match.group(1)))
     return matches
 
 def _choose_from_next_token_candidates(candidates):
@@ -97,7 +96,7 @@ def tokenize(source):
                 next_row, next_col, source[next_index:]))
 
         # Set the col and row on the new token
-        new_token = Token(new_token.type, new_token.source_substring, next_col, next_row)
+        new_token = tokens.Token(new_token.type, new_token.source_substring, next_col, next_row)
 
         # Advance the index, row and col count
         next_index += len(new_token.source_substring)
