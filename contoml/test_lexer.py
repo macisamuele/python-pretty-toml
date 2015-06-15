@@ -80,10 +80,10 @@ valid_tokens = {
     tokens.TYPE_OP_ASSIGNMENT: (
         ('== 42', '='),
     ),
-    tokens.TYPE_DOUBLE_SQUARE_LEFT_BRACKET: (
+    tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET: (
         ('[[array.of.tables]]', '[['),
     ),
-    tokens.TYPE_DOUBLE_SQUARE_RIGHT_BRACKET: (
+    tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET: (
         (']] item=3', ']]'),
     ),
     tokens.TYPE_BARE_STRING: (

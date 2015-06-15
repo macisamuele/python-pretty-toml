@@ -30,8 +30,8 @@ _LEXICAL_SPECS = (
     TokenSpec(tokens.TYPE_OP_CURLY_RIGHT_BRACKET, re.compile(r'^(\})')),
     TokenSpec(tokens.TYPE_OP_ASSIGNMENT, re.compile(r'^(=)')),
     TokenSpec(tokens.TYPE_OP_COMMA, re.compile(r'^(,)')),
-    TokenSpec(tokens.TYPE_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
-    TokenSpec(tokens.TYPE_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
+    TokenSpec(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET, re.compile(r'^(\[\[)')),
+    TokenSpec(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, re.compile(r'^(\]\])')),
     TokenSpec(tokens.TYPE_OPT_DOT, re.compile(r'^(\.)')),
     TokenSpec(tokens.TYPE_NEWLINE, re.compile('^(\n|\r\n)')),
 )
