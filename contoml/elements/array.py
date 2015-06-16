@@ -7,6 +7,10 @@ from contoml.elements.metadata import PunctuationElement
 class ArrayElement(common.ContainerElement):
     """
     A sequence-like container element containing other atomic elements or other containers.
+
+    Implements list-like interface.
+
+    Assumes input sub_elements are correct for an array element.
     """
 
     def __init__(self, sub_elements):
