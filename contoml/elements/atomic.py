@@ -1,20 +1,23 @@
 
 from contoml import toml2py, py2toml
-from contoml.elements import common
+from contoml.elements import common, InvalidElementError
 from contoml.util import is_dict_like, is_sequence_like
 
 
 class AtomicElement(common.TokenElement):
     """
     An element containing a sequence of tokens representing a single atomic value that can be updated in place.
+
+    Raises:
+        InvalidElementError: when passed an invalid sequence of tokens.
     """
 
     def __init__(self, _tokens):
         common.TokenElement.__init__(self, _tokens, common.TYPE_ATOMIC)
 
     def _validate_tokens(self, _tokens):
-        # Must  contain only one non-metadata token
-        assert len([token for token in _tokens if not token.type.is_metadata]) == 1
+        if len([token for token in _tokens if not token.type.is_metadata]) != 1:
+            raise InvalidElementError('Tokens making up an AtomicElement must contain only one non-metadata token')
 
     def serialized(self):
         return ''.join(token.source_substring for token in self.tokens)
