@@ -1,16 +1,15 @@
 
-from .common import *
 from contoml import tokens
-from contoml.elements import InvalidElementError
+from contoml.elements import InvalidElementError, common
 
 
-class WhitespaceElement(TokenElement):
+class WhitespaceElement(common.TokenElement):
     """
     An element that contains tokens of whitespace
     """
 
     def __init__(self, _tokens):
-        TokenElement.__init__(self, _tokens, TYPE_METADATA)
+        common.TokenElement.__init__(self, _tokens, common.TYPE_METADATA)
     
     def _validate_tokens(self, _tokens):
         for token in _tokens:
@@ -18,7 +17,7 @@ class WhitespaceElement(TokenElement):
                 raise InvalidElementError('Tokens making up a WhitespaceElement must all be whitespace')
 
 
-class NewlineElement(TokenElement):
+class NewlineElement(common.TokenElement):
     """
     An element containing newline tokens
 
@@ -27,7 +26,7 @@ class NewlineElement(TokenElement):
     """
 
     def __init__(self, _tokens):
-        TokenElement.__init__(self, _tokens, TYPE_METADATA)
+        common.TokenElement.__init__(self, _tokens, common.TYPE_METADATA)
 
     def _validate_tokens(self, _tokens):
         for token in _tokens:
@@ -35,7 +34,7 @@ class NewlineElement(TokenElement):
                 raise InvalidElementError('Tokens making a NewlineElement must all be newlines')
 
 
-class CommentElement(TokenElement):
+class CommentElement(common.TokenElement):
     """
     An element containing a single comment token followed by a newline token
 
@@ -44,14 +43,14 @@ class CommentElement(TokenElement):
     """
 
     def __init__(self, _tokens):
-        TokenElement.__init__(self, _tokens, TYPE_METADATA)
+        common.TokenElement.__init__(self, _tokens, common.TYPE_METADATA)
 
     def _validate_tokens(self, _tokens):
         if len(_tokens) != 2 or _tokens[0].type != tokens.TYPE_COMMENT or _tokens[1].type != tokens.TYPE_NEWLINE:
             raise InvalidElementError('CommentElement needs exactly one comment token followed by a newline token')
 
 
-class PunctuationElement(TokenElement):
+class PunctuationElement(common.TokenElement):
     """
     An element containing a single punctuation token.
 
@@ -60,7 +59,7 @@ class PunctuationElement(TokenElement):
     """
 
     def __init__(self, _tokens):
-        TokenElement.__init__(self, _tokens, TYPE_METADATA)
+        common.TokenElement.__init__(self, _tokens, common.TYPE_METADATA)
 
     @property
     def token(self):

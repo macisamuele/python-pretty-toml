@@ -1,10 +1,8 @@
-from contoml import tokens
-from contoml.elements import common, factory
+from contoml.elements import common, factory, containertraversalops
 from contoml.elements.factory import create_element
-from contoml.elements.metadata import PunctuationElement, WhitespaceElement
 
 
-class ArrayElement(common.ContainerElement):
+class ArrayElement(containertraversalops.ContainerTraversalOps):
     """
     A sequence-like container element containing other atomic elements or other containers.
 
@@ -26,13 +24,9 @@ class ArrayElement(common.ContainerElement):
         return self._enumerate_non_metadata_sub_elements()[i][1].value
 
     def __setitem__(self, i, value):
-        entry_elements = [
-            factory.create_operator_element(','),
-            factory.create_whitespace_element(),
-            create_element(value),
-        ]
-        begin, end = self._entry(i)
-        self._sub_elements = self._sub_elements[:begin] + entry_elements + self._sub_elements[end:]
+        value_i, _ = self._enumerate_non_metadata_sub_elements()[i]
+        self._sub_elements = self.sub_elements[:value_i] + \
+                             [factory.create_element(value)] + self.sub_elements[value_i+1:]
 
     @property
     def value(self):
@@ -46,50 +40,32 @@ class ArrayElement(common.ContainerElement):
                 for index, element in enumerate(self.sub_elements)
                 if element.type != common.TYPE_METADATA]
 
-    def _entry(self, i):
-        """
-        Returns the range of indices comprising the ith entry and its punctuation.
-
-        Raises IndexError if no entry exists.
-        """
-        index, _ = self._enumerate_non_metadata_sub_elements()[i]
-
-        # Begins at the previous index of comma or lowest index of whitespace before the [ operator
-        begin = next(element_i
-                        for element_i, element in reversed(tuple(enumerate(self.sub_elements)))
-                        if element_i < index and isinstance(element, PunctuationElement) and
-                        element.token.type == tokens.TYPE_OP_COMMA)
-
-        if begin is None:
-            bracket_i = next(element_i for element_i, element in enumerate(self.sub_elements)
-                             if isinstance(element, PunctuationElement) and
-                             element.token.type == tokens.TYPE_OP_SQUARE_LEFT_BRACKET)
-            begin = next(element_i for element_i, element in enumerate(self.sub_elements)
-                         if element_i > bracket_i and isinstance(element, WhitespaceElement))
-
-        begin = index if begin is None else begin
-
-        # Ends at the next comma or closing bracket
-        end = next(element_i for element_i, element in enumerate(self.sub_elements)
-                   if element_i > index and isinstance(element, PunctuationElement) and
-                   element.token.type in (tokens.TYPE_OP_COMMA, tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
-
-        return begin, end
-
     def append(self, v):
-        new_entry = [
-            factory.create_operator_element(','),
-            factory.create_whitespace_element(),
-            create_element(v),
-        ]
+        new_entry = [create_element(v)]
 
-        last_bracket_index = next(element_i for element_i, element in reversed(tuple(enumerate(self.sub_elements)))
-                                  if isinstance(element, PunctuationElement) and
-                                  element.token.type == tokens.TYPE_OP_SQUARE_RIGHT_BRACKET)
+        if self:    # If not empty, we need a comma and whitespace prefix!
+            new_entry = [
+                factory.create_operator_element(','),
+                factory.create_whitespace_element(),
+            ] + new_entry
+
+        last_bracket_index = self._find_closing_square_bracket()
 
         self._sub_elements = self._sub_elements[:last_bracket_index] + new_entry + \
                              self._sub_elements[last_bracket_index:]
 
     def __delitem__(self, i):
-        begin, end = self._entry(i)
+        value_i, value = self._enumerate_non_metadata_sub_elements()[i]
+
+        begin, end = value_i, value_i+1
+
+        preceding_comma_i = self._find_preceding_comma(value_i)
+        if preceding_comma_i >= 0:
+            begin = preceding_comma_i
+        following_comma_i = self._find_following_comma(value_i)
+        if following_comma_i >= 0:
+            end = following_comma_i
+        else:
+            end = self._find_closing_square_bracket()
+
         self._sub_elements = self.sub_elements[:begin] + self._sub_elements[end:]

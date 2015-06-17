@@ -3,6 +3,7 @@
 A converter of python values to TOML Token instances.
 """
 from contoml import tokens
+import re
 
 
 class NotPrimitiveError(Exception):
@@ -25,6 +26,8 @@ def create_primitive_token(value):
     """
     if isinstance(value, int):
         return tokens.Token(tokens.TYPE_INTEGER, '{}'.format(value))
+    if isinstance(value, str) and re.compile('^[a-zA-Z0-9]*$').match(value):
+        return tokens.Token(tokens.TYPE_BARE_STRING, value)
     else:
         raise NotPrimitiveError
 

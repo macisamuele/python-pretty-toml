@@ -26,6 +26,7 @@ def create_operator_element(operator):
     """
     operator_type_map = {
         ',': tokens.TYPE_OP_COMMA,
+        '=': tokens.TYPE_OP_ASSIGNMENT,
     }
 
     ts = (tokens.Token(operator_type_map[operator], operator),)
