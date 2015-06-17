@@ -59,12 +59,22 @@ class ArrayElement(containertraversalops.ContainerTraversalOps):
 
         begin, end = value_i, value_i+1
 
-        preceding_comma_i = self._find_preceding_comma(value_i)
-        if preceding_comma_i >= 0:
-            begin = preceding_comma_i
-        following_comma_i = self._find_following_comma(value_i)
-        if following_comma_i >= 0:
-            end = following_comma_i
+        # Rules:
+        #   1. begin should be index to the preceding comma to the value
+        #   2. end should be index to the following comma, or the closing bracket
+        #   3. If no preceding comma found but following comma found then end should be the index of the following value
+
+        preceding_comma = self._find_preceding_comma(value_i)
+        found_preceding_comma = preceding_comma >= 0
+        if found_preceding_comma:
+            begin = preceding_comma
+
+        following_comma = self._find_following_comma(value_i)
+        if following_comma >= 0:
+            if not found_preceding_comma:
+                end = self._find_following_non_metadata(following_comma)
+            else:
+                end = following_comma
         else:
             end = self._find_closing_square_bracket()
 

@@ -59,3 +59,12 @@ class ContainerTraversalOps(common.ContainerElement):
             if isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_RIGHT_BRACKET:
                 return i
         raise RuntimeError('Not finding a closing square bracket is unexpected!!')
+
+    def _find_closing_curly_bracket(self):
+        """
+        Returns the index to the closing curly bracket, or raises an Error.
+        """
+        for i, element in reversed(tuple(enumerate(self.sub_elements))):
+            if isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_CURLY_RIGHT_BRACKET:
+                return i
+        raise RuntimeError('Not finding a closing square bracket is unexpected!!')

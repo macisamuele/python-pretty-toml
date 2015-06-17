@@ -18,7 +18,7 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
             yield key
 
     def __len__(self):
-        return len(tuple(self.keys()))
+        return len(tuple(self._enumerate_items()))
 
     def _enumerate_items(self):
         """
@@ -45,33 +45,6 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
             if key == item:
                 return value
         raise KeyError
-
-    def _entry(self, entry_key):
-        """
-        Returns the [begin, end) range of indices including the key and value for the given key.
-
-        Raises KeyError if key was not found.
-        """
-
-        # A comma followed by whitespace is a suffix to a key-value pair, not a prefix.
-        # The last entry in the table will not contain a comma-followed-by-whitespace suffix.
-
-        def find_beginning(key_index):
-            # Finds the beginning element index of this entry
-            preceding_comma = self._find_preceding_comma(key_index)
-            if preceding_comma >= 0:
-                return self._find_following_non_metadata(preceding_comma)
-            return next(self._enumerate_non_metadata_sub_elements())[0]
-
-        def find_end(key_index):
-            # Finds end of the element where the given index belongs to the key
-            following_comma = self._find_following_comma(key_index)
-            if following_comma >= 0:
-                return self._find_following_non_metadata(following_comma)
-            return self._find_following_curly_bracket(key_index)
-
-        key_index, _ = self._find_key_and_value(entry_key)
-        return find_beginning(key_index), find_end(key_index)
 
     def _find_key_and_value(self, key):
         """
@@ -123,10 +96,30 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
             self._sub_elements = self.sub_elements[:insertion_index] + new_entry + self.sub_elements[insertion_index:]
 
     def __delitem__(self, key):
-        begin, end = self._entry(key)
+
+        key_i, value_i = self._find_key_and_value(key)
+
+        begin, end = key_i, value_i+1
+
+        # Rules:
+        #   1. begin should be index to the preceding comma to the key
+        #   2. end should be index to the following comma, or the closing bracket
+        #   3. If no preceding comma found but following comma found then end should be the index of the following key
+
         preceding_comma = self._find_preceding_comma(begin)
-        if preceding_comma >= 0:
+        found_preceding_comma = preceding_comma >= 0
+        if found_preceding_comma:
             begin = preceding_comma
+
+        following_comma = self._find_following_comma(value_i)
+        if following_comma >= 0:
+            if not found_preceding_comma:
+                end = self._find_following_non_metadata(following_comma)
+            else:
+                end = following_comma
+        else:
+            end = self._find_closing_curly_bracket()
+
         self._sub_elements = self.sub_elements[:begin] + self.sub_elements[end:]
 
     def value(self):
