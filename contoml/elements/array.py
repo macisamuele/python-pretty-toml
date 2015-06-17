@@ -15,30 +15,22 @@ class ArrayElement(containertraversalops.ContainerTraversalOps):
         common.ContainerElement.__init__(self, sub_elements)
 
     def __len__(self):
-        return len(self._enumerate_non_metadata_sub_elements())
+        return len(tuple(self._enumerate_non_metadata_sub_elements()))
 
     def __getitem__(self, i):
         """
         Returns the ith entry, which can be a primitive value, a seq-lie, or a dict-like object.
         """
-        return self._enumerate_non_metadata_sub_elements()[i][1].value
+        return self._find_value(i)[1].value
 
     def __setitem__(self, i, value):
-        value_i, _ = self._enumerate_non_metadata_sub_elements()[i]
+        value_i, _ = self._find_value(i)
         self._sub_elements = self.sub_elements[:value_i] + \
                              [factory.create_element(value)] + self.sub_elements[value_i+1:]
 
     @property
     def value(self):
         return self     # self is a sequence-like value
-
-    def _enumerate_non_metadata_sub_elements(self):
-        """
-        Returns a sequence of of (index, sub_element) of the non-metadata sub-elements.
-        """
-        return [(index, element)
-                for index, element in enumerate(self.sub_elements)
-                if element.type != common.TYPE_METADATA]
 
     def append(self, v):
         new_entry = [create_element(v)]
@@ -54,8 +46,16 @@ class ArrayElement(containertraversalops.ContainerTraversalOps):
         self._sub_elements = self._sub_elements[:last_bracket_index] + new_entry + \
                              self._sub_elements[last_bracket_index:]
 
+    def _find_value(self, i):
+        """
+        Returns (value_index, value) of ith value in this sequence.
+
+        Raises IndexError if not found.
+        """
+        return tuple(self._enumerate_non_metadata_sub_elements())[i]
+
     def __delitem__(self, i):
-        value_i, value = self._enumerate_non_metadata_sub_elements()[i]
+        value_i, value = self._find_value(i)
 
         begin, end = value_i, value_i+1
 
