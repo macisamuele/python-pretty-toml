@@ -41,10 +41,9 @@ class ArrayElement(containertraversalops.ContainerTraversalOps):
                 factory.create_whitespace_element(),
             ] + new_entry
 
-        last_bracket_index = self._find_closing_square_bracket()
-
-        self._sub_elements = self._sub_elements[:last_bracket_index] + new_entry + \
-                             self._sub_elements[last_bracket_index:]
+        insertion_index = self._find_closing_square_bracket()
+        self._sub_elements = self._sub_elements[:insertion_index] + new_entry + \
+                             self._sub_elements[insertion_index:]
 
     def _find_value(self, i):
         """

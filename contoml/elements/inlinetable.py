@@ -57,12 +57,6 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
                 return key_i, value_i
         raise KeyError
 
-    def _index_for_new_entry(self):
-        """
-        Returns the index where a new key-value pair can be inserted.
-        """
-        return self._find_closing_curly_bracket()
-
     def __setitem__(self, key, value):
 
         try:
@@ -88,7 +82,7 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
                     factory.create_whitespace_element(),
                 ] + new_entry
 
-            insertion_index = self._index_for_new_entry()
+            insertion_index = self._find_closing_curly_bracket()
             self._sub_elements = self.sub_elements[:insertion_index] + new_entry + self.sub_elements[insertion_index:]
 
     def __delitem__(self, key):
