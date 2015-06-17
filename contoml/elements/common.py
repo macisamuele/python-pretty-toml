@@ -52,6 +52,9 @@ class TokenElement(Element):
     def serialized(self):
         return ''.join(token.source_substring for token in self._tokens)
 
+    def __repr__(self):
+        return repr(self.tokens)
+
 
 class ContainerElement(Element):
     """
@@ -68,3 +71,6 @@ class ContainerElement(Element):
 
     def serialized(self):
         return ''.join(element.serialized() for element in self.sub_elements)
+
+    def __repr__(self):
+        return repr(self.sub_elements)

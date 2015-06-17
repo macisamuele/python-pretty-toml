@@ -1,3 +1,4 @@
+from contoml import tokens
 from contoml.tokens import TYPE_BOOLEAN, TYPE_INTEGER, TYPE_FLOAT, TYPE_DATE, \
     TYPE_MULTILINE_STRING, TYPE_BARE_STRING, TYPE_MULTILINE_LITERAL_STRING, TYPE_LITERAL_STRING, \
     TYPE_STRING
@@ -23,6 +24,9 @@ def deserialize(token):
         raise Exception('This should never happen!')
 
 def _to_string(token):
+    if token.type == tokens.TYPE_BARE_STRING:
+        return token.source_substring
+
     raise NotImplementedError
 
 def _to_int(token):
