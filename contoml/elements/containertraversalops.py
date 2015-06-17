@@ -32,16 +32,6 @@ class ContainerTraversalOps(common.ContainerElement):
                 return i
         return float('-inf')
 
-    def _find_following_curly_bracket(self, index):
-        """
-        Returns the index of the following closing curly bracket element after the given index, or -Infinity.
-        """
-        for i, element in tuple(enumerate(self.sub_elements))[index+1:]:
-            if isinstance(element, metadata.PunctuationElement) and \
-                            element.token.type == tokens.TYPE_OP_CURLY_RIGHT_BRACKET:
-                return i
-        return float('-inf')
-
     def _find_following_non_metadata(self, index):
         """
         Returns the index to the following non-metadata element after the given index, or -Infinity.

@@ -61,11 +61,7 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
         """
         Returns the index where a new key-value pair can be inserted.
         """
-        enumerated_non_metadata_elements = tuple(self._enumerate_non_metadata_sub_elements())
-        if enumerated_non_metadata_elements:
-            return enumerated_non_metadata_elements[-1][0] + 1      # Index following last non-metadata element
-        else:
-            return self._find_following_curly_bracket(0)
+        return self._find_closing_curly_bracket()
 
     def __setitem__(self, key, value):
 
