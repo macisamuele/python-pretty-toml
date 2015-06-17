@@ -1,4 +1,5 @@
 from contoml.elements import common, factory, containertraversalops
+from contoml.elements.common import Element
 
 
 class InlineTable(containertraversalops.ContainerTraversalOps):
@@ -59,12 +60,12 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
 
     def __setitem__(self, key, value):
 
+        new_element = value if isinstance(value, Element) else factory.create_element(value)
+
         try:
             key_i, value_i = self._find_key_and_value(key)
             # Found, then replace the value element with a new one
-            self._sub_elements = self.sub_elements[:value_i] + \
-                                 [factory.create_element(value)] + \
-                                 self.sub_elements[value_i+1:]
+            self._sub_elements = self.sub_elements[:value_i] + [new_element] + self.sub_elements[value_i+1:]
 
         except KeyError:    # Key does not exist!
 
@@ -73,7 +74,7 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
                 factory.create_whitespace_element(),
                 factory.create_operator_element('='),
                 factory.create_whitespace_element(),
-                factory.create_element(value),
+                new_element,
             ]
 
             if self:    # If not empty

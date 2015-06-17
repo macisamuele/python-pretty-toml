@@ -1,4 +1,5 @@
 from contoml.elements import common, factory, containertraversalops
+from contoml.elements.common import Element
 from contoml.elements.factory import create_element
 
 
@@ -25,8 +26,8 @@ class ArrayElement(containertraversalops.ContainerTraversalOps):
 
     def __setitem__(self, i, value):
         value_i, _ = self._find_value(i)
-        self._sub_elements = self.sub_elements[:value_i] + \
-                             [factory.create_element(value)] + self.sub_elements[value_i+1:]
+        new_element = value if isinstance(value, Element) else factory.create_element(value)
+        self._sub_elements = self.sub_elements[:value_i] + [new_element] + self.sub_elements[value_i+1:]
 
     @property
     def value(self):
