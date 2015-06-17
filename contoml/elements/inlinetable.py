@@ -63,11 +63,12 @@ class InlineTable(containertraversalops.ContainerTraversalOps):
         new_element = value if isinstance(value, Element) else factory.create_element(value)
 
         try:
+
             key_i, value_i = self._find_key_and_value(key)
             # Found, then replace the value element with a new one
             self._sub_elements = self.sub_elements[:value_i] + [new_element] + self.sub_elements[value_i+1:]
 
-        except KeyError:    # Key does not exist!
+        except KeyError:    # Key does not exist, adding anew!
 
             new_entry = [
                 factory.create_element(key),
