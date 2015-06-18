@@ -36,7 +36,7 @@ class NewlineElement(common.TokenElement):
 
 class CommentElement(common.TokenElement):
     """
-    An element containing a single comment token followed by a newline token
+    An element containing a single comment token
 
     Raises:
         InvalidElementError: when passed an invalid sequence of tokens.
@@ -46,8 +46,8 @@ class CommentElement(common.TokenElement):
         common.TokenElement.__init__(self, _tokens, common.TYPE_METADATA)
 
     def _validate_tokens(self, _tokens):
-        if len(_tokens) != 2 or _tokens[0].type != tokens.TYPE_COMMENT or _tokens[1].type != tokens.TYPE_NEWLINE:
-            raise InvalidElementError('CommentElement needs exactly one comment token followed by a newline token')
+        if len(_tokens) != 1 or _tokens[0].type != tokens.TYPE_COMMENT:
+            raise InvalidElementError('CommentElement needs exactly one comment token')
 
 
 class PunctuationElement(common.TokenElement):

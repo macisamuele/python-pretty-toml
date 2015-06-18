@@ -13,8 +13,8 @@ def test_newline_element():
 
 
 def test_comment_element():
-    element = CommentElement(tuple(lexer.tokenize('# This is my insightful remark\n')))
-    assert element.serialized() == '# This is my insightful remark\n'
+    element = CommentElement(tuple(lexer.tokenize('# This is my insightful remark\n'))[:1])
+    assert element.serialized() == '# This is my insightful remark'
 
 
 def test_punctuation_element():
