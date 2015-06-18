@@ -18,12 +18,7 @@ class AbstractTable(containertraversalops.ContainerTraversalOps):
         """
         non_metadata = self._enumerate_non_metadata_sub_elements()
         while True:
-            key_i, key = next(non_metadata)
-            value_i, value = next(non_metadata)
-            if key_i and value_i:
-                yield ((key_i, key), (value_i, value))
-            else:
-                break
+            yield next(non_metadata), next(non_metadata)
 
     def items(self):
         for (key_i, key), (value_i, value) in self._enumerate_items():
