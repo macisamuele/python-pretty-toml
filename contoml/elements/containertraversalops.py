@@ -32,6 +32,24 @@ class ContainerTraversalOps(common.ContainerElement):
                 return i
         return float('-inf')
 
+    def _find_following_newline(self, index):
+        """
+        Returns the index of the following newline element after the given index, or -Infinity.
+        """
+        for i, element in tuple(enumerate(self.sub_elements))[index+1:]:
+            if isinstance(element, metadata.NewlineElement):
+                return i
+        return float('-inf')
+
+    def _find_preceding_newline(self, index):
+        """
+        Returns the index of the preceding newline element to the given index, or -Infinity.
+        """
+        for i, element in reversed(tuple(enumerate(self.sub_elements))[:index]):
+            if isinstance(element, metadata.NewlineElement):
+                return i
+        return float('-inf')
+
     def _find_following_non_metadata(self, index):
         """
         Returns the index to the following non-metadata element after the given index, or -Infinity.

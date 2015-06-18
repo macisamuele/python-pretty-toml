@@ -1,6 +1,6 @@
 from contoml import py2toml, tokens
 from contoml.elements.atomic import AtomicElement
-from contoml.elements.metadata import PunctuationElement, WhitespaceElement
+from contoml.elements.metadata import PunctuationElement, WhitespaceElement, NewlineElement
 
 
 def create_element(value):
@@ -33,6 +33,14 @@ def create_operator_element(operator):
     return PunctuationElement(ts)
 
     raise NotImplementedError   # TODO
+
+
+def create_newline_element():
+    """
+    Creates and returns a single NewlineElement.
+    """
+    ts = (tokens.Token(tokens.TYPE_NEWLINE, '\n'),)
+    return NewlineElement(ts)
 
 
 def create_whitespace_element(length=1):
