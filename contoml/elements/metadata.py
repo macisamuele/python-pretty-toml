@@ -1,6 +1,6 @@
-
 from contoml import tokens
-from contoml.elements import InvalidElementError, common
+from contoml.elements import common
+from .errors import InvalidElementError
 
 
 class WhitespaceElement(common.TokenElement):

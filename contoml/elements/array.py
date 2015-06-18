@@ -1,9 +1,9 @@
-from contoml.elements import common, factory, containertraversalops
-from contoml.elements.common import Element
+from contoml.elements import common, factory, traversal
+from contoml.elements.common import Element, ContainerElement
 from contoml.elements.factory import create_element
 
 
-class ArrayElement(containertraversalops.ContainerTraversalOps):
+class ArrayElement(ContainerElement, traversal.TraversalMixin):
     """
     A sequence-like container element containing other atomic elements or other containers.
 

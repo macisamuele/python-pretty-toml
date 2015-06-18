@@ -1,4 +1,4 @@
-from contoml.elements import common, factory, containertraversalops, abstracttable
+from contoml.elements import factory, abstracttable
 from contoml.elements.common import Element
 
 

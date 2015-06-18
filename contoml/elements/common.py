@@ -70,6 +70,10 @@ class ContainerElement(Element):
     def sub_elements(self):
         return self._sub_elements
 
+    @property
+    def elements(self):
+        return self.sub_elements
+
     def serialized(self):
         return ''.join(element.serialized() for element in self.sub_elements)
 

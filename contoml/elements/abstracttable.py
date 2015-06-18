@@ -1,8 +1,8 @@
-from contoml.elements import containertraversalops
+from contoml.elements import traversal
 from contoml.elements.common import ContainerElement
 
 
-class AbstractTable(containertraversalops.ContainerTraversalOps):
+class AbstractTable(ContainerElement, traversal.TraversalMixin):
     """
     Common code for handling tables as key-value pairs with metadata elements sprinkled all over.
 
