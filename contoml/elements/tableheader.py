@@ -23,6 +23,7 @@ class TableHeader(Element):
         Element.__init__(self, common.TYPE_MARKUP)
         TableHeader._validate_tokens(_tokens)
         self._tokens = _tokens
+        self._names = tuple(toml2py.deserialize(token) for token in self._tokens if token.type in _name_types)
 
     @property
     def is_array_of_tables(self):
@@ -34,7 +35,7 @@ class TableHeader(Element):
         """
         Returns a sequence of string names making up this table header name.
         """
-        return tuple(toml2py.deserialize(token) for token in self._tokens if token.type in _name_types)
+        return self._names
 
     def has_name_prefix(self, names):
         """
@@ -47,6 +48,12 @@ class TableHeader(Element):
 
     def serialized(self):
         return ''.join(token.source_substring for token in self._tokens)
+
+    def is_named(self, names):
+        """
+        Returns True if the given name sequence matches the full name of this header.
+        """
+        return tuple(names) == self.names
 
     @staticmethod
     def _validate_tokens(_tokens):
