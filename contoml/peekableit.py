@@ -9,8 +9,11 @@ class PeekableIterator:
     def __init__(self, iter):
         self._iter = iter
 
-    def next(self):
+    def __next__(self):
         return next(self._iter)
+
+    def next(self):
+        return self.__next__()
 
     def peek(self):
         """
