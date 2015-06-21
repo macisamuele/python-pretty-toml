@@ -1,6 +1,6 @@
 from contoml import tokens
-from contoml.elements import common, metadata
-from contoml.elements.metadata import PunctuationElement
+from contoml.elements import common
+from contoml.elements.metadata import PunctuationElement, NewlineElement
 
 
 class TraversalMixin:
@@ -8,6 +8,37 @@ class TraversalMixin:
     A mix-in that provides convenient sub-element traversal to any class with
     an `elements` member that is a sequence of Element instances
     """
+
+    def __find_following_element(self, index, predicate):
+        """
+        Finds and returns the index of element in self.elements that evaluates the given predicate to True
+        and whose index is higher than the given index, or returns -Infinity on failure.
+        """
+        for i, element in tuple(enumerate(self.elements))[index+1:]:
+            if predicate(element):
+                return i
+        return float('-inf')
+
+    def __find_preceding_element(self, index, predicate):
+        """
+        Finds and returns the index of the element in self.elements that evaluates the given predicate to True
+        and whose index is lower than the given index.
+        """
+
+        for i, element in reversed(tuple(enumerate(self.elements))[:index]):
+            if predicate(element):
+                return i
+        return float('-inf')
+
+    def __must_find_following_element(self, predicate):
+        """
+        Finds and returns the index to the element in self.elements that evaluatest the predicate to True, or raises
+        an error.
+        """
+        i = self.__find_following_element(-1, predicate)
+        if i < 0:
+            raise RuntimeError('Could not find non-optional element')
+        return i
 
     def _enumerate_non_metadata_sub_elements(self):
         """
@@ -19,61 +50,70 @@ class TraversalMixin:
         """
         Returns the index of the preceding comma element to the given index, or -Infinity.
         """
-        for i, element in reversed(tuple(enumerate(self.elements))[:index]):
-            if isinstance(element, metadata.PunctuationElement) and element.token.type == tokens.TYPE_OP_COMMA:
-                return i
-        return float('-inf')
+        def predicate(element):
+            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_COMMA
+        return self.__find_preceding_element(index, predicate)
 
     def _find_following_comma(self, index):
         """
         Returns the index of the following comma element after the given index, or -Infinity.
         """
-        for i, element in tuple(enumerate(self.elements))[index+1:]:
-            if isinstance(element, metadata.PunctuationElement) and element.token.type == tokens.TYPE_OP_COMMA:
-                return i
-        return float('-inf')
+        def predicate(element):
+            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_COMMA
+        return self.__find_following_element(index, predicate)
 
     def _find_following_newline(self, index):
         """
         Returns the index of the following newline element after the given index, or -Infinity.
         """
-        for i, element in tuple(enumerate(self.elements))[index+1:]:
-            if isinstance(element, metadata.NewlineElement):
-                return i
-        return float('-inf')
+        return self.__find_following_element(index, lambda e: isinstance(e, NewlineElement))
 
     def _find_preceding_newline(self, index):
         """
         Returns the index of the preceding newline element to the given index, or -Infinity.
         """
-        for i, element in reversed(tuple(enumerate(self.elements))[:index]):
-            if isinstance(element, metadata.NewlineElement):
-                return i
-        return float('-inf')
+        return self.__find_preceding_element(index, lambda e: isinstance(e, NewlineElement))
 
     def _find_following_non_metadata(self, index):
         """
         Returns the index to the following non-metadata element after the given index, or -Infinity.
         """
-        for i, element in tuple(enumerate(self.elements))[index+1:]:
-            if element.type != common.TYPE_METADATA:
-                return i
-        return float('-inf')
+        return self.__find_following_element(index, lambda e: e.type != common.TYPE_METADATA)
 
     def _find_closing_square_bracket(self):
         """
         Returns the index to the closing square bracket, or raises an Error.
         """
-        for i, element in reversed(tuple(enumerate(self.elements))):
-            if isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_RIGHT_BRACKET:
-                return i
-        raise RuntimeError('Not finding a closing square bracket is unexpected!!')
+        def predicate(element):
+            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_RIGHT_BRACKET
+        return self.__must_find_following_element(predicate)
+
+    def _find_following_opening_square_bracket(self, index):
+        """
+        Returns the index to the opening square bracket, or -Infinity.
+        """
+        def predicate(element):
+            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_LEFT_BRACKET
+        return self.__find_following_element(index, predicate)
+
+    def _find_following_table(self, index):
+        """
+        Returns the index to the next TableElement after the specified index, or -Infinity.
+        """
+        from contoml.elements.table import TableElement
+        return self.__find_following_element(index, lambda e: isinstance(e, TableElement))
+
+    def _find_preceding_table(self, index):
+        """
+        Returns the index to the preceding TableElement to the specified index, or -Infinity.
+        """
+        from contoml.elements.table import TableElement
+        return self.__find_preceding_element(index, lambda e: isinstance(e, TableElement))
 
     def _find_closing_curly_bracket(self):
         """
         Returns the index to the closing curly bracket, or raises an Error.
         """
-        for i, element in reversed(tuple(enumerate(self.elements))):
-            if isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_CURLY_RIGHT_BRACKET:
-                return i
-        raise RuntimeError('Not finding a closing square bracket is unexpected!!')
+        def predicate(element):
+            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_CURLY_RIGHT_BRACKET
+        return self.__must_find_following_element(predicate)

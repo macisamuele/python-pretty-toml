@@ -1,6 +1,8 @@
-from contoml import tokens
+from contoml import tokens, lexer
+from contoml.elements import traversal
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import NewlineElement, PunctuationElement, WhitespaceElement, CommentElement
+from contoml.elements.table import TableElement
 
 atomic_token_types = (
     tokens.TYPE_INTEGER,
@@ -38,3 +40,45 @@ def primitive_token_to_primitive_element(token):
         return CommentElement((token,))
     else:
         raise RuntimeError("{} has no mapped primitive element".format(token))
+
+
+def primitive_tokens_to_primitive_elements(tokens):
+    return list(map(primitive_token_to_primitive_element, tokens))
+
+
+class DummyFile(traversal.TraversalMixin):
+
+    @property
+    def elements(self):
+        tokens_ = tuple(lexer.tokenize("""
+name = fawzy
+another_name=another_fawzy
+
+[details]
+id= 42
+section =fourth
+
+[[person]]
+personname= lefawzy
+dest=north
+
+[[person]]
+dest=south
+personname=lafawzy
+
+[details.extended]
+number = 313
+type =complex"""))
+
+        elements = \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[:12]))] + \
+            primitive_tokens_to_primitive_elements(tokens_[12:16]) + \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[16:25]))] + \
+            primitive_tokens_to_primitive_elements(tokens_[25:30]) + \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[30:39]))] + \
+            primitive_tokens_to_primitive_elements(tokens_[39:45]) + \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[45:53]))] + \
+            primitive_tokens_to_primitive_elements(tokens_[53:60]) + \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[60:]))]
+
+        return elements

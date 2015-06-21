@@ -1,5 +1,5 @@
-from contoml.elements import traversal
 from contoml.elements.common import ContainerElement
+from contoml.elements import traversal
 
 
 class AbstractTable(ContainerElement, traversal.TraversalMixin):
