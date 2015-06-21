@@ -117,3 +117,10 @@ class TraversalMixin:
         def predicate(element):
             return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_CURLY_RIGHT_BRACKET
         return self.__must_find_following_element(predicate)
+
+    def _find_following_table_header(self, index):
+        """
+        Returns the index to the table header after the given element index, or -Infinity.
+        """
+        from contoml.elements.tableheader import TableHeader
+        return self.__find_following_element(index, lambda e: isinstance(e, TableHeader))
