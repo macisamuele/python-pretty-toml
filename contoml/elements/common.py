@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from contoml import tokens
 
 TYPE_METADATA = 'element-metadata'
 TYPE_ATOMIC = 'element-atomic'
 TYPE_CONTAINER = 'element-container'
+TYPE_MARKUP = 'element-markup'
 
 class Element:
     """

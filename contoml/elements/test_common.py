@@ -46,10 +46,7 @@ def primitive_tokens_to_primitive_elements(tokens):
     return list(map(primitive_token_to_primitive_element, tokens))
 
 
-class DummyFile(traversal.TraversalMixin):
-
-    @property
-    def elements(self):
+def dummy_file_elements():
         tokens_ = tuple(lexer.tokenize("""
 name = fawzy
 another_name=another_fawzy
@@ -82,3 +79,10 @@ type =complex"""))
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[60:]))]
 
         return elements
+
+
+class DummyFile(traversal.TraversalMixin):
+
+    @property
+    def elements(self):
+        return dummy_file_elements()
