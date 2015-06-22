@@ -5,7 +5,8 @@ A regular expression based Lexer/tokenizer for TOML.
 
 from collections import namedtuple
 import re
-from contoml import TOMLError, tokens
+from contoml import tokens
+from contoml.errors import TOMLError
 
 TokenSpec = namedtuple('TokenSpec', ('type', 're'))
 
