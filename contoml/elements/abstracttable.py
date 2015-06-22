@@ -13,14 +13,6 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
         ContainerElement.__init__(self, sub_elements)
         self._fallback = None
 
-    def set_fallback(self, fallback):
-        """
-        Sets a fallback dict-like object that will be queried for a key when a key is not found in this table.
-
-        Mutates this instance.
-        """
-        self._fallback = fallback
-
     def _enumerate_items(self):
         """
         Returns ((key_index, key_element), (value_index, value_element)) for all the element key-value pairs.
@@ -58,7 +50,4 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
         for key, value in self.items():
             if key == item:
                 return value
-
-        if self._fallback is None:
-            raise KeyError
-        return self._fallback[item]
+        raise KeyError
