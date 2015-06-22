@@ -85,6 +85,11 @@ class Token:
         self._col = col
         self._row = row
 
+    def __eq__(self, other):
+        if not isinstance(other, Token):
+            return False
+        return self.source_substring == other.source_substring and self.type == other.type
+
     @property
     def col(self):
         """
