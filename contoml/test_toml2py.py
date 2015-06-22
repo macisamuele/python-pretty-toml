@@ -54,5 +54,3 @@ def test_date():
 
     t1 = tokens.Token(tokens.TYPE_DATE, '1979-05-27T00:32:00-07:00')
     assert toml2py.deserialize(t1) == datetime(1979, 5, 27, 7, 32, tzinfo=pytz.utc)
-
-    assert False
