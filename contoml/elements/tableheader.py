@@ -12,7 +12,7 @@ _name_types = (
 )
 
 
-class TableHeader(Element):
+class TableHeaderElement(Element):
     """
     An element containing opening and closing single and double square brackets, strings and dots
     
@@ -21,7 +21,7 @@ class TableHeader(Element):
     
     def __init__(self, _tokens):
         Element.__init__(self, common.TYPE_MARKUP)
-        TableHeader._validate_tokens(_tokens)
+        TableHeaderElement._validate_tokens(_tokens)
         self._tokens = _tokens
         self._names = tuple(toml2py.deserialize(token) for token in self._tokens if token.type in _name_types)
 

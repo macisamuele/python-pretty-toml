@@ -3,7 +3,7 @@ from contoml.elements import traversal
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import NewlineElement, PunctuationElement, WhitespaceElement, CommentElement
 from contoml.elements.table import TableElement
-from contoml.elements.tableheader import TableHeader
+from contoml.elements.tableheader import TableHeaderElement
 
 atomic_token_types = (
     tokens.TYPE_INTEGER,
@@ -70,13 +70,13 @@ type =complex"""))
 
         elements = \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[:12]))] + \
-            [TableHeader(tokens_[12:16])] + \
+            [TableHeaderElement(tokens_[12:16])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[16:25]))] + \
-            [TableHeader(tokens_[25:30])] + \
+            [TableHeaderElement(tokens_[25:30])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[30:39]))] + \
-            [TableHeader(tokens_[39:45])] + \
+            [TableHeaderElement(tokens_[39:45])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[45:53]))] + \
-            [TableHeader(tokens_[53:60])] + \
+            [TableHeaderElement(tokens_[53:60])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[60:]))]
 
         return elements

@@ -122,5 +122,5 @@ class TraversalMixin:
         """
         Returns the index to the table header after the given element index, or -Infinity.
         """
-        from contoml.elements.tableheader import TableHeader
-        return self.__find_following_element(index, lambda e: isinstance(e, TableHeader))
+        from contoml.elements.tableheader import TableHeaderElement
+        return self.__find_following_element(index, lambda e: isinstance(e, TableHeaderElement))

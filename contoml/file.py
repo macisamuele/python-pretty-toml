@@ -2,13 +2,13 @@ import itertools
 from contoml import elements
 from contoml.cascadedict import CascadeDict
 from contoml.elements.table import TableElement
-from contoml.elements.tableheader import TableHeader
+from contoml.elements.tableheader import TableHeaderElement
 from contoml.errors import InvalidTOMLFileError
 from contoml.peekableit import PeekableIterator
 
 class TOMLFile(elements.TraversalMixin):
     """
-    A TOMLFile instance is made up of TableElement and TableHeader elements.
+    A TOMLFile instance is made up of TableElement and TableHeaderElement elements.
 
     Raises InvalidTOMLFileError on invalid input elements.
     """
@@ -22,7 +22,7 @@ class TOMLFile(elements.TraversalMixin):
     @staticmethod
     def _validate_elements(_elements):
 
-        # Must start with an optional TableElement, followed by zero or more (TableHeader, TableElement) pairs.
+        # Must start with an optional TableElement, followed by zero or more (TableHeaderElement, TableElement) pairs.
 
         if not _elements:
             return
@@ -33,7 +33,7 @@ class TOMLFile(elements.TraversalMixin):
             it.next()
 
         while it.peek():
-            if not isinstance(it.next(), TableHeader):
+            if not isinstance(it.next(), TableHeaderElement):
                 raise InvalidTOMLFileError
             if not isinstance(it.next(), TableElement):
                 raise InvalidTOMLFileError
@@ -61,7 +61,7 @@ class TOMLFile(elements.TraversalMixin):
         Enumerates (element_index, table_header_element) of table headers.
         """
         for i, element in enumerate(self.elements):
-            if isinstance(element, TableHeader) and not element.is_array_of_tables:
+            if isinstance(element, TableHeaderElement) and not element.is_array_of_tables:
                 yield i, element
 
     def _enumerate_array_of_table_headers(self):
@@ -69,7 +69,7 @@ class TOMLFile(elements.TraversalMixin):
         Enumerates (element_index, array_of_table_header_element) of array of table headers.
         """
         for i, element in enumerate(self.elements):
-            if isinstance(element, TableHeader) and element.is_array_of_tables:
+            if isinstance(element, TableHeaderElement) and element.is_array_of_tables:
                 yield i, element
 
     def _lookup_name(self, name):

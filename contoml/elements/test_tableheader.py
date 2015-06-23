@@ -1,10 +1,10 @@
 from contoml import lexer
-from contoml.elements.tableheader import TableHeader
+from contoml.elements.tableheader import TableHeaderElement
 
 
 def test_tableheader():
     tokens = tuple(lexer.tokenize('\n\t [[personal. information.details]]'))
-    element = TableHeader(tokens)
+    element = TableHeaderElement(tokens)
 
     assert element.is_array_of_tables
     assert ('personal', 'information', 'details') == element.names
