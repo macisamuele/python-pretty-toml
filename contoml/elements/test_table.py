@@ -20,8 +20,7 @@ def test_table():
         PunctuationElement(tokens[7:8]),
         AtomicElement(tokens[8:9]),
         WhitespaceElement(tokens[9:10]),
-        CommentElement(tokens[10:11]),
-        NewlineElement(tokens[11:12]),
+        CommentElement(tokens[10:12]),
 
         NewlineElement(tokens[12:13]),
         NewlineElement(tokens[13:14]),
