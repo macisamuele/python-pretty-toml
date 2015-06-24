@@ -1,6 +1,6 @@
 
 """
-    A Recursive Descent implementation of a parser for TOML.
+    A Recursive Descent implementation of a lexical parser for TOML.
 
     Grammar:
     --------
@@ -14,11 +14,13 @@
     Atomic -> STRING | INTEGER | FLOAT | DATE | BOOLEAN
 
     Array -> '[' Space ArrayInternal Space ']'
-    ArrayInternal -> Atomic Space ',' Space LineTerminator Space ArrayInternal |
-        Atomic Space ',' Space ArrayInternal | Atomic | EMPTY
+    ArrayInternal -> Value Space ',' Space LineTerminator Space ArrayInternal |
+        Value Space ',' Space ArrayInternal | ContainedValue | EMPTY
 
-    InlineTable -> '{' Space InlineTableInternal '}'
-    InlineTableInternal -> Atomic Space ',' Space InlineTableInternal | Atomic | Empty
+    InlineTable -> '{' Space InlineTableInternal Space '}'
+    InlineTableKeyValuePair = STRING Space '=' Space Value
+    InlineTableInternal -> InlineTableKeyValuePair Space ',' Space InlineTableInternal |
+        InlineTableKeyValuePair | Empty
 
     Value -> Atomic | InlineTable | Array
     KeyValuePair -> STRING Space '=' Space Value Space LineTerminator
@@ -30,6 +32,7 @@
 from contoml import tokens
 from contoml.elements.array import ArrayElement
 from contoml.elements.atomic import AtomicElement
+from contoml.elements.inlinetable import InlineTable
 from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement, PunctuationElement
 from contoml.elements.tableheader import TableHeaderElement
 
@@ -106,9 +109,12 @@ def string_token(token_stream):
         or_extract(token(tokens.TYPE_LITERAL_STRING)).\
         or_extract(token(tokens.TYPE_MULTILINE_STRING)).\
         or_extract(token(tokens.TYPE_MULTILINE_LITERAL_STRING))
-
     return captured.value('Expected a string'), captured.pending_tokens
 
+
+def string_element(token_stream):
+    captured = capture_from(token_stream).extract(string_token)
+    return AtomicElement(captured.value()), captured.pending_tokens
 
 def table_header_name_tokens(token_stream):
 
@@ -154,17 +160,21 @@ def punctuation_element(token_type):
         return PunctuationElement(c.value('Expected the punctuation element: {}'.format(token_type))), c.pending_tokens
     return factory
 
-def array_element(token_stream):
 
-    # Array -> '[' Space ArrayInternal Space ']'
-    # ArrayInternal -> Atomic Space ',' Space LineTerminator Space ArrayInternal |
-    #     Atomic Space ',' Space ArrayInternal | Atomic | EMPTY
+def value(token_stream):
+    captured = capture_from(token_stream).\
+        extract(atomic_element).\
+        or_extract(array_element).\
+        or_extract(inline_table_element)
+    return captured.value(), captured.pending_tokens
+
+def array_element(token_stream):
 
     def internal(ts):
 
         def one(ts1):
             c = capture_from(ts1).\
-                extract(atomic_element).\
+                extract(value).\
                 and_extract(space_element).\
                 and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
                 and_extract(space_element).\
@@ -175,14 +185,14 @@ def array_element(token_stream):
 
         def two(ts2):
             c = capture_from(ts2).\
-                extract(atomic_element).\
+                extract(value).\
                 and_extract(space_element).\
                 and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
                 and_extract(space_element).\
                 and_extract(internal)
             return c.value(), c.pending_tokens
 
-        captured = capture_from(ts).extract(one).or_extract(two).or_extract(atomic_element).or_empty()
+        captured = capture_from(ts).extract(one).or_extract(two).or_extract(value).or_empty()
         return captured.value(), captured.pending_tokens
 
     ca = capture_from(token_stream).\
@@ -192,3 +202,42 @@ def array_element(token_stream):
         and_extract(space_element).\
         and_extract(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
     return ArrayElement(ca.value()), ca.pending_tokens
+
+
+def inline_table_element(token_stream):
+
+    # InlineTable -> '{' Space InlineTableInternal Space '}'
+    # InlineTableKeyValuePair = STRING Space '=' Space Value
+    # InlineTableInternal -> InlineTableKeyValuePair Space ',' Space InlineTableInternal |
+    #     InlineTableKeyValuePair | Empty
+
+    def key_value(ts):
+        ca = capture_from(ts).\
+            extract(string_element).\
+            and_extract(space_element).\
+            and_extract(punctuation_element(tokens.TYPE_OP_ASSIGNMENT)).\
+            and_extract(space_element).\
+            and_extract(value)
+        return ca.value(), ca.pending_tokens
+
+    def internal(ts):
+        def one(ts1):
+            c1 = capture_from(ts1).\
+                extract(key_value).\
+                and_extract(space_element).\
+                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_extract(space_element).\
+                and_extract(internal)
+            return c1.value(), c1.pending_tokens
+
+        c = capture_from(ts).extract(one).or_extract(key_value).or_empty()
+        return c.value(), c.pending_tokens
+
+    captured = capture_from(token_stream).\
+        extract(punctuation_element(tokens.TYPE_OP_CURLY_LEFT_BRACKET)).\
+        and_extract(space_element).\
+        and_extract(internal).\
+        and_extract(space_element).\
+        and_extract(punctuation_element(tokens.TYPE_OP_CURLY_RIGHT_BRACKET))
+
+    return InlineTable(captured.value()), captured.pending_tokens

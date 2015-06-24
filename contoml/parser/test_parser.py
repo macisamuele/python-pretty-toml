@@ -77,3 +77,12 @@ def test_array():
     assert isinstance(array_element, ArrayElement)
     assert len(array_element) == 5
     assert len(pending_ts) == 1
+
+
+def test_inline_table():
+    inline_table, pending_ts = parser.inline_table_element(TokenStream(tokenize('{ "id"= 42,test = name} vroom')))
+
+    assert set(inline_table.keys()) == {'id', 'test'}
+    assert len(pending_ts) == 2
+    assert inline_table['id'] == 42
+    assert inline_table['test'] == 'name'
