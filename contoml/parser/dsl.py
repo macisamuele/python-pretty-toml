@@ -1,4 +1,5 @@
 from contoml.parser.errors import ParsingError
+from contoml.parser.tokenstream import TokenStream
 
 
 class Captured:
@@ -37,6 +38,12 @@ class Captured:
     def or_extract(self, element_factory):
         if self._error:
             return Captured(self._token_stream).extract(element_factory)
+        else:
+            return self
+
+    def or_empty(self):
+        if self._error:
+            return Captured(self._token_stream)
         else:
             return self
 

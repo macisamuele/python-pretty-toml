@@ -1,4 +1,7 @@
+from contoml.elements.array import ArrayElement
+from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import CommentElement, NewlineElement, WhitespaceElement
+from contoml.elements.tableheader import TableHeaderElement
 from contoml.lexer import tokenize
 from contoml.parser import parser
 from contoml.parser.tokenstream import TokenStream
@@ -51,7 +54,26 @@ def test_space_3():
 
 
 def test_table_header():
-    ts = TokenStream(tokenize(" [ namez    . namey . namex ] \n"))
-    a, b = parser.table_header(ts)
+    ts = TokenStream(tokenize(" [ namez    . namey . namex ] \n other things"))
+    table_header_element, pending_tokens = parser.table_header_element(ts)
 
-    print(a, b)
+    assert isinstance(table_header_element, TableHeaderElement)
+    assert len(pending_tokens) == 4
+
+
+def test_atomic_element():
+    e1, p1 = parser.atomic_element(TokenStream(tokenize('42 not')))
+    assert isinstance(e1, AtomicElement) and e1.value == 42
+    assert len(p1) == 2
+
+    e2, p2 = parser.atomic_element(TokenStream(tokenize('not 42')))
+    assert isinstance(e2, AtomicElement) and e2.value == 'not'
+    assert len(p2) == 2
+
+
+def test_array():
+    array_element, pending_ts = parser.array_element(TokenStream(tokenize('[ 3, 4, 5,6,7] ')))
+
+    assert isinstance(array_element, ArrayElement)
+    assert len(array_element) == 5
+    assert len(pending_ts) == 1

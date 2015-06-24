@@ -28,7 +28,10 @@
     Output -> Space LineTerminator Output | TableHeader Output | TableBody Output | Empty
 """
 from contoml import tokens
-from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement
+from contoml.elements.array import ArrayElement
+from contoml.elements.atomic import AtomicElement
+from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement, PunctuationElement
+from contoml.elements.tableheader import TableHeaderElement
 
 from contoml.parser.dsl import capture_from
 from contoml.parser.errors import ParsingError
@@ -121,7 +124,7 @@ def table_header_name_tokens(token_stream):
     captured = capture_from(token_stream).extract(one).or_extract(string_token)
     return captured.value(), captured.pending_tokens
 
-def table_header(token_stream):
+def table_header_element(token_stream):
     captured = capture_from(token_stream).\
         extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
         and_extract(token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
@@ -132,16 +135,60 @@ def table_header(token_stream):
         and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
         and_extract(token(tokens.TYPE_NEWLINE))
 
-    return captured.value(), captured.pending_tokens
+    return TableHeaderElement(captured.value()), captured.pending_tokens
 
-# def space_element(token_stream):
-#     original = token_stream.fork
-#
-#     first_token = token_stream.next()
-#
-#     # First branch
-#     if first_token.type == tokens.TYPE_WHITESPACE:
-#         try:
-#             next_element = space_element(token_stream)
-#             return WhitespaceElement((first_token,) + next_element.tokens)
-#         except
+
+def atomic_element(token_stream):
+    captured = capture_from(token_stream).\
+        extract(string_token).\
+        or_extract(token(tokens.TYPE_INTEGER)).\
+        or_extract(token(tokens.TYPE_FLOAT)).\
+        or_extract(token(tokens.TYPE_DATE)).\
+        or_extract(token(tokens.TYPE_BOOLEAN))
+    return AtomicElement(captured.value('Expected an atomic primitive value')), captured.pending_tokens
+
+
+def punctuation_element(token_type):
+    def factory(ts):
+        c = capture_from(ts).extract(token(token_type))
+        return PunctuationElement(c.value('Expected the punctuation element: {}'.format(token_type))), c.pending_tokens
+    return factory
+
+def array_element(token_stream):
+
+    # Array -> '[' Space ArrayInternal Space ']'
+    # ArrayInternal -> Atomic Space ',' Space LineTerminator Space ArrayInternal |
+    #     Atomic Space ',' Space ArrayInternal | Atomic | EMPTY
+
+    def internal(ts):
+
+        def one(ts1):
+            c = capture_from(ts1).\
+                extract(atomic_element).\
+                and_extract(space_element).\
+                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_extract(space_element).\
+                and_extract(line_terminator).\
+                and_extract(space_element).\
+                and_extract(internal)
+            return c.value(), c.pending_tokens
+
+        def two(ts2):
+            c = capture_from(ts2).\
+                extract(atomic_element).\
+                and_extract(space_element).\
+                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_extract(space_element).\
+                and_extract(internal)
+            return c.value(), c.pending_tokens
+
+        captured = capture_from(ts).extract(one).or_extract(two).or_extract(atomic_element).or_empty()
+        return captured.value(), captured.pending_tokens
+
+    ca = capture_from(token_stream).\
+        extract(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
+        and_extract(space_element).\
+        and_extract(internal).\
+        and_extract(space_element).\
+        and_extract(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
+    return ArrayElement(ca.value()), ca.pending_tokens
