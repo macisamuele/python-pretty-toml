@@ -71,7 +71,10 @@ class LexerError(TOMLError):
         self._message = message
 
     def __repr__(self):
-        return "{}".format(self._message)
+        return self._message
+
+    def __str__(self):
+        return self._message
 
 
 def tokenize(source):
