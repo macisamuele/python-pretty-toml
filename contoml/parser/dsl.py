@@ -13,19 +13,19 @@ class Captured:
 
     def extract(self, element_factory):
         try:
-            element, pending_ts = element_factory(self._token_stream.fork)
+            element, pending_ts = element_factory(self._token_stream)
             if not isinstance(element, (tuple, list)):
                 element = (element,)
             return Captured(pending_ts, value=self.value() + element)
         except ParsingError as e:
             return Captured(self._token_stream, error=e)
-        except StopIteration:
+        except TokenStream.EndOfStream:
             return Captured(self._token_stream, error=ParsingError('Unexpected end of tokens'))
 
     def value(self, expectation_msg=None):
         if self._error:
             if expectation_msg:
-                raise ParsingError(expectation_msg, token=self._token_stream.peek())
+                raise ParsingError(expectation_msg, token=self._token_stream.head)
             else:
                 raise self._error
         return self._value

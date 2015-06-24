@@ -4,6 +4,9 @@ class TokenStream:
     An immutable subset of a token sequence
     """
 
+    class EndOfStream(Exception):
+        pass
+
     Nothing = tuple()
 
     def __init__(self, _tokens, offset=0):
@@ -11,43 +14,23 @@ class TokenStream:
             self._tokens = _tokens
         else:
             self._tokens = tuple(_tokens)
-        self._next_index = offset
+        self._head_index = offset
 
     @property
-    def fork(self):
-        """
-        Returns a clone of this TokenStream over the same token sequence and at the current offset. Advancing the
-        clone will not affect this instance.
-        """
-        return TokenStream(self._tokens, self._next_index)
+    def head(self):
+        try:
+            return self._tokens[self._head_index]
+        except IndexError:
+            raise TokenStream.EndOfStream
+
+    @property
+    def tail(self):
+        return TokenStream(self._tokens, offset=self._head_index+1)
 
     @property
     def offset(self):
-        return self._next_index
+        return self._head_index
 
-    def next(self):
-        """
-        Advances this iterator and returns the next item in the sequence, or raises StopIteration.
-        """
-        return self.__next__()
-
-    def peek(self):
-        """
-        Returns the next item without advancing the iterator, or TokenStream.Nothing if the end of the sequence
-        had been reached.
-        """
-        try:
-            return self._tokens[self._next_index+1]
-        except IndexError:
-            return TokenStream.Nothing
-
-    def __next__(self):
-        try:
-            item = self._tokens[self._next_index]
-            self._next_index += 1
-            return item
-        except IndexError:
-            raise StopIteration
 
 # class TokenStream:
 #     """

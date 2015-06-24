@@ -40,10 +40,10 @@ from contoml.parser.errors import ParsingError
 
 def token(token_type):
     def factory(ts):
-        t = ts.next()
+        t = ts.head
         if t.type != token_type:
             raise ParsingError('Expected a token of type {}'.format(token_type))
-        return t, ts
+        return t, ts.tail
     return factory
 
 
