@@ -34,3 +34,6 @@ class TokenStream:
     def offset(self):
         return self._head_index
 
+    @property
+    def at_end(self):
+        return self.offset >= len(self._tokens)

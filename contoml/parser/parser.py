@@ -9,7 +9,8 @@
     Comment -> COMMENT Newline
     LineTerminator -> Comment | Newline
     Space -> WHITESPACE Space | WHITESPACE | EMPTY
-    TableHeader -> Space [ Space TableHeaderName Space ] Space LineTerminator
+    TableHeader -> Space [ Space TableHeaderName Space ] Space LineTerminator |
+        Space [[ Space TableHeaderName Space ]] Space LineTerminator
     TableHeaderName -> STRING Space '.' Space TableHeaderName | STRING
     Atomic -> STRING | INTEGER | FLOAT | DATE | BOOLEAN
 
@@ -23,21 +24,28 @@
         InlineTableKeyValuePair | Empty
 
     Value -> Atomic | InlineTable | Array
-    KeyValuePair -> STRING Space '=' Space Value Space LineTerminator
+    KeyValuePair -> Space STRING Space '=' Space Value Space LineTerminator
 
-    TableBody -> KeyValuePair TableBody | KeyValuePair
+    TableBody -> KeyValuePair TableBody | KeyValuePair | EMPTY
 
-    Output -> Space LineTerminator Output | TableHeader Output | TableBody Output | Empty
+    EmptyLine -> Space LineTerminator
+    FileEntry -> EmptyLine | TableHeader | TableBody
+
+    TOMLFile -> FileEntry TOMLFile | FileEntry | EMPTY
 """
+
 from contoml import tokens
 from contoml.elements.array import ArrayElement
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.inlinetable import InlineTable
 from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement, PunctuationElement
+from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
+from contoml.file import TOMLFile
 
 from contoml.parser.dsl import capture_from
 from contoml.parser.errors import ParsingError
+from contoml.parser.tokenstream import TokenStream
 
 """
     Non-terminals are represented as functions which return (RESULT, pending_token_stream), or raise ParsingError.
@@ -57,7 +65,7 @@ def newline_element(token_stream):
     """
     Returns NewlineElement, pending_token_stream or raises ParsingError.
     """
-    captured = capture_from(token_stream).extract(token(tokens.TYPE_NEWLINE))
+    captured = capture_from(token_stream).find(token(tokens.TYPE_NEWLINE))
     return NewlineElement(captured.value()), captured.pending_tokens
 
 
@@ -65,7 +73,7 @@ def comment_element(token_stream):
     """
     Returns CommentElement, pending_token_stream or raises ParsingError.
     """
-    captured = capture_from(token_stream).extract(token(tokens.TYPE_COMMENT)).and_extract(token(tokens.TYPE_NEWLINE))
+    captured = capture_from(token_stream).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
     return CommentElement(captured.value()), captured.pending_tokens
 
 
@@ -73,7 +81,7 @@ def line_terminator(token_stream):
     """
     Returns either (NewlineElement or CommentElement), and pending_token_stream.
     """
-    captured = capture_from(token_stream).extract(comment_element).or_extract(newline_element)
+    captured = capture_from(token_stream).find(comment_element).or_find(newline_element)
     return captured.value('Expected a comment or a newline')[0], captured.pending_tokens
 
 
@@ -81,91 +89,109 @@ def zero_or_more_tokens(token_type):
 
     def factory(token_stream):
         def more(ts):
-            c = capture_from(ts).extract(token(token_type)).and_extract(zero_or_more_tokens(token_type))
+            c = capture_from(ts).find(token(token_type)).and_find(zero_or_more_tokens(token_type))
             return c.value(), c.pending_tokens
 
         def two(ts):
-            c = capture_from(ts).extract(token(tokens.TYPE_WHITESPACE))
+            c = capture_from(ts).find(token(tokens.TYPE_WHITESPACE))
             return c.value(), c.pending
 
         def zero(ts):
             return tuple(), ts
 
-        captured = capture_from(token_stream).extract(more).or_extract(two).or_extract(zero)
+        captured = capture_from(token_stream).find(more).or_find(two).or_find(zero)
         return captured.value(), captured.pending_tokens
 
     return factory
 
 
 def space_element(token_stream):
-    captured = capture_from(token_stream).extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE))
+    captured = capture_from(token_stream).find(zero_or_more_tokens(tokens.TYPE_WHITESPACE))
     return WhitespaceElement([t for t in captured.value() if t]), captured.pending_tokens
 
 
 def string_token(token_stream):
     captured = capture_from(token_stream).\
-        extract(token(tokens.TYPE_BARE_STRING)).\
-        or_extract(token(tokens.TYPE_STRING)).\
-        or_extract(token(tokens.TYPE_LITERAL_STRING)).\
-        or_extract(token(tokens.TYPE_MULTILINE_STRING)).\
-        or_extract(token(tokens.TYPE_MULTILINE_LITERAL_STRING))
+        find(token(tokens.TYPE_BARE_STRING)).\
+        or_find(token(tokens.TYPE_STRING)).\
+        or_find(token(tokens.TYPE_LITERAL_STRING)).\
+        or_find(token(tokens.TYPE_MULTILINE_STRING)).\
+        or_find(token(tokens.TYPE_MULTILINE_LITERAL_STRING))
     return captured.value('Expected a string'), captured.pending_tokens
 
 
 def string_element(token_stream):
-    captured = capture_from(token_stream).extract(string_token)
+    captured = capture_from(token_stream).find(string_token)
     return AtomicElement(captured.value()), captured.pending_tokens
 
 def table_header_name_tokens(token_stream):
 
     def one(ts):
         c = capture_from(ts).\
-            extract(string_token).\
-            and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-            and_extract(token(tokens.TYPE_OPT_DOT)).\
-            and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-            and_extract(table_header_name_tokens)
+            find(string_token).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(token(tokens.TYPE_OPT_DOT)).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(table_header_name_tokens)
         return c.value(), c.pending_tokens
 
-    captured = capture_from(token_stream).extract(one).or_extract(string_token)
+    captured = capture_from(token_stream).find(one).or_find(string_token)
     return captured.value(), captured.pending_tokens
 
 def table_header_element(token_stream):
-    captured = capture_from(token_stream).\
-        extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-        and_extract(token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
-        and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-        and_extract(table_header_name_tokens).\
-        and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-        and_extract(token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET)).\
-        and_extract(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-        and_extract(token(tokens.TYPE_NEWLINE))
 
+    def single(ts1):
+        c1 = capture_from(ts1).\
+            find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(table_header_name_tokens).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET)).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(line_terminator)
+
+        return c1.value(), c1.pending_tokens
+
+    def double(ts2):
+        c2 = capture_from(ts2).\
+            find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(token(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET)).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(table_header_name_tokens).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET)).\
+            and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
+            and_find(line_terminator)
+
+        return c2.value(), c2.pending_tokens
+
+    captured = capture_from(token_stream).find(single).or_find(double)
     return TableHeaderElement(captured.value()), captured.pending_tokens
 
 
 def atomic_element(token_stream):
     captured = capture_from(token_stream).\
-        extract(string_token).\
-        or_extract(token(tokens.TYPE_INTEGER)).\
-        or_extract(token(tokens.TYPE_FLOAT)).\
-        or_extract(token(tokens.TYPE_DATE)).\
-        or_extract(token(tokens.TYPE_BOOLEAN))
+        find(string_token).\
+        or_find(token(tokens.TYPE_INTEGER)).\
+        or_find(token(tokens.TYPE_FLOAT)).\
+        or_find(token(tokens.TYPE_DATE)).\
+        or_find(token(tokens.TYPE_BOOLEAN))
     return AtomicElement(captured.value('Expected an atomic primitive value')), captured.pending_tokens
 
 
 def punctuation_element(token_type):
     def factory(ts):
-        c = capture_from(ts).extract(token(token_type))
+        c = capture_from(ts).find(token(token_type))
         return PunctuationElement(c.value('Expected the punctuation element: {}'.format(token_type))), c.pending_tokens
     return factory
 
 
 def value(token_stream):
     captured = capture_from(token_stream).\
-        extract(atomic_element).\
-        or_extract(array_element).\
-        or_extract(inline_table_element)
+        find(atomic_element).\
+        or_find(array_element).\
+        or_find(inline_table_element)
     return captured.value(), captured.pending_tokens
 
 def array_element(token_stream):
@@ -174,33 +200,33 @@ def array_element(token_stream):
 
         def one(ts1):
             c = capture_from(ts1).\
-                extract(value).\
-                and_extract(space_element).\
-                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
-                and_extract(space_element).\
-                and_extract(line_terminator).\
-                and_extract(space_element).\
-                and_extract(internal)
+                find(value).\
+                and_find(space_element).\
+                and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_find(space_element).\
+                and_find(line_terminator).\
+                and_find(space_element).\
+                and_find(internal)
             return c.value(), c.pending_tokens
 
         def two(ts2):
             c = capture_from(ts2).\
-                extract(value).\
-                and_extract(space_element).\
-                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
-                and_extract(space_element).\
-                and_extract(internal)
+                find(value).\
+                and_find(space_element).\
+                and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_find(space_element).\
+                and_find(internal)
             return c.value(), c.pending_tokens
 
-        captured = capture_from(ts).extract(one).or_extract(two).or_extract(value).or_empty()
+        captured = capture_from(ts).find(one).or_find(two).or_find(value).or_empty()
         return captured.value(), captured.pending_tokens
 
     ca = capture_from(token_stream).\
-        extract(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
-        and_extract(space_element).\
-        and_extract(internal).\
-        and_extract(space_element).\
-        and_extract(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
+        find(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
+        and_find(space_element).\
+        and_find(internal).\
+        and_find(space_element).\
+        and_find(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
     return ArrayElement(ca.value()), ca.pending_tokens
 
 
@@ -213,31 +239,87 @@ def inline_table_element(token_stream):
 
     def key_value(ts):
         ca = capture_from(ts).\
-            extract(string_element).\
-            and_extract(space_element).\
-            and_extract(punctuation_element(tokens.TYPE_OP_ASSIGNMENT)).\
-            and_extract(space_element).\
-            and_extract(value)
+            find(string_element).\
+            and_find(space_element).\
+            and_find(punctuation_element(tokens.TYPE_OP_ASSIGNMENT)).\
+            and_find(space_element).\
+            and_find(value)
         return ca.value(), ca.pending_tokens
 
     def internal(ts):
         def one(ts1):
             c1 = capture_from(ts1).\
-                extract(key_value).\
-                and_extract(space_element).\
-                and_extract(punctuation_element(tokens.TYPE_OP_COMMA)).\
-                and_extract(space_element).\
-                and_extract(internal)
+                find(key_value).\
+                and_find(space_element).\
+                and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
+                and_find(space_element).\
+                and_find(internal)
             return c1.value(), c1.pending_tokens
 
-        c = capture_from(ts).extract(one).or_extract(key_value).or_empty()
+        c = capture_from(ts).find(one).or_find(key_value).or_empty()
         return c.value(), c.pending_tokens
 
     captured = capture_from(token_stream).\
-        extract(punctuation_element(tokens.TYPE_OP_CURLY_LEFT_BRACKET)).\
-        and_extract(space_element).\
-        and_extract(internal).\
-        and_extract(space_element).\
-        and_extract(punctuation_element(tokens.TYPE_OP_CURLY_RIGHT_BRACKET))
+        find(punctuation_element(tokens.TYPE_OP_CURLY_LEFT_BRACKET)).\
+        and_find(space_element).\
+        and_find(internal).\
+        and_find(space_element).\
+        and_find(punctuation_element(tokens.TYPE_OP_CURLY_RIGHT_BRACKET))
 
     return InlineTable(captured.value()), captured.pending_tokens
+
+
+def key_value_pair(token_stream):
+    captured = capture_from(token_stream).\
+        find(space_element).\
+        and_find(string_element).\
+        and_find(space_element).\
+        and_find(punctuation_element(tokens.TYPE_OP_ASSIGNMENT)).\
+        and_find(space_element).\
+        and_find(value).\
+        and_find(space_element).\
+        and_find(line_terminator)
+    return captured.value(), captured.pending_tokens
+
+
+def table_body_tokens(token_stream):
+
+    def one(ts):
+        c = capture_from(ts).\
+            find(key_value_pair).\
+            and_find(table_body_tokens)
+        return c.value(), c.pending_tokens
+
+    captured = capture_from(token_stream).find(one).or_find(key_value_pair).or_empty()
+    return captured.value(), captured.pending_tokens
+
+
+def table_body_element(token_stream):
+    captured = capture_from(token_stream).find(table_body_tokens)
+    return TableElement(captured.value()), captured.pending_tokens
+
+
+def toml_file_element(token_stream):
+
+    if token_stream.at_end:
+        raise TokenStream.EndOfStream
+
+    def empty_line(ts1):
+        c1 = capture_from(ts1).find(space_element).and_find(line_terminator)
+        return c1.value(), c1.pending_tokens
+
+    captured = capture_from(token_stream).find(empty_line).or_find(table_header_element).or_find(table_body_element)
+    return captured.value(), captured.pending_tokens
+
+def toml_file_elements(token_stream):
+
+    def one(ts1):
+        c1 = capture_from(ts1).find(toml_file_element).and_find(toml_file_elements)
+        return c1.value(), c1.pending_tokens
+
+    captured = capture_from(token_stream).find(one).or_find(toml_file_element).or_empty()
+    return captured.value(), captured.pending_tokens
+
+def toml_file(token_stream):
+    elements, _ = toml_file_elements(token_stream)
+    return TOMLFile(elements)

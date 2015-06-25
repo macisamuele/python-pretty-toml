@@ -22,12 +22,13 @@ class TOMLFile(elements.TraversalMixin):
     @staticmethod
     def _validate_elements(_elements):
 
-        # Must start with an optional TableElement, followed by zero or more (TableHeaderElement, TableElement) pairs.
+        # Non-metadata elements must start with an optional TableElement, followed by
+        # zero or more (TableHeaderElement, TableElement) pairs.
 
         if not _elements:
             return
 
-        it = PeekableIterator(iter(_elements))
+        it = PeekableIterator(e for e in _elements if e.type != elements.TYPE_METADATA)
 
         if isinstance(it.peek(), TableElement):
             it.next()
@@ -52,9 +53,15 @@ class TOMLFile(elements.TraversalMixin):
         """
         Returns the TableElement of the anonymous table, or raises a KeyError if not found.
         """
-        if not isinstance(self.elements[0], TableElement):
+        non_metadata_lements = tuple(self._non_metadata_elements())
+        if not isinstance(non_metadata_lements[0], TableElement):
             raise KeyError
-        return self.elements[0]
+        return non_metadata_lements[0]
+
+    def _non_metadata_elements(self):
+        for e in self.elements:
+            if e.type != elements.TYPE_METADATA:
+                yield e
 
     def _enumerate_table_headers(self):
         """
