@@ -14,9 +14,9 @@
     TableHeaderName -> STRING Space '.' Space TableHeaderName | STRING
     Atomic -> STRING | INTEGER | FLOAT | DATE | BOOLEAN
 
-    Array -> '[' Space ArrayInternal Space ']'
-    ArrayInternal -> Value Space ',' Space LineTerminator Space ArrayInternal |
-        Value Space ',' Space ArrayInternal | ContainedValue | EMPTY
+    Array -> '[' Space ArrayInternal Space ']' | '[' Space ArrayInternal Space LineTerminator Space ']'
+    ArrayInternal -> LineTerminator Space ArrayInternal | Value Space ',' Space LineTerminator Space ArrayInternal |
+        Value Space ',' Space ArrayInternal | LineTerminator | Value | EMPTY
 
     InlineTable -> '{' Space InlineTableInternal Space '}'
     InlineTableKeyValuePair = STRING Space '=' Space Value
@@ -26,7 +26,7 @@
     Value -> Atomic | InlineTable | Array
     KeyValuePair -> Space STRING Space '=' Space Value Space LineTerminator
 
-    TableBody -> KeyValuePair TableBody | KeyValuePair | EMPTY
+    TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair | EMPTY
 
     EmptyLine -> Space LineTerminator
     FileEntry -> EmptyLine | TableHeader | TableBody
@@ -68,28 +68,24 @@ def newline_element(token_stream):
     captured = capture_from(token_stream).find(token(tokens.TYPE_NEWLINE))
     return NewlineElement(captured.value()), captured.pending_tokens
 
+def comment_tokens(ts1):
+    c1 = capture_from(ts1).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
+    return c1.value(), c1.pending_tokens
 
 def comment_element(token_stream):
     """
     Returns CommentElement, pending_token_stream or raises ParsingError.
     """
-    captured = capture_from(token_stream).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
+    captured = capture_from(token_stream).find(comment_tokens)
     return CommentElement(captured.value()), captured.pending_tokens
 
 
 def line_terminator_tokens(token_stream):
-
-    def comment_tokens(ts1):
-        c1 = capture_from(ts1).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
-        return c1.value(), c1.pending_tokens
-
     captured = capture_from(token_stream).find(comment_tokens).or_find(token(tokens.TYPE_NEWLINE))
     return captured.value(), captured.pending_tokens
 
-def line_terminator(token_stream):
-    """
-    Returns either (NewlineElement or CommentElement), and pending_token_stream.
-    """
+
+def line_terminator_element(token_stream):
     captured = capture_from(token_stream).find(comment_element).or_find(newline_element)
     return captured.value('Expected a comment or a newline')[0], captured.pending_tokens
 
@@ -201,42 +197,70 @@ def value(token_stream):
         find(atomic_element).\
         or_find(array_element).\
         or_find(inline_table_element)
+    return captured.value('Expected a primitive value, array or an inline table'), captured.pending_tokens
+
+def array_internal(ts):
+
+    def zero(ts0):
+        c = capture_from(ts0).\
+            and_find(line_terminator_element).\
+            and_find(space_element).\
+            and_find(array_internal)
+        return c.value(), c.pending_tokens
+
+    def one(ts1):
+        c = capture_from(ts1).\
+            find(value).\
+            and_find(space_element).\
+            and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
+            and_find(space_element).\
+            and_find(line_terminator_element).\
+            and_find(space_element).\
+            and_find(array_internal)
+        return c.value(), c.pending_tokens
+
+    def two(ts2):
+        c = capture_from(ts2).\
+            find(value).\
+            and_find(space_element).\
+            and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
+            and_find(space_element).\
+            and_find(array_internal)
+        return c.value(), c.pending_tokens
+
+    def three(ts3):
+        c = capture_from(ts3).\
+            find(space_element).\
+            and_find(line_terminator_element)
+        return c.value(), c.pending_tokens
+
+    captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value).or_empty()
     return captured.value(), captured.pending_tokens
 
 def array_element(token_stream):
 
-    def internal(ts):
+    def one(ts1):
+        ca = capture_from(ts1).\
+            find(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
+            and_find(space_element).\
+            and_find(array_internal).\
+            and_find(space_element).\
+            and_find(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
+        return ca.value(), ca.pending_tokens
 
-        def one(ts1):
-            c = capture_from(ts1).\
-                find(value).\
-                and_find(space_element).\
-                and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
-                and_find(space_element).\
-                and_find(line_terminator).\
-                and_find(space_element).\
-                and_find(internal)
-            return c.value(), c.pending_tokens
+    def two(ts2):
+        ca = capture_from(ts2).\
+            find(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
+            and_find(space_element).\
+            and_find(array_internal).\
+            and_find(space_element).\
+            and_find(line_terminator_element).\
+            and_find(space_element).\
+            and_find(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
+        return ca.value(), ca.pending_tokens
 
-        def two(ts2):
-            c = capture_from(ts2).\
-                find(value).\
-                and_find(space_element).\
-                and_find(punctuation_element(tokens.TYPE_OP_COMMA)).\
-                and_find(space_element).\
-                and_find(internal)
-            return c.value(), c.pending_tokens
-
-        captured = capture_from(ts).find(one).or_find(two).or_find(value).or_empty()
-        return captured.value(), captured.pending_tokens
-
-    ca = capture_from(token_stream).\
-        find(punctuation_element(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)).\
-        and_find(space_element).\
-        and_find(internal).\
-        and_find(space_element).\
-        and_find(punctuation_element(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET))
-    return ArrayElement(ca.value()), ca.pending_tokens
+    captured = capture_from(token_stream).find(one).or_find(two)
+    return ArrayElement(captured.value()), captured.pending_tokens
 
 
 def inline_table_element(token_stream):
@@ -287,19 +311,33 @@ def key_value_pair(token_stream):
         and_find(space_element).\
         and_find(value).\
         and_find(space_element).\
-        and_find(line_terminator)
+        and_find(line_terminator_element)
     return captured.value(), captured.pending_tokens
 
 
 def table_body_tokens(token_stream):
 
-    def one(ts):
-        c = capture_from(ts).\
+    # TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair | EMPTY
+
+    def one(ts1):
+        c = capture_from(ts1).\
             find(key_value_pair).\
             and_find(table_body_tokens)
         return c.value(), c.pending_tokens
 
-    captured = capture_from(token_stream).find(one).or_find(key_value_pair).or_empty()
+    def two(ts2):
+        c = capture_from(ts2).\
+            find(line_terminator_tokens).\
+            and_find(table_body_tokens)
+        return c.value(), c.pending_tokens
+
+    captured = capture_from(token_stream).\
+        find(one).\
+        or_find(two).\
+        or_find(line_terminator_tokens).\
+        or_find(key_value_pair).\
+        or_empty()
+
     return captured.value(), captured.pending_tokens
 
 
@@ -314,7 +352,7 @@ def toml_file_element(token_stream):
         raise TokenStream.EndOfStream
 
     def empty_line(ts1):
-        c1 = capture_from(ts1).find(space_element).and_find(line_terminator)
+        c1 = capture_from(ts1).find(space_element).and_find(line_terminator_element)
         return c1.value(), c1.pending_tokens
 
     captured = capture_from(token_stream).find(empty_line).or_find(table_header_element).or_find(table_body_element)

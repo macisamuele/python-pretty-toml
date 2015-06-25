@@ -10,7 +10,7 @@ from contoml.parser.tokenstream import TokenStream
 def test_line_terminator_1():
     tokens = tokenize('# Sup\n')
     ts = TokenStream(tokens)
-    element, pending_ts = parser.line_terminator(ts)
+    element, pending_ts = parser.line_terminator_element(ts)
 
     assert isinstance(element, CommentElement)
     assert pending_ts.offset == 2
@@ -19,7 +19,7 @@ def test_line_terminator_1():
 def test_line_terminator_2():
     tokens = tokenize('\n')
     ts = TokenStream(tokens)
-    element, pending_ts = parser.line_terminator(ts)
+    element, pending_ts = parser.line_terminator_element(ts)
 
     assert isinstance(element, NewlineElement)
     assert pending_ts.offset == 1
@@ -78,6 +78,17 @@ def test_array():
     assert len(array_element) == 5
     assert len(pending_ts) == 1
 
+def test_array_2():
+
+    text = """[
+  "alpha",
+  "omega"
+]"""
+
+    array_element, pending_ts = parser.array_element(TokenStream(tokenize(text)))
+
+    assert array_element[0] == 'alpha'
+    assert array_element[1] == 'omega'
 
 def test_inline_table():
     inline_table, pending_ts = parser.inline_table_element(TokenStream(tokenize('{ "id"= 42,test = name} vroom')))
@@ -93,6 +104,38 @@ def test_table_body():
     assert len(pending_ts) == 2
     assert table_body['name'] == 'test'
     assert table_body['id'] == 42
+
+
+def test_key_value_pair():
+    text = """hosts = [
+  "alpha",
+  "omega"
+]
+"""
+
+    parsed, pending_ts = parser.key_value_pair(TokenStream(tokenize(text)))
+
+    assert isinstance(parsed[1], AtomicElement)
+    assert isinstance(parsed[5], ArrayElement)
+
+def test_table_body_2():
+
+    text = """
+data = [ ["gamma", "delta"], [1, 2] ]
+
+# Line breaks are OK when inside arrays
+hosts = [
+  "alpha",
+  "omega"
+]
+
+str_multiline = wohoo
+"""
+
+    table_body, pending_Ts = parser.table_body_element(TokenStream(tokenize(text)))
+
+    print(table_body)
+
 
 def test_toml_file():
     ts = TokenStream(tokenize("""
