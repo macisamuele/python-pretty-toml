@@ -77,6 +77,15 @@ def comment_element(token_stream):
     return CommentElement(captured.value()), captured.pending_tokens
 
 
+def line_terminator_tokens(token_stream):
+
+    def comment_tokens(ts1):
+        c1 = capture_from(ts1).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
+        return c1.value(), c1.pending_tokens
+
+    captured = capture_from(token_stream).find(comment_tokens).or_find(token(tokens.TYPE_NEWLINE))
+    return captured.value(), captured.pending_tokens
+
 def line_terminator(token_stream):
     """
     Returns either (NewlineElement or CommentElement), and pending_token_stream.
@@ -149,7 +158,7 @@ def table_header_element(token_stream):
             and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
             and_find(token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET)).\
             and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-            and_find(line_terminator)
+            and_find(line_terminator_tokens)
 
         return c1.value(), c1.pending_tokens
 
@@ -162,7 +171,7 @@ def table_header_element(token_stream):
             and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
             and_find(token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET)).\
             and_find(zero_or_more_tokens(tokens.TYPE_WHITESPACE)).\
-            and_find(line_terminator)
+            and_find(line_terminator_tokens)
 
         return c2.value(), c2.pending_tokens
 
