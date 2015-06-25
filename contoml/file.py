@@ -14,10 +14,42 @@ class TOMLFile(elements.TraversalMixin):
     """
 
     def __init__(self, _elements, name_prefixes=(), traversal_index=None):
-        TOMLFile._validate_elements(_elements)
-        self._elements = _elements
+        sanitized_elements = TOMLFile._sanitize_elements(_elements)
+        TOMLFile._validate_elements(sanitized_elements)
+        self._elements = sanitized_elements
         self._name_prefixes = name_prefixes
         self._traversal_index = traversal_index
+
+    @staticmethod
+    def _sanitize_elements(_elements):
+        """
+        Finds TableHeader elements that are not followed by TableBody elements and inserts empty TableElement
+        right after those.
+        """
+
+        output = list(_elements)
+
+        def find_next_table_header(after=-1):
+            return next((i for (i, element) in enumerate(output)
+                         if i > after and isinstance(element, TableHeaderElement)), float('-inf'))
+
+        def find_next_table_body(after=-1):
+            return next((i for (i, element) in enumerate(output)
+                         if i > after and isinstance(element, TableElement)), float('-inf'))
+
+        next_table_header_i = find_next_table_header()
+        while next_table_header_i >= 0:
+
+            following_table_header_i = find_next_table_header(next_table_header_i)
+            following_table_body_i = find_next_table_body(next_table_header_i)
+
+            if (following_table_body_i < 0) or \
+                (following_table_header_i >= 0 and (following_table_header_i < following_table_body_i)):
+                output.insert(next_table_header_i+1, TableElement(tuple()))
+
+            next_table_header_i = find_next_table_header(next_table_header_i)
+
+        return output
 
     @staticmethod
     def _validate_elements(_elements):
@@ -34,10 +66,12 @@ class TOMLFile(elements.TraversalMixin):
             it.next()
 
         while it.peek():
-            if not isinstance(it.next(), TableHeaderElement):
+            if not isinstance(it.peek(), TableHeaderElement):
                 raise InvalidTOMLFileError
-            if not isinstance(it.next(), TableElement):
+            it.next()
+            if not isinstance(it.peek(), TableElement):
                 raise InvalidTOMLFileError
+            it.next()
 
     @property
     def elements(self):
