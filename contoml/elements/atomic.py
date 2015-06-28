@@ -39,6 +39,10 @@ class AtomicElement(common.TokenElement):
         """
         return toml2py.deserialize(self._tokens[self._value_token_index()])
 
+    @property
+    def primitive_value(self):
+        return self.value
+
     def set(self, value):
         """
         Sets the contained value to the given one.

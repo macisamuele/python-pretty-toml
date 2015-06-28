@@ -51,3 +51,13 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
             if key == item:
                 return value
         raise KeyError
+
+    @property
+    def primitive_value(self):
+        """
+        Returns a primitive Python value without any formatting or markup metadata.
+        """
+        return {
+            key:
+                value.primitive_value if hasattr(value, 'primitive_value') else value for key, value in self.items()
+            }

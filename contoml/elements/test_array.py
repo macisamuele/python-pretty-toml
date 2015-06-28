@@ -67,3 +67,6 @@ def test_array_element():
     # Test deleting a value
     del array_element[2][1]
     assert '[4, 8, [42, 77], 12]' == array_element.serialized()
+
+    # Test primitive_value
+    assert (4, 8, (42, 77), 12) == array_element.primitive_value

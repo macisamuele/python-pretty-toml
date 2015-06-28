@@ -56,6 +56,13 @@ class TokenElement(Element):
     def __repr__(self):
         return repr(self.tokens)
 
+    @property
+    def primitive_value(self):
+        """
+        Returns a primitive Python value without any formatting or markup metadata.
+        """
+        raise NotImplementedError
+
 
 class ContainerElement(Element):
     """
@@ -80,5 +87,11 @@ class ContainerElement(Element):
     def __repr__(self):
         return repr(self.sub_elements)
 
+    @property
+    def primitive_value(self):
+        """
+        Returns a primitive Python value without any formatting or markup metadata.
+        """
+        raise NotImplementedError
 
 

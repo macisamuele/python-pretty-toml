@@ -33,6 +33,16 @@ class ArrayElement(ContainerElement, traversal.TraversalMixin):
     def value(self):
         return self     # self is a sequence-like value
 
+    @property
+    def primitive_value(self):
+        """
+        Returns a primitive Python value without any formatting or markup metadata.
+        """
+        return tuple(self[i].primitive_value if hasattr(self[i], 'primitive_value') else self[i] for i in range(len(self)))
+
+    def __str__(self):
+        return "Array{}".format(self.primitive_value)
+
     def append(self, v):
         new_entry = [create_element(v)]
 
