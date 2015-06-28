@@ -13,43 +13,11 @@ class TOMLFile(elements.TraversalMixin):
     Raises InvalidTOMLFileError on invalid input elements.
     """
 
-    def __init__(self, _elements, name_prefixes=(), traversal_index=None):
-        sanitized_elements = TOMLFile._sanitize_elements(_elements)
+    def __init__(self, _elements, name_prefixes=()):
+        sanitized_elements = _sanitize_elements(_elements)
         TOMLFile._validate_elements(sanitized_elements)
         self._elements = sanitized_elements
         self._name_prefixes = name_prefixes
-        self._traversal_index = traversal_index
-
-    @staticmethod
-    def _sanitize_elements(_elements):
-        """
-        Finds TableHeader elements that are not followed by TableBody elements and inserts empty TableElement
-        right after those.
-        """
-
-        output = list(_elements)
-
-        def find_next_table_header(after=-1):
-            return next((i for (i, element) in enumerate(output)
-                         if i > after and isinstance(element, TableHeaderElement)), float('-inf'))
-
-        def find_next_table_body(after=-1):
-            return next((i for (i, element) in enumerate(output)
-                         if i > after and isinstance(element, TableElement)), float('-inf'))
-
-        next_table_header_i = find_next_table_header()
-        while next_table_header_i >= 0:
-
-            following_table_header_i = find_next_table_header(next_table_header_i)
-            following_table_body_i = find_next_table_body(next_table_header_i)
-
-            if (following_table_body_i < 0) or \
-                (following_table_header_i >= 0 and (following_table_header_i < following_table_body_i)):
-                output.insert(next_table_header_i+1, TableElement(tuple()))
-
-            next_table_header_i = find_next_table_header(next_table_header_i)
-
-        return output
 
     @staticmethod
     def _validate_elements(_elements):
@@ -176,3 +144,37 @@ class TOMLFile(elements.TraversalMixin):
         Returns the TOML file serialized back to str.
         """
         return ''.join(element.serialized() for element in self.elements)
+
+    def keys(self):
+        pass
+
+
+def _sanitize_elements(_elements):
+    """
+    Finds TableHeader elements that are not followed by TableBody elements and inserts empty TableElement
+    right after those.
+    """
+
+    output = list(_elements)
+
+    def find_next_table_header(after=-1):
+        return next((i for (i, element) in enumerate(output)
+                     if i > after and isinstance(element, TableHeaderElement)), float('-inf'))
+
+    def find_next_table_body(after=-1):
+        return next((i for (i, element) in enumerate(output)
+                     if i > after and isinstance(element, TableElement)), float('-inf'))
+
+    next_table_header_i = find_next_table_header()
+    while next_table_header_i >= 0:
+
+        following_table_header_i = find_next_table_header(next_table_header_i)
+        following_table_body_i = find_next_table_body(next_table_header_i)
+
+        if (following_table_body_i < 0) or \
+            (following_table_header_i >= 0 and (following_table_header_i < following_table_body_i)):
+            output.insert(next_table_header_i+1, TableElement(tuple()))
+
+        next_table_header_i = find_next_table_header(next_table_header_i)
+
+    return output
