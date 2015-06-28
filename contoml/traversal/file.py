@@ -1,10 +1,12 @@
 import itertools
+
 from contoml import elements
-from contoml.cascadedict import CascadeDict
+from contoml.traversal.cascadedict import CascadeDict
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
 from contoml.errors import InvalidTOMLFileError
-from contoml.peekableit import PeekableIterator
+from contoml.traversal.peekableit import PeekableIterator
+
 
 class TOMLFile(elements.TraversalMixin):
     """
@@ -147,6 +149,54 @@ class TOMLFile(elements.TraversalMixin):
 
     def keys(self):
         pass
+
+    def values(self):
+        pass
+
+    def items(self):
+        return self.primitive.items()
+
+    @property
+    def primitive(self):
+        """
+        Returns a primitive object representation for this container (which is a dict).
+
+        WARNING: The returned container does not contain any markup or formatting metadata.
+        """
+        output = dict()
+
+        try:
+            output[''] = self._anonymous_table().primitive
+        except KeyError:
+            pass
+
+        def dict_set(d, names, value):
+            # Sets d[names[0]][names[1]][names[2]]... = value
+            if len(names) == 1:
+                d[names[0]] = value
+            else:
+                if names[0] not in d:
+                    d[names[0]] = dict()
+                dict_set(d[names[0]], names[1:], value)
+
+        def dict_append(d, names, value):
+            # Does (d[names[0]][names[1]][names[2]]...).append(value)
+            if len(names) == 1:
+                if names[0] not in d:
+                    d[names[0]] = list()
+                d[names[0]].append(value)
+            else:
+                if names[0] not in d:
+                    d[names[0]] = dict()
+                dict_append(d[names[0]], names[1:], value)
+
+        for header_i, header in self._enumerate_table_headers():
+            dict_set(output, header.names, self.elements[header_i+1].primitive)
+
+        for header_i, header in self._enumerate_array_of_table_headers():
+            dict_append(output, header.names, self.elements[header_i+1].primitive)
+
+        return output
 
 
 def _sanitize_elements(_elements):

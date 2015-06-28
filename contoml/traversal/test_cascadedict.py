@@ -1,4 +1,4 @@
-from contoml.cascadedict import CascadeDict
+from contoml.traversal.cascadedict import CascadeDict
 
 
 def test_cascadedict():

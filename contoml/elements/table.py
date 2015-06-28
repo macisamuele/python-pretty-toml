@@ -60,3 +60,8 @@ class TableElement(abstracttable.AbstractTable):
 
     def value(self):
         return self
+
+    @property
+    def primitive(self):
+        # TODO
+        return dict()

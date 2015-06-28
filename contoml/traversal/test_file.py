@@ -1,5 +1,5 @@
 from contoml.elements.test_common import dummy_file_elements
-from contoml.file import TOMLFile
+from contoml.traversal.file import TOMLFile
 
 
 def test_file():
