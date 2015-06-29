@@ -7,15 +7,43 @@ class Entry:
 
     def __init__(self, names, table_element):
         self._table_element = table_element
-        self._names = names
+        self._names = EntryName(names)
 
     @property
     def table_element(self):
         return self._table_element
 
     @property
+    def name(self):
+        """
+        Returns an instnace of EntryName.
+        """
+        return self._names
+
+
+class EntryName:
+    """
+    An entry's name.
+    """
+
+    def __init__(self, names):
+        self._names = names
+
+    @property
     def names(self):
         return self._names
+
+    def is_prefixed_with(self, names):
+        for i, name in enumerate(names):
+            if self._names[i] != name:
+                return False
+        return True
+
+    def without_prefix(self, names):
+        for i, name in enumerate(names):
+            if name != self._names[i]:
+                return EntryName(self._names[i:])
+        return EntryName(names=self.names[len(names):])
 
 
 class AnonymousTableEntry(Entry):
