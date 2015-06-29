@@ -42,7 +42,7 @@ from contoml.elements.metadata import NewlineElement, CommentElement, Whitespace
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
 
-from contoml.parser.dsl import capture_from
+from contoml.parser.recdesc import capture_from
 from contoml.parser.errors import ParsingError
 from contoml.parser.tokenstream import TokenStream
 from contoml.traversal.file import TOMLFile
