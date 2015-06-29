@@ -369,4 +369,4 @@ def toml_file_elements(token_stream):
 
 def toml_file(token_stream):
     elements, _ = toml_file_elements(token_stream)
-    return TOMLFile(elements)
+    return tuple(elements)
