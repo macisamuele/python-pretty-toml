@@ -41,11 +41,11 @@ from contoml.elements.inlinetable import InlineTable
 from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement, PunctuationElement
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
-from contoml.traversal.file import TOMLFile
 
 from contoml.parser.dsl import capture_from
 from contoml.parser.errors import ParsingError
 from contoml.parser.tokenstream import TokenStream
+from contoml.traversal.file import TOMLFile
 
 """
     Non-terminals are represented as functions which return (RESULT, pending_token_stream), or raise ParsingError.
