@@ -30,20 +30,26 @@ class EntryName:
         self._names = names
 
     @property
-    def names(self):
+    def sub_names(self):
         return self._names
 
     def is_prefixed_with(self, names):
+        if isinstance(names, EntryName):
+            return self.is_prefixed_with(names.sub_names)
+
         for i, name in enumerate(names):
             if self._names[i] != name:
                 return False
         return True
 
     def without_prefix(self, names):
+        if isinstance(names, EntryName):
+            return self.without_prefix(names.sub_names)
+
         for i, name in enumerate(names):
             if name != self._names[i]:
                 return EntryName(self._names[i:])
-        return EntryName(names=self.names[len(names):])
+        return EntryName(names=self.sub_names[len(names):])
 
 
 class AnonymousTableEntry(Entry):
