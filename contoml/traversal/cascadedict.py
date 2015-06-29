@@ -11,6 +11,12 @@ class CascadeDict:
         assert internal_dicts, 'internal_dicts cannot be empty'
         self._internal_dicts = tuple(internal_dicts)
 
+    def cascaded_with(self, one_more_dict):
+        """
+        Returns another instance with one more dict cascaded at the end.
+        """
+        return CascadeDict(internal_dicts=self._internal_dicts + (one_more_dict,))
+
     def __getitem__(self, item):
         for d in self._internal_dicts:
             try:
@@ -29,3 +35,9 @@ class CascadeDict:
         all_items = reduce(operator.add, (list(d.items()) for d in reversed(self._internal_dicts)))
         unique_items = {k: v for k, v in all_items}.items()
         return set(unique_items)
+
+    def __contains__(self, item):
+        for d in self._internal_dicts:
+            if item in d:
+                return True
+        return False
