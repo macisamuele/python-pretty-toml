@@ -37,6 +37,7 @@ class TableElement(abstracttable.AbstractTable):
                 factory.create_operator_element('='),
                 factory.create_whitespace_element(),
                 new_element,
+                factory.create_newline_element(),
             ]
             self._sub_elements = self.sub_elements[:insertion_index] + elements + self.sub_elements[insertion_index:]
         else:
@@ -46,6 +47,7 @@ class TableElement(abstracttable.AbstractTable):
                 factory.create_operator_element('='),
                 factory.create_whitespace_element(),
                 new_element,
+                factory.create_newline_element(),
             ]
 
     def __delitem__(self, key):
