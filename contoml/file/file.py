@@ -20,11 +20,15 @@ class TOMLFile:
     def __getitem__(self, item):
         return self._navigable[item]
 
-    def serialized(self):
+    def dumps(self):
         """
         Returns the TOML file serialized back to str.
         """
         return ''.join(element.serialized() for element in self._elements)
+
+    def dump(self, file_path):
+        with open(file_path, mode='w') as fp:
+            fp.write(self.dumps())
 
     def keys(self):
         return self._navigable.keys()
