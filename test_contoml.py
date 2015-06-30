@@ -5,7 +5,7 @@ def test_it_should_correctly_load_sample_file():
 
     toml_file = contoml.load('dateless_sample.toml')
 
-    assert set(toml_file.keys()) == {'fruit', 'clients', '', 'owner', 'database', 'servers'}
+    assert set(toml_file.keys()) == {'fruit', 'clients', '', 'owner', 'database', 'servers', 'extra'}
 
     json_file = json.load(open('dateless_sample.json'))
 

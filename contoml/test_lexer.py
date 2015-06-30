@@ -141,12 +141,6 @@ def test_invalid_tokenizing():
                 assert not (token.type == token_type and token.source_substring == expected_match)
 
 
-def test_tokenizing_sample_file():
-    source = open('sample.toml').read()
-    # Number of valid tokens was manually verified
-    assert len(list(tokenize(source))) == 468
-
-
 def test_token_type_order():
     type_a = tokens.TokenType('a', 5, is_metadata=False)
     type_b = tokens.TokenType('b', 0, is_metadata=False)

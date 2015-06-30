@@ -93,5 +93,10 @@
  "owner": {
   "dob": "yesterday", 
   "name": "Tom Preston-Werner"
+ },
+ "extra": {
+  "stuff": {
+   "the_truth": "not_here"
+  }
  }
 }

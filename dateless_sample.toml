@@ -87,5 +87,8 @@ trimmed in raw strings.
 
 
 points = [ { x = 1, y = 2, z = 3 },
-           { x = 7, y = 8, z = 9 },
+           { x = 7, y = 8, z = 9 },         # This value is so special to me
            { x = 2, y = 4, z = 8 } ]
+
+[extra.stuff]
+        the_truth =   not_here  # Gotcha!
