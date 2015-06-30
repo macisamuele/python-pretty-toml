@@ -20,8 +20,8 @@ import contoml
 toml_file = contoml.load('sample.toml')
 
 # The anonymous table is accessible using the empty string key on the TOML file
->>> print(toml_file['']['title'])
-TOML Example
+>>> toml_file['']['title']
+'TOML Example'
 
 # You can modify table values, or add new values to pre-existing tables, 
 # but you cannot create new top-level tables.
