@@ -315,26 +315,26 @@ def key_value_pair(token_stream):
     return captured.value(), captured.pending_tokens
 
 
-def table_body_tokens(token_stream):
+def table_body_elements(token_stream):
 
     # TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair | EMPTY
 
     def one(ts1):
         c = capture_from(ts1).\
             find(key_value_pair).\
-            and_find(table_body_tokens)
+            and_find(table_body_elements)
         return c.value(), c.pending_tokens
 
     def two(ts2):
         c = capture_from(ts2).\
-            find(line_terminator_tokens).\
-            and_find(table_body_tokens)
+            find(line_terminator_element).\
+            and_find(table_body_elements)
         return c.value(), c.pending_tokens
 
     captured = capture_from(token_stream).\
         find(one).\
         or_find(two).\
-        or_find(line_terminator_tokens).\
+        or_find(line_terminator_element).\
         or_find(key_value_pair).\
         or_empty()
 
@@ -342,7 +342,7 @@ def table_body_tokens(token_stream):
 
 
 def table_body_element(token_stream):
-    captured = capture_from(token_stream).find(table_body_tokens)
+    captured = capture_from(token_stream).find(table_body_elements)
     return TableElement(captured.value()), captured.pending_tokens
 
 
