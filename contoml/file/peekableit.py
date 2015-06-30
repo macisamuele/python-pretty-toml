@@ -15,6 +15,9 @@ class PeekableIterator:
     def next(self):
         return self.__next__()
 
+    def __iter__(self):
+        return self
+
     def peek(self):
         """
         Returns PeekableIterator.Nothing when the iterator is exhausted.

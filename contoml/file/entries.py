@@ -1,6 +1,7 @@
 from contoml import elements
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
+from contoml.file.peekableit import PeekableIterator
 
 
 class Entry:
@@ -110,12 +111,13 @@ def extract(file_elements):
     _validate_file_elements(file_elements)
 
     # An iterator over enumerate(the non-metadata) elements
-    iterator = ((element_i, element) for (element_i, element) in enumerate(file_elements)
-                if element.type != elements.TYPE_METADATA)
+    iterator = PeekableIterator((element_i, element) for (element_i, element) in enumerate(file_elements)
+                                if element.type != elements.TYPE_METADATA)
 
     try:
-        _, first_element = next(iterator)
+        _, first_element = iterator.peek()
         if isinstance(first_element, TableElement):
+            iterator.next()
             yield AnonymousTableEntry(first_element)
     except KeyError:
         pass

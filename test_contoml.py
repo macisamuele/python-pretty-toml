@@ -10,3 +10,17 @@ def test_it_should_correctly_load_sample_file():
     json_file = json.load(open('dateless_sample.json'))
 
     assert json_file == toml_file.primitive
+
+
+def test_works_fine_without_anonymous_section():
+
+    toml =  """
+[apple]
+color = "green"
+name = "yonagold"
+"""
+
+    file = contoml.loads(toml)
+    assert set(file.keys()) == {'apple'}
+    assert file['apple']['color'] == 'green'
+    assert file['apple']['name'] == 'yonagold'
