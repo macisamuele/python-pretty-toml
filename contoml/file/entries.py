@@ -51,6 +51,15 @@ class EntryName:
                 return EntryName(self._names[i:])
         return EntryName(names=self.sub_names[len(names):])
 
+    def __str__(self):
+        return '.'.join(self.sub_names)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
 
 class AnonymousTableEntry(Entry):
 
