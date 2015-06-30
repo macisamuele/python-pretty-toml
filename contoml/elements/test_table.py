@@ -37,11 +37,11 @@ def test_table():
     table['relation'] = 'another'
 
     assert set(table.items()) == {('name', 'first'), ('id', 42), ('relation', 'another')}
-    assert table.serialized() == 'name = first\nid=42 # My id\n\n\n\nrelation = another'
+    assert table.serialized() == 'name = first\nid=42 # My id\n\n\n\nrelation = another\n'
 
     table['name'] = 'fawzy'
 
     assert set(table.items()) == {('name', 'fawzy'), ('id', 42), ('relation', 'another')}
-    assert table.serialized() == 'name = fawzy\nid=42 # My id\n\n\n\nrelation = another'
+    assert table.serialized() == 'name = fawzy\nid=42 # My id\n\n\n\nrelation = another\n'
 
 
