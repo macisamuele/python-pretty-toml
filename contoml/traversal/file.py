@@ -1,7 +1,7 @@
 import itertools
 
 from contoml import elements
-from contoml.traversal.cascadedict import CascadeDict
+from contoml.file.cascadedict import CascadeDict
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
 from contoml.errors import InvalidTOMLFileError
@@ -125,7 +125,7 @@ class TOMLFile(elements.TraversalMixin):
             # Try to find a partial match
             for i, table_header in \
                     itertools.chain(self._enumerate_table_headers(), self._enumerate_array_of_table_headers()):
-                if table_header.names == full_name:
+                if table_header.name == full_name:
                     return TOMLFile(self.elements, name_prefixes=full_name)
 
         # Give up

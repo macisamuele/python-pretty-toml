@@ -7,7 +7,7 @@ class CascadeDict:
     it from all the internal dicts in order of their listing, and setting an item sets it on the first dict listed.
     """
 
-    def __init__(self, internal_dicts):
+    def __init__(self, *internal_dicts):
         assert internal_dicts, 'internal_dicts cannot be empty'
         self._internal_dicts = tuple(internal_dicts)
 
@@ -15,7 +15,7 @@ class CascadeDict:
         """
         Returns another instance with one more dict cascaded at the end.
         """
-        return CascadeDict(internal_dicts=self._internal_dicts + (one_more_dict,))
+        return CascadeDict(self._internal_dicts, one_more_dict,)
 
     def __getitem__(self, item):
         for d in self._internal_dicts:

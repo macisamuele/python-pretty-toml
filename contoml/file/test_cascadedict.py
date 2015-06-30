@@ -1,4 +1,4 @@
-from contoml.traversal.cascadedict import CascadeDict
+from contoml.file.cascadedict import CascadeDict
 
 
 def test_cascadedict():
@@ -6,7 +6,7 @@ def test_cascadedict():
     d1 = {'a': 1, 'b': 2, 'c': 3}
     d2 = {'b': 12, 'e': 4, 'f': 5}
 
-    cascade = CascadeDict((d1, d2))
+    cascade = CascadeDict(d1, d2)
 
     # Test querying
     assert cascade['a'] == 1
