@@ -70,5 +70,6 @@ class InlineTable(abstracttable.AbstractTable):
 
         self._sub_elements = self.sub_elements[:begin] + self.sub_elements[end:]
 
+    @property
     def value(self):
         return self     # self is a dict-like value that is perfectly usable
