@@ -1,8 +1,8 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name='contoml',
-    packages=['contoml'],
+    packages=find_packages(),
     version='0.1',
     description='Consistent TOML for Python',
     author='Amr Hassan',
