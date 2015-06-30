@@ -5,4 +5,18 @@
 A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python that tries its best to preserve order of table mappings, formatting of source file, and comments during a deserialize/update/serialize job.
 
 ## Usage ##
-*TODO*
+
+```python
+import contoml
+toml_file = contoml.load('sample.toml')
+
+print(toml_file['']['title'])    # The anonymous table is accessible using the `''` key on the tom file
+
+# You can modify table values, or add new values to pre-existing tables, but you cannot create new
+# top-level tables.
+toml_file['fruit'][1]['variety'][0]['points'][0]['y'] = 42
+toml_file['servers']['alpha']['ip'] = '192.168.0.111'
+
+# Serialize back to text at any point
+toml_file.dump('sample_modified.toml')
+```
