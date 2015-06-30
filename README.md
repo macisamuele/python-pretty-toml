@@ -19,7 +19,7 @@ import contoml
 
 toml_file = contoml.load('sample.toml')
 
-# The anonymous table is accessible using the `''` key on the tom file
+# The anonymous table is accessible using the empty string key on the tom file
 print(toml_file['']['title'])
 
 # You can modify table values, or add new values to pre-existing tables, 
