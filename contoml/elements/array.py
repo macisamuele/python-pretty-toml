@@ -38,7 +38,7 @@ class ArrayElement(ContainerElement, traversal.TraversalMixin):
         """
         Returns a primitive Python value without any formatting or markup metadata.
         """
-        return tuple(
+        return list(
             self[i].primitive_value if hasattr(self[i], 'primitive_value')
             else self[i]
             for i in range(len(self)))

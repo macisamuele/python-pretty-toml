@@ -1,5 +1,7 @@
 import operator
 from functools import reduce
+from contoml.file import raw
+
 
 class CascadeDict:
     """
@@ -42,5 +44,6 @@ class CascadeDict:
                 return True
         return False
 
-    def neutralize(self):
-        return {k: v for k, v in self.items()}
+    @property
+    def neutralized(self):
+        return {k: raw.to_raw(v) for k, v in self.items()}

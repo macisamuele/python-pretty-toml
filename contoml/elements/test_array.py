@@ -69,4 +69,4 @@ def test_array_element():
     assert '[4, 8, [42, 77], 12]' == array_element.serialized()
 
     # Test primitive_value
-    assert (4, 8, (42, 77), 12) == array_element.primitive_value
+    assert [4, 8, [42, 77], 12] == array_element.primitive_value

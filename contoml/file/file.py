@@ -1,10 +1,5 @@
-import itertools
 
-from contoml import elements
-from contoml.file import elementsanitizer, structurer, entries
-from contoml.file.cascadedict import CascadeDict
-from contoml.elements.table import TableElement
-from contoml.elements.tableheader import TableHeaderElement
+from contoml.file import elementsanitizer, structurer, entries, raw
 
 
 class TOMLFile:
@@ -32,7 +27,7 @@ class TOMLFile:
         return ''.join(element.serialized() for element in self._elements)
 
     def keys(self):
-        raise NotImplementedError   # TODO
+        return self._navigable.keys()
 
     def values(self):
         raise NotImplementedError   # TODO
@@ -47,4 +42,4 @@ class TOMLFile:
 
         WARNING: The returned container does not contain any markup or formatting metadata.
         """
-        raise NotImplementedError   # TODO
+        return raw.to_raw(self._navigable)
