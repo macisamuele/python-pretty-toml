@@ -34,10 +34,10 @@ class TOMLFile:
         return self._navigable.keys()
 
     def values(self):
-        raise NotImplementedError   # TODO
+        return self._navigable.values()
 
     def items(self):
-        return self.primitive.items()
+        return self._navigable.items()
 
     @property
     def primitive(self):
