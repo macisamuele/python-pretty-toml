@@ -1,7 +1,3 @@
-from contoml.elements.test_common import dummy_file_elements
-from contoml.traversal.file import TOMLFile
-
-
 # def test_file():
 #     toml_file = TOMLFile(_elements=dummy_file_elements())
 #

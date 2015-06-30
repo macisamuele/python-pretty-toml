@@ -31,7 +31,7 @@
     EmptyLine -> Space LineTerminator
     FileEntry -> EmptyLine | TableHeader | TableBody
 
-    TOMLFile -> FileEntry TOMLFile | FileEntry | EMPTY
+    TOMLFileElements -> FileEntry TOMLFileElements | FileEntry | EMPTY
 """
 
 from contoml import tokens
@@ -45,7 +45,6 @@ from contoml.elements.tableheader import TableHeaderElement
 from contoml.parser.recdesc import capture_from
 from contoml.parser.errors import ParsingError
 from contoml.parser.tokenstream import TokenStream
-from contoml.traversal.file import TOMLFile
 
 """
     Non-terminals are represented as functions which return (RESULT, pending_token_stream), or raise ParsingError.
@@ -366,7 +365,3 @@ def toml_file_elements(token_stream):
 
     captured = capture_from(token_stream).find(one).or_find(toml_file_element).or_empty()
     return captured.value(), captured.pending_tokens
-
-def toml_file(token_stream):
-    elements, _ = toml_file_elements(token_stream)
-    return tuple(elements)

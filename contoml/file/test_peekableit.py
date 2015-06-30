@@ -1,4 +1,4 @@
-from contoml.traversal.peekableit import PeekableIterator
+from contoml.file.peekableit import PeekableIterator
 
 
 def test_peekable_iterator():

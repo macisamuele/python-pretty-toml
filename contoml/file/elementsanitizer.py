@@ -1,5 +1,8 @@
+from contoml import elements
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
+from contoml.errors import InvalidTOMLFileError
+from contoml.file.peekableit import PeekableIterator
 
 
 def sanitize(_elements):
@@ -31,3 +34,25 @@ def sanitize(_elements):
         next_table_header_i = find_next_table_header(next_table_header_i)
 
     return output
+
+
+def validate_sanitized(_elements):
+
+    # Non-metadata elements must start with an optional TableElement, followed by
+    # zero or more (TableHeaderElement, TableElement) pairs.
+
+    if not _elements:
+        return
+
+    it = PeekableIterator(e for e in _elements if e.type != elements.TYPE_METADATA)
+
+    if isinstance(it.peek(), TableElement):
+        it.next()
+
+    while it.peek():
+        if not isinstance(it.peek(), TableHeaderElement):
+            raise InvalidTOMLFileError
+        it.next()
+        if not isinstance(it.peek(), TableElement):
+            raise InvalidTOMLFileError
+        it.next()

@@ -20,7 +20,7 @@ def test_superdict():
 
 def test_structure():
     tokens = TokenStream(lexer.tokenize(open('sample.toml').read()))
-    elements = elementsanitizer.sanitize(parser.parse(tokens))
+    elements = elementsanitizer.sanitize(parser.parse_token_stream(tokens))
     entries_ = tuple(entries.extract(elements))
 
     s = structure(entries_)

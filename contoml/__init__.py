@@ -1,17 +1,19 @@
 
-from contoml.errors import TOMLError, InvalidTOMLFileError
+
 
 
 def loads(text):
     """
     Parses TOML text into a dict-like object and returns it.
     """
-    from .parser.parser import toml_file as parser
+    from .parser import parse_token_stream
     from .lexer import tokenize as lexer
     from .parser.tokenstream import TokenStream
+    from .file import TOMLFile
 
     tokens = lexer(text)
-    return parser(TokenStream(tokens))
+    elements = parse_token_stream(TokenStream(tokens))
+    return TOMLFile(elements)
 
 
 def load(file_path):
