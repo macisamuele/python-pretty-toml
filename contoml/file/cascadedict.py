@@ -34,10 +34,13 @@ class CascadeDict:
     def items(self):
         all_items = reduce(operator.add, (list(d.items()) for d in reversed(self._internal_dicts)))
         unique_items = {k: v for k, v in all_items}.items()
-        return set(unique_items)
+        return tuple(unique_items)
 
     def __contains__(self, item):
         for d in self._internal_dicts:
             if item in d:
                 return True
         return False
+
+    def neutralize(self):
+        return {k: v for k, v in self.items()}

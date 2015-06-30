@@ -14,7 +14,7 @@ def test_cascadedict():
     assert cascade['c'] == 3
     assert cascade['e'] == 4
     assert cascade.keys() == {'a', 'b', 'c', 'e', 'f'}
-    assert cascade.items() == {('a', 1), ('b', 2), ('c', 3), ('e', 4), ('f', 5)}
+    assert set(cascade.items()) == {('a', 1), ('b', 2), ('c', 3), ('e', 4), ('f', 5)}
 
     # Test mutating
     cascade['a'] = 11

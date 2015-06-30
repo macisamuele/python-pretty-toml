@@ -23,6 +23,21 @@ def test_structure():
     elements = elementsanitizer.sanitize(parser.parse(tokens))
     entries_ = tuple(entries.extract(elements))
 
-    navigable_struct = structure(entries_)
+    s = structure(entries_)
 
-    print(navigable_struct)
+    assert s['']['title'] == 'TOML Example'
+    assert s['owner']['name'] == 'Tom Preston-Werner'
+    assert s['database']['ports'][1] == 8001
+    assert s['servers']['alpha']['dc'] == 'eqdc10'
+    assert s['clients']['data'][1][0] == 1
+    assert s['clients']['key3'] == 'The quick brown fox jumps over the lazy dog.'
+
+    assert s['fruit'][0]['name'] == 'apple'
+    assert s['fruit'][0]['physical']['color'] == 'red'
+    assert s['fruit'][0]['physical']['shape'] == 'round'
+    assert s['fruit'][0]['variety'][0]['name'] == 'red delicious'
+    assert s['fruit'][0]['variety'][1]['name'] == 'granny smith'
+
+    assert s['fruit'][1]['name'] == 'banana'
+    assert s['fruit'][1]['variety'][0]['name'] == 'plantain'
+    assert s['fruit'][1]['variety'][0]['points'][2]['y'] == 4
