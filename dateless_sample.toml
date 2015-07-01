@@ -4,7 +4,7 @@ title = "TOML Example"
 
 [owner]
 name = "Tom Preston-Werner"
-dob = yesterday # First class dates
+dob = yesterday # Unquoted strings!!
 
 [database]
 server = "192.168.1.1"

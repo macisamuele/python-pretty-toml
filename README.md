@@ -33,7 +33,7 @@ toml_file = contoml.load('sample.toml')
 >>> toml_file.dump('sample_modified.toml')
 
 # If you would like to drop all the formatting metadata and markup information, you 
-# can decode to regular Python. primitives
+# can decode to regular Python primitives
 >>> toml_file.primitive
 {'': {'title': u'TOML Example'},
  'clients': {'data': [[u'gamma', u'delta'], [1, 2]],
