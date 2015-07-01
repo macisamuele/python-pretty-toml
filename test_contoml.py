@@ -24,3 +24,31 @@ name = "yonagold"
     assert set(file.keys()) == {'apple'}
     assert file['apple']['color'] == 'green'
     assert file['apple']['name'] == 'yonagold'
+
+
+def test_table_should_insert_new_entries_right_after_last_entry():
+
+    toml =  """
+[apple]
+color = "green"
+name = "yonagold"
+
+
+# Nevermind
+"""
+
+    file = contoml.loads(toml)
+
+    file['apple']['other_name'] = 'nevermind'
+
+    expected_toml = """
+[apple]
+color = "green"
+name = "yonagold"
+"other_name" = nevermind
+
+
+# Nevermind
+"""
+
+    assert expected_toml == file.dumps()

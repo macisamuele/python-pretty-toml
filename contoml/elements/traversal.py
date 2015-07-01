@@ -1,6 +1,6 @@
 from contoml import tokens
 from contoml.elements import common
-from contoml.elements.metadata import PunctuationElement, NewlineElement
+from contoml.elements.metadata import PunctuationElement, NewlineElement, CommentElement
 
 
 class TraversalMixin:
@@ -67,6 +67,29 @@ class TraversalMixin:
         Returns the index of the following newline element after the given index, or -Infinity.
         """
         return self.__find_following_element(index, lambda e: isinstance(e, NewlineElement))
+
+    def _find_following_comment(self, index):
+        """
+        Returns the index of the following comment element after the given index, or -Infinity.
+        """
+        return self.__find_following_element(index, lambda e: isinstance(e, CommentElement))
+
+    def _find_following_line_terminator(self, index):
+        """
+        Returns the index of the following comment or newline element after the given index, or -Infinity.
+        """
+        following_comment = self._find_following_comment(index)
+        following_newline = self._find_following_newline(index)
+
+        if following_comment == float('-inf'):
+            return following_newline
+        if following_newline == float('inf'):
+            return following_comment
+
+        if following_newline < following_comment:
+            return following_newline
+        else:
+            return following_comment
 
     def _find_preceding_newline(self, index):
         """

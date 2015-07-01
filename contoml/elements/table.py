@@ -24,31 +24,60 @@ class TableElement(abstracttable.AbstractTable):
         _, value_i = self._find_key_and_value(key)
         self._sub_elements[value_i] = value if isinstance(value, Element) else factory.create_element(value)
 
+    def _find_insertion_index(self):
+        """
+        Returns the self.sub_elements index in which new entries should be inserted.
+        """
+
+        non_metadata_elements = tuple(self._enumerate_non_metadata_sub_elements())
+
+        if not non_metadata_elements:
+            return 0
+
+        last_entry_i = non_metadata_elements[-1][0]
+        following_newline_i = self._find_following_line_terminator(last_entry_i)
+
+        return following_newline_i + 1
+
     def _insert(self, key, value):
 
-        new_element = value if isinstance(value, Element) else factory.create_element(value)
+        value_element = value if isinstance(value, Element) else factory.create_element(value)
 
-        if self:    # If not empty
-            insertion_index = len(self.sub_elements)   # Index of last value + 1
-            elements = [
-                factory.create_newline_element(),
-                factory.create_element(key),
-                factory.create_whitespace_element(),
-                factory.create_operator_element('='),
-                factory.create_whitespace_element(),
-                new_element,
-                factory.create_newline_element(),
-            ]
-            self._sub_elements = self.sub_elements[:insertion_index] + elements + self.sub_elements[insertion_index:]
-        else:
-            self._sub_elements = [
-                factory.create_element(key),
-                factory.create_whitespace_element(),
-                factory.create_operator_element('='),
-                factory.create_whitespace_element(),
-                new_element,
-                factory.create_newline_element(),
-            ]
+        inserted_elements = [
+            factory.create_element(key),
+            factory.create_whitespace_element(),
+            factory.create_operator_element('='),
+            factory.create_whitespace_element(),
+            value_element,
+            factory.create_newline_element(),
+        ]
+        
+        insertion_index = self._find_insertion_index()
+        
+        self._sub_elements = \
+            self.sub_elements[:insertion_index] + inserted_elements + self.sub_elements[insertion_index:]
+
+        # if self:    # If not empty
+        #     insertion_index = len(self.sub_elements)   # Index of last value + 1
+        #     elements = [
+        #         factory.create_newline_element(),
+        #         factory.create_element(key),
+        #         factory.create_whitespace_element(),
+        #         factory.create_operator_element('='),
+        #         factory.create_whitespace_element(),
+        #         value_element,
+        #         factory.create_newline_element(),
+        #     ]
+        #     self._sub_elements = self.sub_elements[:insertion_index] + elements + self.sub_elements[insertion_index:]
+        # else:
+        #     self._sub_elements = [
+        #         factory.create_element(key),
+        #         factory.create_whitespace_element(),
+        #         factory.create_operator_element('='),
+        #         factory.create_whitespace_element(),
+        #         value_element,
+        #         factory.create_newline_element(),
+        #     ]
 
     def __delitem__(self, key):
         begin, _ = self._find_key_and_value(key)

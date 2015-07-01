@@ -6,7 +6,13 @@ from contoml.elements.table import TableElement
 
 def test_table():
 
-    tokens = tuple(lexer.tokenize('name = first\nid=42 # My id\n\n\n'))
+    initial_toml = """name = first
+id=42 # My id
+
+
+"""
+
+    tokens = tuple(lexer.tokenize(initial_toml))
 
     elements = (
         AtomicElement(tokens[:1]),
@@ -24,7 +30,6 @@ def test_table():
 
         NewlineElement(tokens[12:13]),
         NewlineElement(tokens[13:14]),
-        NewlineElement(tokens[14:15]),
     )
 
     table = TableElement(elements)
@@ -37,11 +42,18 @@ def test_table():
     table['relation'] = 'another'
 
     assert set(table.items()) == {('name', 'first'), ('id', 42), ('relation', 'another')}
-    assert table.serialized() == 'name = first\nid=42 # My id\n\n\n\nrelation = another\n'
 
     table['name'] = 'fawzy'
 
     assert set(table.items()) == {('name', 'fawzy'), ('id', 42), ('relation', 'another')}
-    assert table.serialized() == 'name = fawzy\nid=42 # My id\n\n\n\nrelation = another\n'
+
+    expected_toml = """name = fawzy
+id=42 # My id
+relation = another
+
+
+"""
+
+    assert table.serialized() == expected_toml
 
 
