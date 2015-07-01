@@ -52,3 +52,31 @@ name = "yonagold"
 """
 
     assert expected_toml == file.dumps()
+
+
+def test_should_insert_with_sensible_indentation_in_tables():
+
+    toml = """
+[apple]
+    color = "green"
+    name = "yonagold"
+
+
+# Nevermind
+"""
+
+    file = contoml.loads(toml)
+
+    file['apple']['key'] = 23
+
+    expected_toml = """
+[apple]
+    color = "green"
+    name = "yonagold"
+    key = 23
+
+
+# Nevermind
+"""
+
+    assert file.dumps() == expected_toml

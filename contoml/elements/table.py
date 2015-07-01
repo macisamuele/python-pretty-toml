@@ -1,5 +1,6 @@
 from contoml.elements import abstracttable, factory
 from contoml.elements.common import Element
+from contoml.elements.metadata import CommentElement, NewlineElement, WhitespaceElement
 
 
 class TableElement(abstracttable.AbstractTable):
@@ -39,11 +40,36 @@ class TableElement(abstracttable.AbstractTable):
 
         return following_newline_i + 1
 
+    def _detect_indentation_size(self):
+        """
+        Detects the level of indentation used in this table.
+        """
+
+        def lines():
+            # Returns a sequence of sequences of elements belonging to each line
+            start = 0
+            for i, element in enumerate(self.elements):
+                if isinstance(element, (CommentElement, NewlineElement)):
+                    yield self.elements[start:i+1]
+                    start = i+1
+
+        def indentation(line):
+            # Counts the number of whitespace tokens at the beginning of this line
+            try:
+                first_non_whitespace_i = next(i for (i, e) in enumerate(line) if not isinstance(e, WhitespaceElement))
+                return sum(space.length for space in line[:first_non_whitespace_i])
+            except StopIteration:
+                return 0
+
+        return min(indentation(line) for line in lines() if len(line) > 1)
+
     def _insert(self, key, value):
 
         value_element = value if isinstance(value, Element) else factory.create_element(value)
 
-        inserted_elements = [
+        indentation = [factory.create_whitespace_element(self._detect_indentation_size())]
+
+        inserted_elements = indentation + [
             factory.create_element(key),
             factory.create_whitespace_element(),
             factory.create_operator_element('='),

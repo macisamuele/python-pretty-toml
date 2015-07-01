@@ -16,6 +16,13 @@ class WhitespaceElement(common.TokenElement):
             if token.type != tokens.TYPE_WHITESPACE:
                 raise InvalidElementError('Tokens making up a WhitespaceElement must all be whitespace')
 
+    @property
+    def length(self):
+        """
+        The whitespace length of this element
+        """
+        return len(self.tokens)
+
 
 class NewlineElement(common.TokenElement):
     """
