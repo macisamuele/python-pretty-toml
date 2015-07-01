@@ -14,7 +14,8 @@ _name_types = (
 
 class TableHeaderElement(Element):
     """
-    An element containing opening and closing single and double square brackets, strings and dots
+    An element containing opening and closing single and double square brackets, strings and dots and ending with
+    a newline.
     
     Raises InvalidElementError.
     """
@@ -58,7 +59,6 @@ class TableHeaderElement(Element):
     @staticmethod
     def _validate_tokens(_tokens):
 
-        # The way this code advances through the sequence _tokens is horrible and I am ashamed of it.
         opening_bracket_i = next((i for i, token in enumerate(_tokens)
                                   if token.type in _opening_bracket_types), float('-inf'))
 
@@ -92,3 +92,6 @@ class TableHeaderElement(Element):
 
         if closing_bracket_i < 0:
             raise InvalidElementError('Expected a closing bracket')
+
+        if _tokens[-1].type != tokens.TYPE_NEWLINE:
+            raise InvalidElementError('Must end with a newline')

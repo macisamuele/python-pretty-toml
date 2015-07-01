@@ -1,5 +1,7 @@
 
-from contoml.file import elementsanitizer, structurer, entries, raw
+from contoml.file import structurer, entries, raw
+from contoml.parser import elementsanitizer
+from contoml.file.freshtable import FreshTable
 
 
 class TOMLFile:
@@ -10,15 +12,23 @@ class TOMLFile:
     """
 
     def __init__(self, _elements):
-        sanitized_elements = elementsanitizer.sanitize(_elements)
-        elementsanitizer.sanitize(_elements)
-
-        self._elements = sanitized_elements
-
-        self._navigable = structurer.structure(entries.extract(self._elements))
+        self._elements = []
+        self._navigable = {}
+        self.append_elements(_elements)
 
     def __getitem__(self, item):
-        return self._navigable[item]
+        try:
+            return self._navigable[item]
+        except KeyError:
+            return FreshTable(self, item)
+
+    def append_elements(self, elements):
+        """
+        Appends more elements to the contained internal elements.
+        """
+        self._elements = self._elements + list(elements)
+        if self._elements:
+            self._navigable = structurer.structure(entries.extract(self._elements))
 
     def dumps(self):
         """

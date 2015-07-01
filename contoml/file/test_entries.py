@@ -10,7 +10,7 @@ def test_entry_extraction():
 
     e = tuple(entries.extract(elements))
 
-    assert len(e) == 12
+    assert len(e) == 13
     assert isinstance(e[0], AnonymousTableEntry)
 
 

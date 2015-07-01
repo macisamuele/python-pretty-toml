@@ -61,7 +61,10 @@ class TableElement(abstracttable.AbstractTable):
             except StopIteration:
                 return 0
 
-        return min(indentation(line) for line in lines() if len(line) > 1)
+        try:
+            return min(indentation(line) for line in lines() if len(line) > 1)
+        except ValueError:  # Raised by ValueError when no matching lines found
+            return 0
 
     def _insert(self, key, value):
 

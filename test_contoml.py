@@ -80,3 +80,11 @@ def test_should_insert_with_sensible_indentation_in_tables():
 """
 
     assert file.dumps() == expected_toml
+
+
+def test_setting_primitive_value_on_non_existing_section():
+
+    f = contoml.new()
+    f['details']['id'] = 12
+
+    assert f.dumps() == '[details]\nid = 12\n\n'

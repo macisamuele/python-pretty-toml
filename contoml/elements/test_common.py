@@ -72,8 +72,8 @@ type =complex"""))
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[:12]))] + \
             [TableHeaderElement(tokens_[12:16])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[16:25]))] + \
-            [TableHeaderElement(tokens_[25:30])] + \
-            [TableElement(primitive_tokens_to_primitive_elements(tokens_[30:39]))] + \
+            [TableHeaderElement(tokens_[25:31])] + \
+            [TableElement(primitive_tokens_to_primitive_elements(tokens_[31:39]))] + \
             [TableHeaderElement(tokens_[39:45])] + \
             [TableElement(primitive_tokens_to_primitive_elements(tokens_[45:53]))] + \
             [TableHeaderElement(tokens_[53:60])] + \

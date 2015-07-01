@@ -1,5 +1,8 @@
 
 
+def new():
+    from contoml.file.file import TOMLFile
+    return TOMLFile([])
 
 
 def loads(text):

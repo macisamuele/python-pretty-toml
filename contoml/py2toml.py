@@ -9,6 +9,7 @@ import strict_rfc3339
 import timestamp
 from contoml import tokens
 import re
+from contoml.elements.metadata import NewlineElement
 from contoml.errors import TOMLError
 
 
@@ -16,12 +17,23 @@ class NotPrimitiveError(TOMLError):
     pass
 
 
-def create_operator_token(token_type):
+_operator_tokens_by_type = {
+    tokens.TYPE_OP_SQUARE_LEFT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET, '['),
+    tokens.TYPE_OP_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET, ']'),
+    tokens.TYPE_OP_COMMA: tokens.Token(tokens.TYPE_OP_COMMA, ','),
+    tokens.TYPE_NEWLINE: tokens.Token(tokens.TYPE_NEWLINE, '\n'),
+}
 
-    if token_type == tokens.TYPE_OP_COMMA:
-        return tokens.Token(tokens.TYPE_OP_COMMA, ',')
 
-    raise NotImplementedError   # TODO
+def operator_token(token_type):
+    return _operator_tokens_by_type[token_type]
+
+
+_newline = NewlineElement([operator_token(tokens.TYPE_NEWLINE)])
+
+
+def newline_element():
+    return _newline
 
 
 def create_primitive_token(value):
@@ -58,3 +70,5 @@ def _escape_string(text):
         return text.encode('unicode-escape').encode('string-escape').replace('"', '\\"').replace("\\'", "'")
     else:
         return codecs.encode(text, 'unicode-escape').decode().replace('"', '\\"')
+
+

@@ -3,7 +3,7 @@ from contoml.elements.tableheader import TableHeaderElement
 
 
 def test_tableheader():
-    tokens = tuple(lexer.tokenize('\n\t [[personal. information.details]]'))
+    tokens = tuple(lexer.tokenize('\n\t [[personal. information.details]] \n'))
     element = TableHeaderElement(tokens)
 
     assert element.is_array_of_tables

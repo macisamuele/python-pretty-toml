@@ -1,5 +1,6 @@
 from contoml import lexer, parser
-from contoml.file import entries, elementsanitizer
+from contoml.file import entries
+from contoml.parser import elementsanitizer
 from contoml.file.entries import EntryName
 from contoml.file.structurer import superdict, structure
 from contoml.parser.tokenstream import TokenStream
