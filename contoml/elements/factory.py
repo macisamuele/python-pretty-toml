@@ -1,4 +1,5 @@
-from contoml import py2toml, tokens
+from contoml import tokens
+from contoml.tokens import py2toml
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import PunctuationElement, WhitespaceElement, NewlineElement
 from contoml.elements.tableheader import TableHeaderElement

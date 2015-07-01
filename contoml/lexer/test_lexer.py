@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .lexer import _munch_a_token
-from .lexer import *
+from contoml.lexer import _munch_a_token
+from contoml.lexer import *
 
 # A mapping from token types to a sequence of pairs of (source_text, expected_matched_text)
 valid_tokens = {

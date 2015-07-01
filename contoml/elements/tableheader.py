@@ -1,4 +1,5 @@
-from contoml import tokens, toml2py
+from contoml import tokens
+from contoml.tokens import toml2py
 from contoml.elements import common
 from contoml.elements.common import Element
 from contoml.elements.errors import InvalidElementError

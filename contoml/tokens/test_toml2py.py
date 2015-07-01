@@ -1,6 +1,9 @@
+from datetime import datetime
+
 import pytz
-from contoml import tokens, toml2py
-from datetime import datetime, tzinfo
+
+from contoml import tokens
+from contoml.tokens import toml2py
 
 
 def test_integer():

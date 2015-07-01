@@ -1,5 +1,4 @@
-
-from contoml import toml2py, py2toml
+from contoml.tokens import py2toml, toml2py
 from contoml.elements import common, InvalidElementError
 from contoml.util import is_dict_like, is_sequence_like
 

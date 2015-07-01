@@ -1,6 +1,9 @@
 import datetime
+
 import strict_rfc3339
-from contoml import py2toml, tokens
+
+from contoml import tokens
+from contoml.tokens import py2toml
 
 
 def test_string():
