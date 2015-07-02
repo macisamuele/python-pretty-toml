@@ -1,4 +1,3 @@
-from contoml.file.array import ArrayOfTables
 from contoml.file.entries import TableEntry, EntryName, AnonymousTableEntry
 from contoml.file.cascadedict import CascadeDict
 
@@ -115,7 +114,7 @@ def structure(entries):
                 if unprefixed_name in seq[-1]:
                     seq[-1][unprefixed_name].append(entry.table_element)
                 else:
-                    cascaded_with = NamedDict({unprefixed_name: ArrayOfTables(unprefixed_name, [entry.table_element])})
+                    cascaded_with = NamedDict({unprefixed_name: [entry.table_element]})
                     seq[-1] = CascadeDict(seq[-1], cascaded_with)
 
             else:

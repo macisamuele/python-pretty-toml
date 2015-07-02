@@ -1,5 +1,7 @@
+from contoml.elements.table import TableElement
 from contoml.errors import NoArrayFound
 from contoml.file import structurer, entries, raw
+from contoml.file.array import ArrayOfTables
 from contoml.file.fresharray import FreshArrayOfTables
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
@@ -19,7 +21,13 @@ class TOMLFile:
 
     def __getitem__(self, item):
         try:
-            return self._navigable[item]
+            value = self._navigable[item]
+            if isinstance(value, (list, tuple)):
+                return ArrayOfTables(parent=self, name=item, iterable=value)
+            elif isinstance(value, (TableElement, dict)):
+                return value    # TODO: Return a dict that writes back to TOMLFile
+            else:
+                raise RuntimeError('Whaaaaa!')
         except KeyError:
             return FreshTable(parents=(self,), name=item, is_array=False)
 
@@ -29,7 +37,7 @@ class TOMLFile:
         """
         if name in self._navigable:
             if isinstance(self._navigable[name], (list, tuple)):
-                return self._navigable[name]
+                return self[name]
             else:
                 raise NoArrayFound
         else:
