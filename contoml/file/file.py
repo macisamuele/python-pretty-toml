@@ -1,7 +1,7 @@
 
 from contoml.file import structurer, entries, raw
-from contoml.parser import elementsanitizer
 from contoml.file.freshtable import FreshTable
+import contoml.elements.factory as element_factory
 
 
 class TOMLFile:
@@ -20,7 +20,7 @@ class TOMLFile:
         try:
             return self._navigable[item]
         except KeyError:
-            return FreshTable(self, item)
+            return FreshTable(parents=(self,), name=item, is_array=False)
 
     def append_elements(self, elements):
         """
@@ -57,3 +57,14 @@ class TOMLFile:
         WARNING: The returned container does not contain any markup or formatting metadata.
         """
         return raw.to_raw(self._navigable)
+
+    def append(self, fresh_table):
+        """
+        Gets called by FreshTable instances when they get written to.
+        """
+        self.append_elements([
+            element_factory.create_array_of_tables_header_element(fresh_table.name)
+            if fresh_table.is_array else element_factory.create_table_header_element(fresh_table.name),
+            fresh_table,
+            element_factory.create_newline_element(),
+        ])
