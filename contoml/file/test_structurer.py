@@ -2,14 +2,14 @@ from contoml import lexer, parser
 from contoml.file import entries
 from contoml.parser import elementsanitizer
 from contoml.file.entries import EntryName
-from contoml.file.structurer import superdict, structure
+from contoml.file.structurer import NamedDict, structure
 from contoml.parser.tokenstream import TokenStream
 from contoml.file.cascadedict import CascadeDict
 
 
-def test_superdict():
+def test_NamedDict():
 
-    d = superdict()
+    d = NamedDict()
 
     d[EntryName(('super', 'sub1', 'sub2', 'sub3'))] = 12
     d[EntryName(('super', 'sub1', 'sub2', 'sub4'))] = 42

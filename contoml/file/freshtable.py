@@ -5,7 +5,7 @@ class FreshTable(TableElement):
     """
     A fresh TableElement that appended itself to each of parents when it first gets written to at most once.
 
-    parents is a sequence of objects providing an append(TableElement) method
+    parents is a sequence of objects providing an append_fresh_table(TableElement) method
     """
 
     def __init__(self, parents, name, is_array=False):
@@ -33,7 +33,7 @@ class FreshTable(TableElement):
             return
 
         for parent in self._parents:
-            parent.append(self)
+            parent.append_fresh_table(self)
 
         self.__appended = True
 

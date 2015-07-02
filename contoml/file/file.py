@@ -1,5 +1,6 @@
-
+from contoml.errors import NoArrayFound
 from contoml.file import structurer, entries, raw
+from contoml.file.fresharray import FreshArrayOfTables
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 
@@ -21,6 +22,18 @@ class TOMLFile:
             return self._navigable[item]
         except KeyError:
             return FreshTable(parents=(self,), name=item, is_array=False)
+
+    def array(self, name):
+        """
+        Returns the array of tables with the given name.
+        """
+        if name in self._navigable:
+            if isinstance(self._navigable[name], (list, tuple)):
+                return self._navigable[name]
+            else:
+                raise NoArrayFound
+        else:
+            return FreshArrayOfTables(self, name=name)
 
     def append_elements(self, elements):
         """
@@ -58,7 +71,7 @@ class TOMLFile:
         """
         return raw.to_raw(self._navigable)
 
-    def append(self, fresh_table):
+    def append_fresh_table(self, fresh_table):
         """
         Gets called by FreshTable instances when they get written to.
         """

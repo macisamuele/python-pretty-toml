@@ -88,3 +88,15 @@ def test_setting_primitive_value_on_non_existing_section():
     f['details']['id'] = 12
 
     assert f.dumps() == '[details]\nid = 12\n\n'
+
+
+def test_creating_an_array_of_tables():
+
+    f = contoml.new()
+
+    f.array('fruit')[0]['name'] = 'banana'
+
+    assert f.dumps() == """[[fruit]]
+name = banana
+
+"""

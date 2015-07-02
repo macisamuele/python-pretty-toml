@@ -1,8 +1,12 @@
+from contoml.file.array import ArrayOfTables
 from contoml.file.entries import TableEntry, EntryName, AnonymousTableEntry
 from contoml.file.cascadedict import CascadeDict
 
 
-class superdict(dict):
+class NamedDict(dict):
+    """
+    A dict that can use EntryName instances as keys.
+    """
 
     def __init__(self, other_dict=None):
         dict.__init__(self)
@@ -15,8 +19,8 @@ class superdict(dict):
         key can be an EntryName instance.
 
         When key is a path in the form of an EntryName instance, all the parents and grandparents of the value are
-        created along the way as instances of superdict. If the parent of the value exists, it is replaced with a
-        CascadeDict() that cascades the old parent value with a new superdict that contains the given child name
+        created along the way as instances of NamedDict. If the parent of the value exists, it is replaced with a
+        CascadeDict() that cascades the old parent value with a new NamedDict that contains the given child name
         and value.
         """
         if isinstance(key, EntryName):
@@ -30,23 +34,23 @@ class superdict(dict):
             elif len(key.sub_names) == 2:
                 parent, child = key.sub_names
                 if parent in self:
-                    self[parent] = CascadeDict(self[parent], superdict({child: value}))
+                    self[parent] = CascadeDict(self[parent], NamedDict({child: value}))
                 else:
-                    self[parent] = superdict({child: value})
+                    self[parent] = NamedDict({child: value})
             else:
                 grand_parents_name, parent_name, child_name = key.sub_names[:-2], key.sub_names[-2], key.sub_names[-1]
 
-                # Make sure parents exist, or create as instances of superdict
+                # Make sure parents exist, or create as instances of NamedDict
                 d = self
                 for name in grand_parents_name:
                     if name not in d:
-                        d[name] = superdict()
+                        d[name] = NamedDict()
                     d = d[name]
 
                 if parent_name in d:
-                    d[parent_name] = CascadeDict(d[parent_name], superdict({child_name: value}))
+                    d[parent_name] = CascadeDict(d[parent_name], NamedDict({child_name: value}))
                 else:
-                    d[parent_name] = superdict({child_name: value})
+                    d[parent_name] = NamedDict({child_name: value})
         else:
             return dict.__setitem__(self, key, value)
 
@@ -83,7 +87,7 @@ def structure(entries):
     TOML file.
     """
 
-    obj = superdict()
+    obj = NamedDict()
 
     last_array_of_tables = None         # The EntryName of the last array-of-tables header
 
@@ -97,7 +101,7 @@ def structure(entries):
                 seq = obj[last_array_of_tables]
                 unprefixed_name = entry.name.without_prefix(last_array_of_tables)
 
-                seq[-1] = CascadeDict(seq[-1], superdict({unprefixed_name: entry.table_element}))
+                seq[-1] = CascadeDict(seq[-1], NamedDict({unprefixed_name: entry.table_element}))
             else:
                 obj[entry.name] = entry.table_element
         else:    # It's an ArrayOfTablesEntry
@@ -111,7 +115,8 @@ def structure(entries):
                 if unprefixed_name in seq[-1]:
                     seq[-1][unprefixed_name].append(entry.table_element)
                 else:
-                    seq[-1] = CascadeDict(seq[-1], superdict({unprefixed_name: [entry.table_element]}))
+                    cascaded_with = NamedDict({unprefixed_name: ArrayOfTables(unprefixed_name, [entry.table_element])})
+                    seq[-1] = CascadeDict(seq[-1], cascaded_with)
 
             else:
                 obj.append(entry.name, entry.table_element)

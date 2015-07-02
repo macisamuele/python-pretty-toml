@@ -64,4 +64,9 @@ def create_table_header_element(name):
     ))
 
 def create_array_of_tables_header_element(name):
-    raise NotImplementedError   # TODO
+    return TableHeaderElement((
+        py2toml.operator_token(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET),
+        py2toml.create_primitive_token(name),
+        py2toml.operator_token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET),
+        py2toml.operator_token(tokens.TYPE_NEWLINE),
+    ))

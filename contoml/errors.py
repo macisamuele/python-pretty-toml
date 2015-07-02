@@ -7,3 +7,8 @@ class TOMLError(Exception):
 
 class InvalidTOMLFileError(TOMLError):
     pass
+
+class NoArrayFound(TOMLError):
+    """
+    An array of tables was requested but none exist by the given name.
+    """
