@@ -22,7 +22,7 @@ class ArrayOfTables(list):
             return list.__getitem__(self, item)
         except IndexError:
             if item == len(self):
-                return FreshTable(parents=(self,), name=self._name, is_array=True)
+                return FreshTable(parent=self, name=self._name, is_array=True)
             else:
                 raise
 

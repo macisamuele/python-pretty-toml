@@ -8,10 +8,10 @@ class FreshTable(TableElement):
     parents is a sequence of objects providing an append_fresh_table(TableElement) method
     """
 
-    def __init__(self, parents, name, is_array=False):
+    def __init__(self, parent, name, is_array=False):
         TableElement.__init__(self, sub_elements=[])
 
-        self._parents = parents
+        self._parent = parent
         self._name = name
         self._is_array = is_array
 
@@ -27,16 +27,16 @@ class FreshTable(TableElement):
     def is_array(self):
         return self._is_array
 
-    def _append_to_parents(self):
+    def _append_to_parent(self):
 
         if self.__appended:
             return
 
-        for parent in self._parents:
-            parent.append_fresh_table(self)
+        if self._parent is not None:
+            self._parent.append_fresh_table(self)
 
         self.__appended = True
 
     def __setitem__(self, key, value):
         TableElement.__setitem__(self, key, value)
-        self._append_to_parents()
+        self._append_to_parent()

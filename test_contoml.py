@@ -96,7 +96,7 @@ def test_creating_an_array_of_tables():
 
     f.array('fruit')[0]['name'] = 'banana'
     f.array('fruit')[1]['name'] = 'grapes'
-    f.array('fruit')[1]['name'] = 'grapes'
+    f['fruit'][1]['name'] = 'grapes'
 
     assert f.dumps() == """[[fruit]]
 name = banana

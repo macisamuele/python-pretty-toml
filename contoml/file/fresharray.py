@@ -19,9 +19,10 @@ class FreshArrayOfTables(list):
             return list.__getitem__(self, item)
         except IndexError:
             if item == len(self):
-                return FreshTable(parents=(self, self._toml_file), name=self._name, is_array=True)
+                return FreshTable(parent=self, name=self._name, is_array=True)
             else:
                 raise
 
     def append_fresh_table(self, fresh_table):
         list.append(self, fresh_table)
+        self._toml_file.append_fresh_table(fresh_table)

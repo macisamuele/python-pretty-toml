@@ -29,7 +29,7 @@ class TOMLFile:
             else:
                 raise RuntimeError('Whaaaaa!')
         except KeyError:
-            return FreshTable(parents=(self,), name=item, is_array=False)
+            return FreshTable(parent=self, name=item, is_array=False)
 
     def array(self, name):
         """
