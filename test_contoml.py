@@ -152,3 +152,27 @@ name = Kcuhc
 id = 21
 
 """
+
+def test_creating_an_array_of_tables_all_at_once():
+
+    f = contoml.new()
+
+    f['person'] = [
+        {'Name': "First Guy", 'id': 0},
+        {'Name': "Second Guy", 'id': 1},
+        {'Name': "Third Guy", 'id': 2},
+    ]
+
+    assert f.dumps() == """[[person]]
+Name = "First Guy"
+id = 0
+
+[[person]]
+Name = "Second Guy"
+id = 1
+
+[[person]]
+Name = "Third Guy"
+id = 2
+
+"""
