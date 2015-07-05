@@ -110,18 +110,21 @@ def test_creating_tables_from_dicts():
     assert f.dumps() == """["my table"]
 really = false
 noo = "yeah!"
+
 """
 
     f['my table']['noo'] = 'indeed'
     assert f.dumps() == """["my table"]
 really = false
 noo = indeed
+
 """
 
     f['my table'] = OrderedDict((('another_dict', True), ('should replace other one', 'right')))
     assert f.dumps() == """["my table"]
 "another_dict" = true
 "should replace other one" = right
+
 """
 
 
@@ -170,5 +173,42 @@ id = 1
 [[person]]
 Name = "Third Guy"
 id = 2
+
+"""
+
+
+def creating_an_anonymous_table():
+
+    f = contoml.new()
+
+    f[''] = {'Name': 'Fawzy'}
+
+    assert f.dumps() == "Name = Fawzy"
+
+
+def test_dumping_a_dict():
+
+    d = OrderedDict((('My string', 'string1'), ('My int', 42), ('My float', 12.111)))
+
+    assert contoml.dumps(d) == """"My string" = string1
+"My int" = 42
+"My float" = 12.111
+
+"""
+
+    d21 = OrderedDict((('My string', 'string1'), ('My int', 42), ('My float', 12.111)))
+    d22 = OrderedDict((('My string2', 'string2'), ('My int', 43), ('My float', 13.111)))
+
+    d2 = OrderedDict((('d1', d21), ('d2', d22)))
+
+    assert contoml.dumps(d2) == """[d1]
+"My string" = string1
+"My int" = 42
+"My float" = 12.111
+
+[d2]
+"My string2" = string2
+"My int" = 43
+"My float" = 13.111
 
 """

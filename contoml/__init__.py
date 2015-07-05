@@ -1,3 +1,4 @@
+from contoml.errors import InvalidValueError
 
 
 def new():
@@ -21,3 +22,24 @@ def loads(text):
 
 def load(file_path):
     return loads(open(file_path).read())
+
+
+def dumps(value):
+
+    if not isinstance(value, dict):
+        raise InvalidValueError('Input must be a dict of dicts, or just a dict!')
+
+    f = new()
+
+    if all(isinstance(child, dict) for child in value.values()):
+        for k, v in value.items():
+            f[k] = v
+    else:
+        f[''] = value
+
+    return f.dumps()
+
+
+def dump(obj, file_path):
+    with open(file_path, 'w') as fp:
+        fp.write(dumps(obj))
