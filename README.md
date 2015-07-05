@@ -20,7 +20,7 @@ pip install contoml
 ```python
 import contoml
 
-toml_file = contoml.load('sample.toml')
+>>> toml_file = contoml.load('sample.toml')
 
 # The anonymous table is accessible using the empty string key on the TOML file
 >>> toml_file['']['title']
@@ -38,7 +38,12 @@ toml_file = contoml.load('sample.toml')
 >>> toml_file.array('disks').append({'dev': '/dev/sdb', 'cap': '120'})
 
 # Serialize back to TOML text at any point
->>> print(toml_file.dumps())
+>>> toml_file.dump('updated_file.toml')
+```
+
+This produces the following TOML file:
+
+```toml
 # This is a TOML document.
 
 title = "TOML Example"
@@ -144,39 +149,90 @@ dev = "/dev/sda"
 cap = 120
 dev = "/dev/sdb"
 
-# If you would like to drop all the formatting metadata and markup information, you 
-# can decode to regular Python primitives
->>> toml_file.primitive
-{'': {'title': u'TOML Example'},
- 'clients': {'data': [[u'gamma', u'delta'], [1, 2]],
-  'hosts': [u'alpha', u'omega'],
-  'key3': u'The quick brown fox jumps over the lazy dog.',
-  'lines': 'The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n',
-  'quoted': 'Tom "Dubs" Preston-Werner',
-  'regex': '<\\i\\c*\\s*>',
-  'regex2': "I [dw]on't need \\d{2} apples",
-  'str2': u'The quick brown fox jumps over the lazy dog.',
-  'str_multiline': u'Roses are red\nViolets are blue',
-  'str_quoted': u'I\'m a string. "You can quote me". Name\tJos\xe9\nLocation\tSF.',
-  'winpath': 'C:\\Users\\nodejs\\templates',
-  'winpath2': '\\\\ServerX\\admin$\\system32\\'},
- 'database': {'connection_max': 5000,
-  'enabled': True,
-  'ports': [8001, 8001, 8002],
-  'server': u'192.168.1.1'},
- 'disks': [{'cap': '230', 'dev': u'/dev/sda'},
-  {'cap': '120', 'dev': u'/dev/sdb'}],
- 'environment': {'OS': u'Arch Linux', 'Type': u'GNU/Linux'},
- 'fruit': [{'name': u'apple',
-   'physical': {'color': u'red', 'shape': u'round'},
-   'variety': [{'name': u'red delicious'}, {'name': u'granny smith'}]},
-  {'name': u'banana',
-   'variety': [{'name': u'plantain',
-     'points': [{'x': 1, 'y': 42, 'z': 3},
-      {'x': 7, 'y': 8, 'z': 9},
-      {'x': 2, 'y': 4, 'z': 8}]}]}],
- 'owner': {'dob': datetime.datetime(1979, 5, 27, 15, 32, tzinfo=<UTC>),
-  'name': u'Tom Preston-Werner'},
- 'servers': {'alpha': {'dc': u'eqdc10', 'ip': u'192.168.0.111'},
-  'beta': {'dc': u'eqdc10', 'ip': u'10.0.0.2'}}}
+```
+
+Which is equivalent to the following data structure:
+
+```json
+{
+ "": {"title": "TOML Example"},
+ "owner": {
+  "name": "Tom Preston-Werner",
+  "dob": "1979-05-27 15:32:00+00:00"
+ },
+ "database": {
+  "ports": [8001, 8001, 8002],
+  "enabled": true,
+  "connection_max": 5000,
+  "server": "192.168.1.1"
+ },
+ "clients": {
+  "lines": "The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n",
+  "str_multiline": "Roses are red\nViolets are blue",
+  "regex": "<\\i\\c*\\s*>",
+  "winpath": "C:\\Users\\nodejs\\templates",
+  "data": [
+   ["gamma", "delta"],
+   [1, 2]
+  ],
+  "hosts": [
+   "alpha",
+   "omega"
+  ],
+  "key3": "The quick brown fox jumps over the lazy dog.",
+  "str_quoted": "I'm a string. \"You can quote me\". Name\tJos\u00e9\nLocation\tSF.",
+  "quoted": "Tom \"Dubs\" Preston-Werner",
+  "str2": "The quick brown fox jumps over the lazy dog.",
+  "winpath2": "\\\\ServerX\\admin$\\system32\\",
+  "regex2": "I [dw]on't need \\d{2} apples"
+ },
+ "servers": {
+  "alpha": {
+   "dc": "eqdc10",
+   "ip": "192.168.0.111"
+  },
+  "beta": {
+   "dc": "eqdc10",
+   "ip": "10.0.0.2"
+  }
+ },
+ "fruit": [
+  {
+   "name": "apple",
+   "variety": [
+    {
+     "name": "red delicious"
+    },
+    {
+     "name": "granny smith"
+    }
+   ],
+   "physical": {
+    "shape": "round",
+    "color": "red"
+   }
+  },
+  {
+   "name": "banana",
+   "variety": [
+    {
+     "name": "plantain",
+     "points": [
+      {"y": 42, "x": 1, "z": 3},
+      {"y": 8, "x": 7, "z": 9},
+      {"y": 4, "x": 2, "z": 8}
+     ]
+    }
+   ]
+  }
+ ],
+ "disks": [
+  {"cap": "230", "dev": "/dev/sda"},
+  {"cap": "120", "dev": "/dev/sdb"}
+ ],
+ "environment": {
+  "Type": "GNU/Linux",
+  "OS": "Arch Linux"
+ }
+}
 ```
