@@ -6,9 +6,7 @@
 [![Join the chat at https://gitter.im/Jumpscale/python-consistent-toml](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Jumpscale/python-consistent-toml?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python that tries its best to preserve order of table mappings, formatting of source file, and comments during a deserialize/update/serialize job.
-
-This module works by representing the TOML data structures as TOML lexical tokens internally and having the data manipulations performed directly on those tokens, so it may not be as efficient in handling relatively big TOML data structures like the other TOML modules.  
+A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python that tries its best to preserve order of table mappings, formatting of source file, and comments during a deserialize/update/serialize job. This is achieved by preserving the parsed/constructed TOML data structures as lexical tokens internally and having the data manipulations performed directly on the tokens.
 
 ## Installation ##
 ```bash
@@ -38,7 +36,7 @@ import contoml
 >>> toml_file.array('disks').append({'dev': '/dev/sdb', 'cap': '120'})
 
 # Serialize back to TOML text at any point
->>> toml_file.dump('updated_file.toml')
+>>> toml_file.dump('updated_sample.toml')
 ```
 
 This produces the following TOML file:
