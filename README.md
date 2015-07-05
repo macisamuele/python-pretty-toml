@@ -8,6 +8,8 @@
 
 A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python that tries its best to preserve order of table mappings, formatting of source file, and comments during a deserialize/update/serialize job.
 
+This module works by representing the TOML data structures as TOML lexical tokens internally and having the data manipulations performed directly on those tokens, so it may not be as efficient in handling relatively big TOML data structures like the other TOML modules.  
+
 ## Installation ##
 ```bash
 pip install contoml
