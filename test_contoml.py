@@ -138,5 +138,17 @@ def test_appending_to_an_array_of_tables():
     assert f.dumps() == """[[person]]
 name = Chuck
 id = 12
+
 """
 
+    f['person'].append(OrderedDict([('name', 'Kcuhc'), ('id', 21)]))
+
+    assert f.dumps() == """[[person]]
+name = Chuck
+id = 12
+
+[[person]]
+name = Kcuhc
+id = 21
+
+"""

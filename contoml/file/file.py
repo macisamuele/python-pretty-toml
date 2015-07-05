@@ -2,7 +2,6 @@ from contoml.elements.table import TableElement
 from contoml.errors import NoArrayFoundError, InvalidValueError
 from contoml.file import structurer, entries, raw
 from contoml.file.array import ArrayOfTables
-from contoml.file.fresharray import FreshArrayOfTables
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 

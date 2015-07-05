@@ -1,4 +1,5 @@
 from contoml.elements.table import TableElement
+from contoml.errors import InvalidValueError
 from contoml.file.freshtable import FreshTable
 
 
@@ -10,12 +11,13 @@ class ArrayOfTables(list):
         self._name = name
         self._parent = parent
 
-    def append(self, table):
-        if isinstance(table, TableElement):
-            list.append(self, table)
+    def append(self, value):
+        if isinstance(value, dict):
+            table = FreshTable(parent=self, name=self._name, is_array=True)
+            for k, v in value.items():
+                table[k] = v
         else:
-            # TODO: Convert to a TableElement and insert
-            raise NotImplementedError   # TODO
+            raise InvalidValueError('Can only append a dict to an array of tables')
 
     def __getitem__(self, item):
         try:
