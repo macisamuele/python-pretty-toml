@@ -59,7 +59,7 @@ class TOMLFile:
             else:
                 raise NoArrayFoundError
         else:
-            return FreshArrayOfTables(self, name=name)
+            return ArrayOfTables(parent=self, name=name)
 
     def append_elements(self, elements):
         """

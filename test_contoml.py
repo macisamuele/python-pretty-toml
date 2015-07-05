@@ -127,3 +127,16 @@ noo = indeed
 "another_dict" = true
 "should replace other one" = right
 """
+
+
+def test_appending_to_an_array_of_tables():
+
+    f = contoml.new()
+
+    f.array('person').append(OrderedDict([('name', 'Chuck'), ('id', 12)]))
+
+    assert f.dumps() == """[[person]]
+name = Chuck
+id = 12
+"""
+
