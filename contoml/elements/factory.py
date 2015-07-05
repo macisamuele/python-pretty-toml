@@ -15,6 +15,8 @@ def create_element(value):
         primitive_token = py2toml.create_primitive_token(value)
         return AtomicElement((primitive_token,))
     except py2toml.NotPrimitiveError:
+        # TODO: if dict instance return inline-table
+        # TODO: if sequence instance return array
         # TODO: Create a container element and return it
         pass
 
@@ -70,3 +72,19 @@ def create_array_of_tables_header_element(name):
         py2toml.operator_token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET),
         py2toml.operator_token(tokens.TYPE_NEWLINE),
     ))
+
+
+def create_table(dict_value):
+    """
+    Creates a TableElement out of a dict instance.
+    """
+    from contoml.elements.table import TableElement
+
+    if not isinstance(dict_value, dict):
+        raise ValueError('input must be a dict instance.')
+
+    table_element = TableElement([])
+    for k, v in dict_value.items():
+        table_element[k] = create_element(v)
+
+    return table_element

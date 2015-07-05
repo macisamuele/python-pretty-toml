@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import json
 import contoml
 
@@ -104,4 +105,25 @@ name = banana
 [[fruit]]
 name = grapes
 
+"""
+
+
+def test_creating_tables_from_dicts():
+    f = contoml.new()
+    f['my table'] = OrderedDict((('really', False), ('noo', 'yeah!')))
+    assert f.dumps() == """["my table"]
+really = false
+noo = "yeah!"
+"""
+
+    f['my table']['noo'] = 'indeed'
+    assert f.dumps() == """["my table"]
+really = false
+noo = indeed
+"""
+
+    f['my table'] = OrderedDict((('another_dict', True), ('should replace other one', 'right')))
+    assert f.dumps() == """["my table"]
+"another_dict" = true
+"should replace other one" = right
 """

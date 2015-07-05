@@ -1,5 +1,5 @@
 from contoml.elements.table import TableElement
-from contoml.errors import NoArrayFound
+from contoml.errors import NoArrayFoundError, InvalidValueError
 from contoml.file import structurer, entries, raw
 from contoml.file.array import ArrayOfTables
 from contoml.file.fresharray import FreshArrayOfTables
@@ -31,6 +31,24 @@ class TOMLFile:
         except KeyError:
             return FreshTable(parent=self, name=item, is_array=False)
 
+    def __setitem__(self, key, value):
+
+        if not isinstance(value, dict):
+            raise InvalidValueError('Assigned value must be a dict')
+
+        if key in self._navigable:
+            index = self._elements.index(self._navigable[key])
+            self._elements = self._elements[:index] + [element_factory.create_table(value)] + self._elements[index+1:]
+        else:
+            self._elements.append(element_factory.create_table_header_element(key))
+            self._elements.append(element_factory.create_table(value))
+
+        self._recreate_navigable()
+
+    def _recreate_navigable(self):
+        if self._elements:
+            self._navigable = structurer.structure(entries.extract(self._elements))
+
     def array(self, name):
         """
         Returns the array of tables with the given name.
@@ -39,7 +57,7 @@ class TOMLFile:
             if isinstance(self._navigable[name], (list, tuple)):
                 return self[name]
             else:
-                raise NoArrayFound
+                raise NoArrayFoundError
         else:
             return FreshArrayOfTables(self, name=name)
 
@@ -48,8 +66,7 @@ class TOMLFile:
         Appends more elements to the contained internal elements.
         """
         self._elements = self._elements + list(elements)
-        if self._elements:
-            self._navigable = structurer.structure(entries.extract(self._elements))
+        self._recreate_navigable()
 
     def dumps(self):
         """
