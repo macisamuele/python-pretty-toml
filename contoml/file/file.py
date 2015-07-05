@@ -23,10 +23,8 @@ class TOMLFile:
             value = self._navigable[item]
             if isinstance(value, (list, tuple)):
                 return ArrayOfTables(parent=self, name=item, iterable=value)
-            elif isinstance(value, (TableElement, dict)):
-                return value    # TODO: Return a dict that writes back to TOMLFile
             else:
-                raise RuntimeError('Whaaaaa!')
+                return value
         except KeyError:
             return FreshTable(parent=self, name=item, is_array=False)
 
