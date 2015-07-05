@@ -1,7 +1,8 @@
 # Consistent TOML for Python
 
 [![Build Status](https://travis-ci.org/Jumpscale/python-consistent-toml.svg?branch=master)](https://travis-ci.org/Jumpscale/python-consistent-toml)
-[![Pypi](https://img.shields.io/pypi/pyversions/contoml.svg)](https://pypi.python.org/pypi/contoml)
+![Python Versions](https://img.shields.io/pypi/pyversions/contoml.svg)
+[![Release](https://img.shields.io/pypi/v/contoml.svg)](https://pypi.python.org/pypi/contoml)
 [![Join the chat at https://gitter.im/Jumpscale/python-consistent-toml](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Jumpscale/python-consistent-toml?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
