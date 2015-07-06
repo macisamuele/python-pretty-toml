@@ -1,4 +1,3 @@
-from contoml.elements.table import TableElement
 from contoml.errors import NoArrayFoundError, InvalidValueError
 from contoml.file import structurer, entries, raw
 from contoml.file.array import ArrayOfTables
