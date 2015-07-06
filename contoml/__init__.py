@@ -1,7 +1,11 @@
 from contoml.errors import InvalidValueError
+from contoml.file.file import TOMLFile
 
 
 def new():
+    """
+    Constructs a fresh empty TOML data structure.
+    """
     from contoml.file.file import TOMLFile
     return TOMLFile([])
 
@@ -21,10 +25,21 @@ def loads(text):
 
 
 def load(file_path):
+    """
+    Parses a TOML file into a dict-like object and returns it.
+    """
     return loads(open(file_path).read())
 
 
 def dumps(value):
+    """
+    Dumps a data structure to TOML source code.
+
+    The given value must be either a dict of dict values, a dict, or a TOML file constructed by this module.
+    """
+
+    if isinstance(value, TOMLFile):
+        return value.dumps()
 
     if not isinstance(value, dict):
         raise InvalidValueError('Input must be a dict of dicts, or just a dict!')
@@ -41,5 +56,10 @@ def dumps(value):
 
 
 def dump(obj, file_path):
+    """
+    Dumps a data structure to the filesystem as TOML.
+
+    The given value must be either a dict of dict values, a dict, or a TOML file constructed by this module.
+    """
     with open(file_path, 'w') as fp:
         fp.write(dumps(obj))
