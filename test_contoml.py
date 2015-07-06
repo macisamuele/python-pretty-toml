@@ -177,13 +177,24 @@ id = 2
 """
 
 
-def creating_an_anonymous_table():
+def test_creating_an_anonymous_table():
+
+    f = contoml.new()
+
+    f['']['creator'] = True
+    f['']['id'] = 12
+
+    assert f.dumps() == "creator = true\nid = 12\n\n"
+
+
+def test_creating_an_anonymous_table_2():
 
     f = contoml.new()
 
     f[''] = {'Name': 'Fawzy'}
 
-    assert f.dumps() == "Name = Fawzy"
+    assert f.dumps() == "Name = Fawzy\n\n"
+
 
 
 def test_dumping_a_dict():

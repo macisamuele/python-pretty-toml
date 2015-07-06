@@ -103,9 +103,12 @@ class TOMLFile:
         """
         Gets called by FreshTable instances when they get written to.
         """
-        self.append_elements([
-            element_factory.create_array_of_tables_header_element(fresh_table.name)
-            if fresh_table.is_array else element_factory.create_table_header_element(fresh_table.name),
-            fresh_table,
-            element_factory.create_newline_element(),
-        ])
+        elements = []
+        if fresh_table.name:
+            if fresh_table.is_array:
+                elements += [element_factory.create_array_of_tables_header_element(fresh_table.name)]
+            else:
+                elements += [element_factory.create_table_header_element(fresh_table.name)]
+
+        elements += [fresh_table, element_factory.create_newline_element()]
+        self.append_elements(elements)
