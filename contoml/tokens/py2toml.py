@@ -62,7 +62,9 @@ def create_primitive_token(value):
 _bare_string_regex = re.compile('^[a-zA-Z0-9]*$')
 
 def _create_string_token(text):
-    if _bare_string_regex.match(text):
+    if text == '':
+        return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_string(text)))
+    elif _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
     else:
         return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_string(text)))
