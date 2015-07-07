@@ -46,7 +46,7 @@ def dumps(value):
 
     f = new()
 
-    if all(isinstance(child, dict) for child in value.values()):
+    if all(isinstance(child, (dict, tuple, list)) for child in value.values()):
         for k, v in value.items():
             f[k] = v
     else:

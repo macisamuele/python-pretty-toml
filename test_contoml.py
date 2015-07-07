@@ -176,6 +176,30 @@ id = 2
 
 """
 
+def test_creating_an_array_of_tables_all_at_once_via_dump():
+
+    d = {
+        'person': [
+            OrderedDict((('Name', "First Guy"), ('id', 0))),
+            OrderedDict((('Name', "Second Guy"), ('id', 1))),
+            OrderedDict((('Name', "Third Guy"), ('id', 2))),
+            ]
+    }
+
+    assert contoml.dumps(d) == """[[person]]
+Name = "First Guy"
+id = 0
+
+[[person]]
+Name = "Second Guy"
+id = 1
+
+[[person]]
+Name = "Third Guy"
+id = 2
+
+"""
+
 
 def test_creating_an_anonymous_table():
 
