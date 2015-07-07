@@ -2,7 +2,7 @@ from contoml.elements import factory, abstracttable
 from contoml.elements.common import Element
 
 
-class InlineTable(abstracttable.AbstractTable):
+class InlineTableElement(abstracttable.AbstractTable):
     """
     An Element containing key-value pairs, representing an inline table.
 

@@ -1,6 +1,6 @@
 from contoml import lexer
 from contoml.elements.atomic import AtomicElement
-from contoml.elements.inlinetable import InlineTable
+from contoml.elements.inlinetable import InlineTableElement
 from contoml.elements.metadata import PunctuationElement, WhitespaceElement
 
 
@@ -22,7 +22,7 @@ def test_inline_table():
         PunctuationElement(tokens[11:12])
     )
 
-    table = InlineTable(elements)
+    table = InlineTableElement(elements)
 
     assert table['name'] == 'first'
     assert table['id'] == 42

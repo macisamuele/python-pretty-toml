@@ -37,7 +37,7 @@
 from contoml import tokens
 from contoml.elements.array import ArrayElement
 from contoml.elements.atomic import AtomicElement
-from contoml.elements.inlinetable import InlineTable
+from contoml.elements.inlinetable import InlineTableElement
 from contoml.elements.metadata import NewlineElement, CommentElement, WhitespaceElement, PunctuationElement
 from contoml.elements.table import TableElement
 from contoml.elements.tableheader import TableHeaderElement
@@ -264,7 +264,7 @@ def array_element(token_stream):
 
 def inline_table_element(token_stream):
 
-    # InlineTable -> '{' Space InlineTableInternal Space '}'
+    # InlineTableElement -> '{' Space InlineTableInternal Space '}'
     # InlineTableKeyValuePair = STRING Space '=' Space Value
     # InlineTableInternal -> InlineTableKeyValuePair Space ',' Space InlineTableInternal |
     #     InlineTableKeyValuePair | Empty
@@ -298,7 +298,7 @@ def inline_table_element(token_stream):
         and_find(space_element).\
         and_find(punctuation_element(tokens.TYPE_OP_CURLY_RIGHT_BRACKET))
 
-    return InlineTable(captured.value()), captured.pending_tokens
+    return InlineTableElement(captured.value()), captured.pending_tokens
 
 
 def key_value_pair(token_stream):
