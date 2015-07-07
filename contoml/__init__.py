@@ -46,11 +46,12 @@ def dumps(value):
 
     f = new()
 
-    if all(isinstance(child, (dict, tuple, list)) for child in value.values()):
-        for k, v in value.items():
+    for k, v in value.items():
+        if isinstance(v, dict) or \
+                (isinstance(v, (tuple, list)) and all(isinstance(child, dict) for child in v)):
             f[k] = v
-    else:
-        f[''] = value
+        else:
+            f[''][k] = v
 
     return f.dumps()
 
