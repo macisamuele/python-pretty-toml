@@ -53,7 +53,7 @@ def create_primitive_token(value):
     elif isinstance(value, (datetime.datetime, datetime.date, datetime.time)):
         ts = timestamp(value) // 1000
         return tokens.Token(tokens.TYPE_DATE, strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts))
-    elif isinstance(value, str):
+    elif isinstance(value, six.string_types):
         return _create_string_token(value)
 
     raise NotPrimitiveError("{} of type {}".format(value, type(value)))
