@@ -56,7 +56,7 @@ def create_primitive_token(value):
     elif isinstance(value, str):
         return _create_string_token(value)
 
-    raise NotPrimitiveError
+    raise NotPrimitiveError("{} of type {}".format(value, type(value)))
 
 
 _bare_string_regex = re.compile('^[a-zA-Z0-9]*$')
