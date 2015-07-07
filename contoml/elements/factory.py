@@ -1,8 +1,11 @@
+import datetime
+import six
 from contoml import tokens
 from contoml.tokens import py2toml
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import PunctuationElement, WhitespaceElement, NewlineElement
 from contoml.elements.tableheader import TableHeaderElement
+from contoml.util import join_with
 
 
 def create_element(value):
@@ -10,17 +13,42 @@ def create_element(value):
     Creates and returns the appropriate elements.Element instance from the given Python primitive, sequence-like,
     or dict-like value.
     """
+    from contoml.elements.array import ArrayElement
+    from contoml.elements.inlinetable import InlineTableElement
 
-    try:
+    if isinstance(value, (int, float, bool, datetime.datetime, datetime.date) + six.string_types):
         primitive_token = py2toml.create_primitive_token(value)
         return AtomicElement((primitive_token,))
-    except py2toml.NotPrimitiveError:
-        # TODO: if dict instance return inline-table
-        # TODO: if sequence instance return array
-        # TODO: Create a container element and return it
-        pass
 
-    raise NotImplementedError   # TODO
+    elif isinstance(value, (list, tuple)):
+        preamble = [create_operator_element('[')]
+        postable = [create_operator_element(']')]
+        stuffing_elements = [create_element(v) for v in value]
+        spaced_stuffing = join_with(stuffing_elements,
+                                    separator=[create_operator_element(','), create_whitespace_element()])
+
+        return ArrayElement(preamble + spaced_stuffing + postable)
+
+    elif isinstance(value, dict):
+        preamble = [create_operator_element('{')]
+        postable = [create_operator_element('}')]
+
+        stuffing_elements = (
+            (
+                create_element(k),
+                create_whitespace_element(),
+                create_operator_element('='),
+                create_whitespace_element(),
+                create_element(v)
+            ) for (k, v) in value.items())
+
+        spaced_elements = join_with(stuffing_elements,
+                                    separator=[create_operator_element(','), create_whitespace_element()])
+
+        return InlineTableElement(preamble + spaced_elements + postable)
+
+    else:
+        raise RuntimeError('Value type unaccounted for: {} of type {}'.format(value, type(value)))
 
 
 def create_operator_element(operator):
@@ -35,6 +63,8 @@ def create_operator_element(operator):
         ']': tokens.TYPE_OP_SQUARE_RIGHT_BRACKET,
         '[[': tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET,
         ']]': tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET,
+        '{': tokens.TYPE_OP_CURLY_LEFT_BRACKET,
+        '}': tokens.TYPE_OP_CURLY_RIGHT_BRACKET,
     }
 
     ts = (tokens.Token(operator_type_map[operator], operator),)
