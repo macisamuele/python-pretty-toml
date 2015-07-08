@@ -247,3 +247,17 @@ def test_dumping_a_dict():
 "My float" = 13.111
 
 """
+
+def test_late_addition_to_anonymous_table():
+
+    f = contoml.new()
+
+    f['details']['name'] = 'John Doe'
+    f['']['global'] = 42
+
+    assert f.dumps() == """global = 42
+
+[details]
+name = "John Doe"
+
+"""

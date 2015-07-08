@@ -71,6 +71,13 @@ class TOMLFile:
         self._elements = self._elements + list(elements)
         self._recreate_navigable()
 
+    def prepend_elements(self, elements):
+        """
+        Prepends more elements to the contained internal elements.
+        """
+        self._elements = list(elements) + self._elements
+        self._recreate_navigable()
+
     def dumps(self):
         """
         Returns the TOML file serialized back to str.
@@ -103,12 +110,16 @@ class TOMLFile:
         """
         Gets called by FreshTable instances when they get written to.
         """
-        elements = []
         if fresh_table.name:
+            elements = []
             if fresh_table.is_array:
                 elements += [element_factory.create_array_of_tables_header_element(fresh_table.name)]
             else:
                 elements += [element_factory.create_table_header_element(fresh_table.name)]
 
-        elements += [fresh_table, element_factory.create_newline_element()]
-        self.append_elements(elements)
+            elements += [fresh_table, element_factory.create_newline_element()]
+            self.append_elements(elements)
+
+        else:
+            # It's an anonymous table
+            self.prepend_elements([fresh_table, element_factory.create_newline_element()])
