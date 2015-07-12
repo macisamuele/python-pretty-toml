@@ -16,7 +16,7 @@
 
     Array -> '[' Space ArrayInternal Space ']' | '[' Space ArrayInternal Space LineTerminator Space ']'
     ArrayInternal -> LineTerminator Space ArrayInternal | Value Space ',' Space LineTerminator Space ArrayInternal |
-        Value Space ',' Space ArrayInternal | LineTerminator | Value | EMPTY
+        Value Space ',' Space ArrayInternal | LineTerminator | Value
 
     InlineTable -> '{' Space InlineTableInternal Space '}'
     InlineTableKeyValuePair = STRING Space '=' Space Value
@@ -26,7 +26,7 @@
     Value -> Atomic | InlineTable | Array
     KeyValuePair -> Space STRING Space '=' Space Value Space LineTerminator
 
-    TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair | EMPTY
+    TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair
 
     EmptyLine -> Space LineTerminator
     FileEntry -> EmptyLine | TableHeader | TableBody
@@ -233,7 +233,7 @@ def array_internal(ts):
             and_find(line_terminator_element)
         return c.value(), c.pending_tokens
 
-    captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value).or_empty()
+    captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value)
     return captured.value(), captured.pending_tokens
 
 def array_element(token_stream):
@@ -316,7 +316,7 @@ def key_value_pair(token_stream):
 
 def table_body_elements(token_stream):
 
-    # TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair | EMPTY
+    # TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair
 
     def one(ts1):
         c = capture_from(ts1).\
@@ -334,8 +334,7 @@ def table_body_elements(token_stream):
         find(one).\
         or_find(two).\
         or_find(line_terminator_element).\
-        or_find(key_value_pair).\
-        or_empty()
+        or_find(key_value_pair)
 
     return captured.value(), captured.pending_tokens
 
