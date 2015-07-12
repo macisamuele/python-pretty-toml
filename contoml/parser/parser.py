@@ -356,11 +356,12 @@ def toml_file_element(token_stream):
     captured = capture_from(token_stream).find(empty_line).or_find(table_header_element).or_find(table_body_element)
     return captured.value(), captured.pending_tokens
 
+
 def toml_file_elements(token_stream):
 
     def one(ts1):
         c1 = capture_from(ts1).find(toml_file_element).and_find(toml_file_elements)
         return c1.value(), c1.pending_tokens
 
-    captured = capture_from(token_stream).find(one).or_find(toml_file_element).or_empty()
+    captured = capture_from(token_stream).find(one).or_find(toml_file_element)
     return captured.value(), captured.pending_tokens

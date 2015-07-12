@@ -1,12 +1,27 @@
 from collections import OrderedDict
 import json
 import contoml
+from contoml.errors import TOMLError
+
 
 def test_it_should_correctly_load_sample_file():
+
     toml_file = contoml.load('dateless_sample.toml')
     assert set(toml_file.keys()) == {'fruit', 'clients', '', 'owner', 'database', 'servers', 'extra'}
     json_file = json.load(open('dateless_sample.json'))
     assert json_file == toml_file.primitive
+
+
+def test_it_should_fail_loading_broken_file():
+    try:
+        toml_file = contoml.load('dateless_sample-broken.toml')
+        assert set(toml_file.keys()) == {'fruit', 'clients', '', 'owner', 'database', 'servers', 'extra'}
+        json_file = json.load(open('dateless_sample.json'))
+        assert json_file == toml_file.primitive
+    except TOMLError:
+        return
+
+    assert False, 'Should have thrown an error'
 
 
 def test_works_fine_without_anonymous_section():
