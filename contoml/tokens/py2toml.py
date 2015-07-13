@@ -61,18 +61,26 @@ def create_primitive_token(value):
 
 _bare_string_regex = re.compile('^[a-zA-Z0-9]*$')
 
+
 def _create_string_token(text):
     if text == '':
-        return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_string(text)))
+        return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_single_line_quoted_string(text)))
     elif _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
+    elif len(tuple(c for c in text if c == '\n')) >= 2:
+        # If containing two or more newlines we'll use the multiline string format
+        return _create_multiline_token(text)
     else:
-        return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_string(text)))
+        return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_single_line_quoted_string(text)))
 
-def _escape_string(text):
+
+def _escape_single_line_quoted_string(text):
     if six.PY2:
         return text.encode('unicode-escape').encode('string-escape').replace('"', '\\"').replace("\\'", "'")
     else:
         return codecs.encode(text, 'unicode-escape').decode().replace('"', '\\"')
 
 
+def _create_multiline_token(text):
+    escaped = text.replace('"""', '\"\"\"')
+    return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""{}"""'.format(escaped))
