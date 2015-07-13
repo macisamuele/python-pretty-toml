@@ -67,8 +67,8 @@ def _create_string_token(text):
         return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_single_line_quoted_string(text)))
     elif _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
-    elif len(tuple(c for c in text if c == '\n')) >= 2:
-        # If containing two or more newlines we'll use the multiline string format
+    elif len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 50:
+        # If containing two or more newlines or is longer than 50 characaters we'll use the multiline string format
         return _create_multiline_token(text)
     else:
         return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_single_line_quoted_string(text)))
@@ -83,4 +83,34 @@ def _escape_single_line_quoted_string(text):
 
 def _create_multiline_token(text):
     escaped = text.replace('"""', '\"\"\"')
-    return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""{}"""'.format(escaped))
+    if len(escaped) > 50:
+        return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""\n{}\\\n"""'.format(_break_long_text(escaped)))
+    else:
+        return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""{}"""'.format(escaped))
+
+
+def _break_long_text(text, maximum_length=75):
+    """
+    Breaks into lines of 75 character maximum length that are terminated by a backslash.
+    """
+
+    def next_line(remaining_text):
+
+        # Returns a line and the remaining text
+
+        if '\n' in remaining_text and remaining_text.index('\n') < maximum_length:
+            i = remaining_text.index('\n')
+            return remaining_text[:i+1], remaining_text[i+2:]
+        elif len(remaining_text) > maximum_length:
+            i = remaining_text[:maximum_length].rfind(' ')
+            return remaining_text[:i+1] + '\\\n', remaining_text[i+2:]
+        else:
+            return remaining_text, ''
+
+    remaining_text = text
+    lines = []
+    while remaining_text:
+        line, remaining_text = next_line(remaining_text)
+        lines += [line]
+
+    return ''.join(lines)
