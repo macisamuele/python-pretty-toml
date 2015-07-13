@@ -16,6 +16,7 @@ def test_line_terminator_1():
     assert pending_ts.offset == 2
     assert ts.offset == 0
 
+
 def test_line_terminator_2():
     tokens = tokenize('\n')
     ts = TokenStream(tokens)
@@ -24,6 +25,7 @@ def test_line_terminator_2():
     assert isinstance(element, NewlineElement)
     assert pending_ts.offset == 1
     assert ts.offset == 0
+
 
 def test_space_1():
     ts = TokenStream(tokenize('  noo'))
@@ -34,6 +36,7 @@ def test_space_1():
     assert pending_ts.offset == 2
     assert ts.offset == 0
 
+
 def test_space_2():
     ts = TokenStream(tokenize(' noo'))
     space_element, pending_ts = parser.space_element(ts)
@@ -42,6 +45,7 @@ def test_space_2():
     assert len(space_element.tokens) == 1
     assert pending_ts.offset == 1
     assert ts.offset == 0
+
 
 def test_space_3():
     ts = TokenStream(tokenize('noo'))
@@ -78,6 +82,7 @@ def test_array():
     assert len(array_element) == 5
     assert len(pending_ts) == 1
 
+
 def test_array_2():
 
     text = """[
@@ -90,6 +95,7 @@ def test_array_2():
     assert array_element[0] == 'alpha'
     assert array_element[1] == 'omega'
 
+
 def test_inline_table():
     inline_table, pending_ts = parser.inline_table_element(TokenStream(tokenize('{ "id"= 42,test = name} vroom')))
 
@@ -97,6 +103,7 @@ def test_inline_table():
     assert len(pending_ts) == 2
     assert inline_table['id'] == 42
     assert inline_table['test'] == 'name'
+
 
 def test_table_body():
     table_body, pending_ts = parser.table_body_element(TokenStream(tokenize(' name= "test" # No way man!\nid =42\n vvv')))
@@ -118,6 +125,7 @@ def test_key_value_pair():
     assert isinstance(parsed[1], AtomicElement)
     assert isinstance(parsed[5], ArrayElement)
 
+
 def test_table_body_2():
 
     text = """
@@ -136,36 +144,3 @@ str_multiline = wohoo
 
     assert len(pending_ts) == 0
 
-
-# def test_toml_file():
-#     ts = TokenStream(tokenize("""
-#
-#     # My awesome TOML sample
-#
-#     name =    amr
-#     id= 42
-#
-#     [section1]
-#         sec1name =3.14
-#         sec11 =  false
-#     [section2]
-#     sec2name= 2.16
-#
-#     [[person]]  # array of tables
-#     name =Amr
-#
-# [[person]]
-# name= fawzy
-# """))
-#
-#     toml_file = parser.toml_file(ts)
-#
-#     assert toml_file['']['name'] == 'amr'
-#     assert toml_file['']['id'] == 42
-#
-#     assert toml_file['section1']['sec1name'] == 3.14
-#     assert toml_file['section1']['sec11'] == False
-#     assert toml_file['section2']['sec2name'] == 2.16
-#
-#     assert toml_file['person'][0]['name'] == 'Amr'
-#     assert toml_file['person'][1]['name'] == 'fawzy'
