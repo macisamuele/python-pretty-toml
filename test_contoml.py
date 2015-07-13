@@ -297,3 +297,12 @@ key = []"""
 
     assert 'section' in toml
     assert len(toml['section']['key']) == 0
+
+
+def test_loading_an_empty_toml_source():
+
+    toml_text = ''
+
+    contoml.loads(toml_text)
+
+    # Should not fail

@@ -31,7 +31,7 @@
     EmptyLine -> Space LineTerminator
     FileEntry -> EmptyLine | TableHeader | TableBody
 
-    TOMLFileElements -> FileEntry TOMLFileElements | FileEntry | EMPTY
+    TOMLFileElements -> FileEntry TOMLFileElements | FileEntry | EmptyLine | EMPTY
 """
 
 from contoml import tokens
@@ -67,9 +67,11 @@ def newline_element(token_stream):
     captured = capture_from(token_stream).find(token(tokens.TYPE_NEWLINE))
     return NewlineElement(captured.value()), captured.pending_tokens
 
+
 def comment_tokens(ts1):
     c1 = capture_from(ts1).find(token(tokens.TYPE_COMMENT)).and_find(token(tokens.TYPE_NEWLINE))
     return c1.value(), c1.pending_tokens
+
 
 def comment_element(token_stream):
     """
@@ -128,6 +130,7 @@ def string_element(token_stream):
     captured = capture_from(token_stream).find(string_token)
     return AtomicElement(captured.value()), captured.pending_tokens
 
+
 def table_header_name_tokens(token_stream):
 
     def one(ts):
@@ -141,6 +144,7 @@ def table_header_name_tokens(token_stream):
 
     captured = capture_from(token_stream).find(one).or_find(string_token)
     return captured.value(), captured.pending_tokens
+
 
 def table_header_element(token_stream):
 
@@ -236,6 +240,7 @@ def array_internal(ts):
 
     captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value).or_empty()
     return captured.value(), captured.pending_tokens
+
 
 def array_element(token_stream):
 
@@ -345,10 +350,7 @@ def table_body_element(token_stream):
     return TableElement(captured.value()), captured.pending_tokens
 
 
-def toml_file_element(token_stream):
-
-    if token_stream.at_end:
-        raise TokenStream.EndOfStream
+def file_entry_element(token_stream):
 
     def empty_line(ts1):
         c1 = capture_from(ts1).find(space_element).and_find(line_terminator_element)
@@ -361,8 +363,8 @@ def toml_file_element(token_stream):
 def toml_file_elements(token_stream):
 
     def one(ts1):
-        c1 = capture_from(ts1).find(toml_file_element).and_find(toml_file_elements)
+        c1 = capture_from(ts1).find(file_entry_element).and_find(toml_file_elements)
         return c1.value(), c1.pending_tokens
 
-    captured = capture_from(token_stream).find(one).or_find(toml_file_element)
+    captured = capture_from(token_stream).find(one).or_find(file_entry_element).or_empty()
     return captured.value(), captured.pending_tokens
