@@ -77,15 +77,21 @@ class LexerError(TOMLError):
         return self._message
 
 
-def tokenize(source):
+def tokenize(source, is_top_level=False):
     """
     Tokenizes the input TOML source into a stream of tokens.
+
+    If is_top_level is set to True, will make sure that the input source has a trailing newline character
+    before it is tokenized.
 
     Raises a LexerError when it fails recognize another token while not at the end of the source.
     """
 
     # Newlines are going to be normalized to UNIX newlines.
     source = source.replace('\r\n', '\n')
+
+    if is_top_level and source and source[-1] != '\n':
+        source += '\n'
 
     next_row = 1
     next_col = 1

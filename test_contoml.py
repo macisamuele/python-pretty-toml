@@ -276,3 +276,10 @@ def test_late_addition_to_anonymous_table():
 name = "John Doe"
 
 """
+
+
+def test_loading_toml_without_trailing_newline():
+    toml_text = '[main]\nname = "azmy"'
+    toml = contoml.loads(toml_text)
+
+    assert toml['main']['name'] == 'azmy'
