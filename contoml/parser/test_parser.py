@@ -96,6 +96,16 @@ def test_array_2():
     assert array_element[1] == 'omega'
 
 
+def test_empty_array():
+
+    text = '[]'
+
+    array_element, pending_ts = parser.array_element(TokenStream(tokenize(text)))
+
+    assert isinstance(array_element, ArrayElement)
+    assert pending_ts.at_end
+
+
 def test_inline_table():
     inline_table, pending_ts = parser.inline_table_element(TokenStream(tokenize('{ "id"= 42,test = name} vroom')))
 

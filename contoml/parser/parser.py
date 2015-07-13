@@ -16,7 +16,7 @@
 
     Array -> '[' Space ArrayInternal Space ']' | '[' Space ArrayInternal Space LineTerminator Space ']'
     ArrayInternal -> LineTerminator Space ArrayInternal | Value Space ',' Space LineTerminator Space ArrayInternal |
-        Value Space ',' Space ArrayInternal | LineTerminator | Value
+        Value Space ',' Space ArrayInternal | LineTerminator | Value | EMPTY
 
     InlineTable -> '{' Space InlineTableInternal Space '}'
     InlineTableKeyValuePair = STRING Space '=' Space Value
@@ -198,6 +198,7 @@ def value(token_stream):
         or_find(inline_table_element)
     return captured.value('Expected a primitive value, array or an inline table'), captured.pending_tokens
 
+
 def array_internal(ts):
 
     def zero(ts0):
@@ -233,7 +234,7 @@ def array_internal(ts):
             and_find(line_terminator_element)
         return c.value(), c.pending_tokens
 
-    captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value)
+    captured = capture_from(ts).find(zero).or_find(one).or_find(two).or_find(three).or_find(value).or_empty()
     return captured.value(), captured.pending_tokens
 
 def array_element(token_stream):

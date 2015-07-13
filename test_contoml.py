@@ -167,6 +167,7 @@ id = 21
 
 """
 
+
 def test_creating_an_array_of_tables_all_at_once():
 
     f = contoml.new()
@@ -190,6 +191,7 @@ Name = "Third Guy"
 id = 2
 
 """
+
 
 def test_creating_an_array_of_tables_all_at_once_via_dump():
 
@@ -235,7 +237,6 @@ def test_creating_an_anonymous_table_2():
     assert f.dumps() == "Name = Fawzy\n\n"
 
 
-
 def test_dumping_a_dict():
 
     d = OrderedDict((('My string', 'string1'), ('My int', 42), ('My float', 12.111)))
@@ -263,6 +264,7 @@ def test_dumping_a_dict():
 
 """
 
+
 def test_late_addition_to_anonymous_table():
 
     f = contoml.new()
@@ -283,3 +285,15 @@ def test_loading_toml_without_trailing_newline():
     toml = contoml.loads(toml_text)
 
     assert toml['main']['name'] == 'azmy'
+
+
+def test_array_edge_cases():
+
+    # Parsing an empty array value
+    toml_text = """[section]
+key = []"""
+
+    toml = contoml.loads(toml_text)
+
+    assert 'section' in toml
+    assert len(toml['section']['key']) == 0

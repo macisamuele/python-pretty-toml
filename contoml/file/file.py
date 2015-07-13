@@ -27,6 +27,9 @@ class TOMLFile:
         except KeyError:
             return FreshTable(parent=self, name=item, is_array=False)
 
+    def __contains__(self, item):
+        return item in self.keys()
+
     def __setitem__(self, key, value):
 
         if key and isinstance(value, (tuple, list)) and all(isinstance(v, dict) for v in value):
