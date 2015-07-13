@@ -11,7 +11,7 @@ A [TOML](https://github.com/toml-lang/toml) serializer/deserializer for Python t
 
 ## Installation ##
 ```bash
-pip install contoml
+pip install --upgrade contoml
 ```
 
 ## Usage ##
