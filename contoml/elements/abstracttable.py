@@ -56,6 +56,12 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
                 return value
         raise KeyError
 
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
     @property
     def primitive_value(self):
         """
