@@ -17,7 +17,7 @@ pip install --upgrade contoml
 ## Usage ##
 
 ```python
-import contoml
+>>> import contoml
 
 >>> toml_file = contoml.load('sample.toml')
 
@@ -36,7 +36,43 @@ import contoml
 >>> toml_file.array('disks').append({'dev': '/dev/sda', 'cap': '230'})
 >>> toml_file.array('disks').append({'dev': '/dev/sdb', 'cap': '120'})
 
-# Serialize back to TOML text at any point
+# If you like, you can at any moment drop all the formatting metadata preserved in the lodaded TOML file and obtain
+# a primive Python container out of it
+>>> toml_file.primitive
+{'': {'title': 'TOML Example'},
+ 'clients': {'data': [['gamma', 'delta'], [1, 2]],
+  'hosts': ['alpha', 'omega'],
+  'key3': 'The quick brown fox jumps over the lazy dog.',
+  'lines': 'The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n',
+  'quoted': 'Tom "Dubs" Preston-Werner',
+  'regex': '<\\i\\c*\\s*>',
+  'regex2': "I [dw]on't need \\d{2} apples",
+  'str2': 'The quick brown fox jumps over the lazy dog.',
+  'str_multiline': 'Roses are red\nViolets are blue',
+  'str_quoted': 'I\'m a string. "You can quote me". Name\tJosé\nLocation\tSF.',
+  'winpath': 'C:\\Users\\nodejs\\templates',
+  'winpath2': '\\\\ServerX\\admin$\\system32\\'},
+ 'database': {'connection_max': 5000,
+  'enabled': True,
+  'ports': [8001, 8001, 8002],
+  'server': '192.168.1.1'},
+ 'disks': [{'cap': '230', 'dev': '/dev/sda'},
+  {'cap': '120', 'dev': '/dev/sdb'}],
+ 'environment': {'OS': 'Arch Linux', 'Type': 'GNU/Linux'},
+ 'fruit': [{'name': 'apple',
+   'physical': {'color': 'red', 'shape': 'round'},
+   'variety': [{'name': 'red delicious'}, {'name': 'granny smith'}]},
+  {'name': 'banana',
+   'variety': [{'name': 'plantain',
+     'points': [{'x': 1, 'y': 42, 'z': 3},
+      {'x': 7, 'y': 8, 'z': 9},
+      {'x': 2, 'y': 4, 'z': 8}]}]}],
+ 'owner': {'dob': datetime.datetime(1979, 5, 27, 15, 32, tzinfo=<UTC>),
+  'name': 'Tom Preston-Werner'},
+ 'servers': {'alpha': {'dc': 'eqdc10', 'ip': '192.168.0.111'},
+  'beta': {'dc': 'eqdc10', 'ip': '10.0.0.2'}}}
+
+# You can serialize your TOML file back to TOML text at any point
 >>> toml_file.dump('updated_sample.toml')
 ```
 
