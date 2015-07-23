@@ -36,8 +36,8 @@ pip install --upgrade contoml
 >>> toml_file.array('disks').append({'dev': '/dev/sda', 'cap': '230'})
 >>> toml_file.array('disks').append({'dev': '/dev/sdb', 'cap': '120'})
 
-# If you like, you can at any moment drop all the formatting metadata preserved in the lodaded TOML file and obtain
-# a primive Python container out of it
+# If you like, you can at any moment drop all the formatting metadata preserved in the 
+# lodaded TOML file and obtain a primive Python container out of it
 >>> toml_file.primitive
 {'': {'title': 'TOML Example'},
  'clients': {'data': [['gamma', 'delta'], [1, 2]],
