@@ -74,7 +74,7 @@ class TableElement(abstracttable.AbstractTable):
         indentation = [factory.create_whitespace_element(self._detect_indentation_size())] if indentation_size else []
 
         inserted_elements = indentation + [
-            factory.create_element(key),
+            factory.create_string_element(key, bare_allowed=True),
             factory.create_whitespace_element(),
             factory.create_operator_element('='),
             factory.create_whitespace_element(),

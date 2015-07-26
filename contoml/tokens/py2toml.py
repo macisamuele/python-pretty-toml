@@ -54,7 +54,7 @@ def create_primitive_token(value):
         ts = timestamp(value) // 1000
         return tokens.Token(tokens.TYPE_DATE, strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts))
     elif isinstance(value, six.string_types):
-        return _create_string_token(value)
+        return create_string_token(value)
 
     raise NotPrimitiveError("{} of type {}".format(value, type(value)))
 
@@ -62,10 +62,19 @@ def create_primitive_token(value):
 _bare_string_regex = re.compile('^[a-zA-Z0-9]*$')
 
 
-def _create_string_token(text):
+def create_string_token(text, bare_string_allowed=False):
+    """
+    Creates and returns a single string token.
+
+    Raises ValueError on non-string input.
+    """
+    
+    if not isinstance(text, six.string_types):
+        raise ValueError('Given value must be a string')
+
     if text == '':
         return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_single_line_quoted_string(text)))
-    elif _bare_string_regex.match(text):
+    elif bare_string_allowed and _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
     elif len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 50:
         # If containing two or more newlines or is longer than 50 characaters we'll use the multiline string format

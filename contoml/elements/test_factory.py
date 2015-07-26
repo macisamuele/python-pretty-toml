@@ -13,7 +13,7 @@ def test_creating_elements():
 
     seq = factory.create_element(['a', 'p', 'p', 'l', 'e'])
     assert isinstance(seq, ArrayElement)
-    assert seq.serialized() == '[a, p, p, l, e]'
+    assert seq.serialized() == '["a", "p", "p", "l", "e"]'
     assert ''.join(seq.primitive_value) == 'apple'
 
     mapping = factory.create_element(OrderedDict((('one', 1), ('two', 2))))

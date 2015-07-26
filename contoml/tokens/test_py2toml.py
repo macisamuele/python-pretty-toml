@@ -7,7 +7,7 @@ from contoml.tokens import py2toml
 
 
 def test_string():
-    assert py2toml.create_primitive_token('fawzy') == tokens.Token(tokens.TYPE_BARE_STRING, 'fawzy')
+    assert py2toml.create_string_token('fawzy', bare_string_allowed=True) == tokens.Token(tokens.TYPE_BARE_STRING, 'fawzy')
     assert py2toml.create_primitive_token('I am a "cr\'azy" sentence.') == \
            tokens.Token(tokens.TYPE_STRING, '"I am a \\"cr\'azy\\" sentence."')
 

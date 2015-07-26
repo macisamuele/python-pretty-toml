@@ -5,7 +5,7 @@ from contoml.elements.metadata import PunctuationElement, WhitespaceElement
 
 
 def test_inline_table():
-    tokens = tuple(lexer.tokenize('{ name= first, id=42}'))
+    tokens = tuple(lexer.tokenize('{ name= "first", id=42}'))
 
     elements = (
         PunctuationElement(tokens[:1]),
@@ -32,11 +32,11 @@ def test_inline_table():
 
     assert set(table.items()) == {('name', 'fawzy'), ('id', 42), ('nickname', 'nickfawzy')}
 
-    assert table.serialized() == '{ name= fawzy, id=42, nickname = nickfawzy}'
+    assert table.serialized() == '{ name= "fawzy", id=42, nickname = "nickfawzy"}'
 
     del table['name']
 
-    assert table.serialized() == '{ id=42, nickname = nickfawzy}'
+    assert table.serialized() == '{ id=42, nickname = "nickfawzy"}'
 
     del table['nickname']
 

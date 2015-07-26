@@ -27,7 +27,7 @@ class InlineTableElement(abstracttable.AbstractTable):
         except KeyError:    # Key does not exist, adding anew!
 
             new_entry = [
-                factory.create_element(key),
+                factory.create_string_element(key, bare_allowed=True),
                 factory.create_whitespace_element(),
                 factory.create_operator_element('='),
                 factory.create_whitespace_element(),

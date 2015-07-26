@@ -35,7 +35,7 @@ def create_element(value):
 
         stuffing_elements = (
             (
-                create_element(k),
+                create_string_element(k, bare_allowed=True),
                 create_whitespace_element(),
                 create_operator_element('='),
                 create_whitespace_element(),
@@ -49,6 +49,13 @@ def create_element(value):
 
     else:
         raise RuntimeError('Value type unaccounted for: {} of type {}'.format(value, type(value)))
+
+
+def create_string_element(value, bare_allowed=False):
+    """
+    Creates and returns an AtomicElement wrapping a string value.
+    """
+    return AtomicElement((py2toml.create_string_token(value, bare_allowed),))
 
 
 def create_operator_element(operator):
@@ -90,15 +97,16 @@ def create_whitespace_element(length=1):
 def create_table_header_element(name):
     return TableHeaderElement((
         py2toml.operator_token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET),
-        py2toml.create_primitive_token(name),
+        py2toml.create_string_token(name, bare_string_allowed=True),
         py2toml.operator_token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET),
         py2toml.operator_token(tokens.TYPE_NEWLINE),
     ))
 
+
 def create_array_of_tables_header_element(name):
     return TableHeaderElement((
         py2toml.operator_token(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET),
-        py2toml.create_primitive_token(name),
+        py2toml.create_string_token(name, bare_string_allowed=True),
         py2toml.operator_token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET),
         py2toml.operator_token(tokens.TYPE_NEWLINE),
     ))

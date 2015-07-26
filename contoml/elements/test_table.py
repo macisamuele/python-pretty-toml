@@ -6,7 +6,7 @@ from contoml.elements.table import TableElement
 
 def test_table():
 
-    initial_toml = """name = first
+    initial_toml = """name = "first"
 id=42 # My id
 
 
@@ -47,9 +47,9 @@ id=42 # My id
 
     assert set(table.items()) == {('name', 'fawzy'), ('id', 42), ('relation', 'another')}
 
-    expected_toml = """name = fawzy
+    expected_toml = """name = "fawzy"
 id=42 # My id
-relation = another
+relation = "another"
 
 
 """

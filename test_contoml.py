@@ -57,7 +57,7 @@ name = "yonagold"
 [apple]
 color = "green"
 name = "yonagold"
-"other_name" = nevermind
+"other_name" = "nevermind"
 
 
 # Nevermind
@@ -111,10 +111,10 @@ def test_creating_an_array_of_tables():
     f['fruit'][1]['name'] = 'grapes'
 
     assert f.dumps() == """[[fruit]]
-name = banana
+name = "banana"
 
 [[fruit]]
-name = grapes
+name = "grapes"
 
 """
 
@@ -131,14 +131,14 @@ noo = "yeah!"
     f['my table']['noo'] = 'indeed'
     assert f.dumps() == """["my table"]
 really = false
-noo = indeed
+noo = "indeed"
 
 """
 
     f['my table'] = OrderedDict((('another_dict', True), ('should replace other one', 'right')))
     assert f.dumps() == """["my table"]
 "another_dict" = true
-"should replace other one" = right
+"should replace other one" = "right"
 
 """
 
@@ -150,7 +150,7 @@ def test_appending_to_an_array_of_tables():
     f.array('person').append(OrderedDict([('name', 'Chuck'), ('id', 12)]))
 
     assert f.dumps() == """[[person]]
-name = Chuck
+name = "Chuck"
 id = 12
 
 """
@@ -158,11 +158,11 @@ id = 12
     f['person'].append(OrderedDict([('name', 'Kcuhc'), ('id', 21)]))
 
     assert f.dumps() == """[[person]]
-name = Chuck
+name = "Chuck"
 id = 12
 
 [[person]]
-name = Kcuhc
+name = "Kcuhc"
 id = 21
 
 """
@@ -234,14 +234,14 @@ def test_creating_an_anonymous_table_2():
 
     f[''] = {'Name': 'Fawzy'}
 
-    assert f.dumps() == "Name = Fawzy\n\n"
+    assert f.dumps() == 'Name = "Fawzy"\n\n'
 
 
 def test_dumping_a_dict():
 
     d = OrderedDict((('My string', 'string1'), ('My int', 42), ('My float', 12.111)))
 
-    assert contoml.dumps(d) == """"My string" = string1
+    assert contoml.dumps(d) == """"My string" = "string1"
 "My int" = 42
 "My float" = 12.111
 
@@ -253,12 +253,12 @@ def test_dumping_a_dict():
     d2 = OrderedDict((('d1', d21), ('d2', d22)))
 
     assert contoml.dumps(d2) == """[d1]
-"My string" = string1
+"My string" = "string1"
 "My int" = 42
 "My float" = 12.111
 
 [d2]
-"My string2" = string2
+"My string2" = "string2"
 "My int" = 43
 "My float" = 13.111
 
