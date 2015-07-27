@@ -332,14 +332,14 @@ def table_body_elements(token_stream):
 
     def two(ts2):
         c = capture_from(ts2).\
-            find(line_terminator_element).\
+            find(empty_line_elements).\
             and_find(table_body_elements)
         return c.value(), c.pending_tokens
 
     captured = capture_from(token_stream).\
         find(one).\
         or_find(two).\
-        or_find(line_terminator_element).\
+        or_find(empty_line_elements).\
         or_find(key_value_pair)
 
     return captured.value(), captured.pending_tokens
@@ -350,13 +350,19 @@ def table_body_element(token_stream):
     return TableElement(captured.value()), captured.pending_tokens
 
 
+def empty_line_tokens(ts1):
+    c1 = capture_from(ts1).find(space_element).and_find(line_terminator_element)
+    return c1.value(), c1.pending_tokens
+
+
+def empty_line_elements(token_stream):
+    captured = capture_from(token_stream).find(empty_line_tokens)
+    return captured.value(), captured.pending_tokens
+
+
 def file_entry_element(token_stream):
-
-    def empty_line(ts1):
-        c1 = capture_from(ts1).find(space_element).and_find(line_terminator_element)
-        return c1.value(), c1.pending_tokens
-
-    captured = capture_from(token_stream).find(empty_line).or_find(table_header_element).or_find(table_body_element)
+    captured = capture_from(token_stream).find(empty_line_tokens).or_find(table_header_element)\
+        .or_find(table_body_element)
     return captured.value(), captured.pending_tokens
 
 

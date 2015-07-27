@@ -306,3 +306,63 @@ def test_loading_an_empty_toml_source():
     contoml.loads(toml_text)
 
     # Should not fail
+
+
+def test_parsing_section_with_indentation_and_comment_lines():
+    toml = """[main]
+listen = ":8966"
+redis_host =  "localhost:6379"
+redis_password = ""
+
+[influxdb]
+host = "localhost:8086"
+db   = "agentcontroller"
+user = "ac"
+password = "acctrl"
+
+[handlers]
+binary = "python2.7"
+cwd = "./handlers"
+    [handlers.env]
+    PYTHONPATH = "/opt/jumpscale7/lib:../client"
+    SYNCTHING_URL = "http://localhost:8384/"
+    SYNCTHING_SHARED_FOLDER_ID = "jumpscripts"
+    #SYNCTHING_API_KEY = ""
+    REDIS_ADDRESS = "localhost"
+    REDIS_PORT = "6379"
+    #REDIS_PASSWORD = ""
+"""
+
+    f = contoml.loads(toml)
+
+    assert f['handlers']['env']['REDIS_ADDRESS'] == 'localhost'
+    assert 'REDIS_PASSWORD' not in f['handlers']['env']
+
+    f['handlers']['env']['REDIS_PASSWORD'] = 'MYPASSWORD'
+
+    expected = """[main]
+listen = ":8966"
+redis_host =  "localhost:6379"
+redis_password = ""
+
+[influxdb]
+host = "localhost:8086"
+db   = "agentcontroller"
+user = "ac"
+password = "acctrl"
+
+[handlers]
+binary = "python2.7"
+cwd = "./handlers"
+    [handlers.env]
+    PYTHONPATH = "/opt/jumpscale7/lib:../client"
+    SYNCTHING_URL = "http://localhost:8384/"
+    SYNCTHING_SHARED_FOLDER_ID = "jumpscripts"
+    #SYNCTHING_API_KEY = ""
+    REDIS_ADDRESS = "localhost"
+    REDIS_PORT = "6379"
+    "REDIS_PASSWORD" = "MYPASSWORD"
+    #REDIS_PASSWORD = ""
+"""
+
+    assert expected == f.dumps()

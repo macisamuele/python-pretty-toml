@@ -1,6 +1,7 @@
 from contoml.elements import abstracttable, factory
 from contoml.elements.common import Element
 from contoml.elements.metadata import CommentElement, NewlineElement, WhitespaceElement
+from contoml import elements
 
 
 class TableElement(abstracttable.AbstractTable):
@@ -61,8 +62,11 @@ class TableElement(abstracttable.AbstractTable):
             except StopIteration:
                 return 0
 
+        def is_empty_line(line):
+            return all(e.type == elements.TYPE_METADATA for e in line)
+
         try:
-            return min(indentation(line) for line in lines() if len(line) > 1)
+            return min(indentation(line) for line in lines() if len(line) > 1 and not is_empty_line(line))
         except ValueError:  # Raised by ValueError when no matching lines found
             return 0
 
