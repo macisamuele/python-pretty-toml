@@ -30,26 +30,17 @@ class NamedDict(dict):
                     self[name] = CascadeDict(self[name], value)
                 else:
                     self[name] = value
-            elif len(key.sub_names) == 2:
-                parent, child = key.sub_names
-                if parent in self:
-                    self[parent] = CascadeDict(self[parent], NamedDict({child: value}))
-                else:
-                    self[parent] = NamedDict({child: value})
-            else:
-                grand_parents_name, parent_name, child_name = key.sub_names[:-2], key.sub_names[-2], key.sub_names[-1]
 
-                # Make sure parents exist, or create as instances of NamedDict
-                d = self
-                for name in grand_parents_name:
-                    if name not in d:
-                        d[name] = NamedDict()
-                    d = d[name]
-
-                if parent_name in d:
-                    d[parent_name] = CascadeDict(d[parent_name], NamedDict({child_name: value}))
+            elif len(key.sub_names) > 1:
+                name = key.sub_names[0]
+                rest_of_key = key.drop(1)
+                if name in self:
+                    named_dict = NamedDict()
+                    named_dict[rest_of_key] = value
+                    self[name] = CascadeDict(self[name], named_dict)
                 else:
-                    d[parent_name] = NamedDict({child_name: value})
+                    self[name] = NamedDict()
+                    self[name][rest_of_key] = value
         else:
             return dict.__setitem__(self, key, value)
 
@@ -86,6 +77,7 @@ def structure(entries):
     TOML file.
     """
 
+    entries = tuple(entries)
     obj = NamedDict()
 
     last_array_of_tables = None         # The EntryName of the last array-of-tables header

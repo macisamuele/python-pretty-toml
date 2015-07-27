@@ -367,3 +367,57 @@ cwd = "./handlers"
 
     assert expected == f.dumps()
 
+
+def test_loading_complex_file_1():
+
+    toml = """
+[main]
+gid = 1
+nid = 10
+max_jobs = 100
+message_id_file = "./.mid"
+history_file = "./.history"
+agent_controllers = ["http://localhost:8966/"]
+
+[cmds]
+    [cmds.execute_js_py]
+    binary = "python2.7"
+    cwd = "./jumpscripts"
+    script = "{domain}/{name}.py"
+
+    [cmds.sync]
+    #syncthing extension
+    binary = "python2.7"
+    cwd = "./extensions/sync"
+    script = "{name}.py"
+    [cmds.sync.env]
+    PYTHONPATH = "../"
+    JUMPSCRIPTS_HOME = "../../jumpscripts"
+    SYNCTHING_URL = "http://localhost:8384"
+
+[channel]
+cmds = [0] # long polling from agent 0
+
+[logging]
+    [logging.db]
+    type = "DB"
+    log_dir = "./logs"
+    levels = [2, 4, 7, 8, 9]  # (all error messages) empty for all
+
+    [logging.ac]
+    type = "AC"
+    flush_int = 300 # seconds (5min)
+    batch_size = 1000 # max batch size, force flush if reached this count.
+    agent_controllers = [] # to all agents
+    levels = [2, 4, 7, 8, 9]  # (all error messages) empty for all
+
+    [logging.console]
+    type = "console"
+    levels = [2, 4, 7, 8, 9]
+
+[stats]
+interval = 60 # seconds
+agent_controllers = []
+"""
+
+    contoml.loads(toml)

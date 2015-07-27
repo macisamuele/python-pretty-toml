@@ -4,18 +4,16 @@ from contoml.parser import elementsanitizer
 from contoml.file.entries import EntryName
 from contoml.file.structurer import NamedDict, structure
 from contoml.parser.tokenstream import TokenStream
-from contoml.file.cascadedict import CascadeDict
 
 
 def test_NamedDict():
 
     d = NamedDict()
 
-    d[EntryName(('super', 'sub1', 'sub2', 'sub3'))] = 12
-    d[EntryName(('super', 'sub1', 'sub2', 'sub4'))] = 42
+    d[EntryName(('super', 'sub1', 'sub2'))] = {'sub3': 12}
+    d[EntryName(('super', 'sub1', 'sub2'))]['sub4'] = 42
 
     assert d[EntryName(('super', 'sub1', 'sub2', 'sub3'))] == 12
-    assert isinstance(d[EntryName(('super', 'sub1', 'sub2'))], CascadeDict)
     assert d[EntryName(('super', 'sub1', 'sub2', 'sub4'))] == 42
 
 

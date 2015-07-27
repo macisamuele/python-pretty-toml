@@ -34,6 +34,12 @@ class EntryName:
     def sub_names(self):
         return self._names
 
+    def drop(self, n=0):
+        """
+        Returns the name after dropping the first n entries of it.
+        """
+        return EntryName(names=self._names[n:])
+
     def is_prefixed_with(self, names):
         if isinstance(names, EntryName):
             return self.is_prefixed_with(names.sub_names)
