@@ -33,7 +33,7 @@ name = "yonagold"
 """
 
     file = contoml.loads(toml)
-    assert set(file.keys()) == {'apple'}
+    assert set(file.keys()) == {'apple', ''}
     assert file['apple']['color'] == 'green'
     assert file['apple']['name'] == 'yonagold'
 
@@ -366,3 +366,4 @@ cwd = "./handlers"
 """
 
     assert expected == f.dumps()
+

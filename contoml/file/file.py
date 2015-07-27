@@ -92,13 +92,21 @@ class TOMLFile:
             fp.write(self.dumps())
 
     def keys(self):
-        return self._navigable.keys()
+        return set(self._navigable.keys()) | {''}
 
     def values(self):
         return self._navigable.values()
 
     def items(self):
-        return self._navigable.items()
+        items = self._navigable.items()
+
+        def has_anonymous_entry():
+            return any(key == '' for (key, _) in items)
+
+        if has_anonymous_entry():
+            return items
+        else:
+            return items + [('', self[''])]
 
     @property
     def primitive(self):

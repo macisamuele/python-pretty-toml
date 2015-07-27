@@ -29,7 +29,7 @@
     TableBody -> KeyValuePair TableBody | EmptyLine TableBody | EmptyLine | KeyValuePair
 
     EmptyLine -> Space LineTerminator
-    FileEntry -> EmptyLine | TableHeader | TableBody
+    FileEntry -> TableHeader | TableBody
 
     TOMLFileElements -> FileEntry TOMLFileElements | FileEntry | EmptyLine | EMPTY
 """
@@ -361,8 +361,8 @@ def empty_line_elements(token_stream):
 
 
 def file_entry_element(token_stream):
-    captured = capture_from(token_stream).find(empty_line_tokens).or_find(table_header_element)\
-        .or_find(table_body_element)
+    captured = capture_from(token_stream).find(table_header_element).\
+        or_find(table_body_element)
     return captured.value(), captured.pending_tokens
 
 

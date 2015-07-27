@@ -76,6 +76,7 @@ class TableEntry(Entry):
     def __init__(self, names, table_element):
         Entry.__init__(self, names=names, table_element=table_element)
 
+
 class ArrayOfTablesEntry(Entry):
 
     def __init__(self, names, table_element):
@@ -97,7 +98,6 @@ def _anonymous_table(peekable_iter):
 
 
 def _validate_file_elements(file_elements):
-    # TODO
     pass
 
 
