@@ -59,7 +59,7 @@ def create_primitive_token(value):
     raise NotPrimitiveError("{} of type {}".format(value, type(value)))
 
 
-_bare_string_regex = re.compile('^[a-zA-Z0-9]*$')
+_bare_string_regex = re.compile('^[a-zA-Z0-9_-]*$')
 
 
 def create_string_token(text, bare_string_allowed=False):
@@ -68,7 +68,7 @@ def create_string_token(text, bare_string_allowed=False):
 
     Raises ValueError on non-string input.
     """
-    
+
     if not isinstance(text, six.string_types):
         raise ValueError('Given value must be a string')
 

@@ -57,7 +57,7 @@ name = "yonagold"
 [apple]
 color = "green"
 name = "yonagold"
-"other_name" = "nevermind"
+other_name = "nevermind"
 
 
 # Nevermind
@@ -137,7 +137,7 @@ noo = "indeed"
 
     f['my table'] = OrderedDict((('another_dict', True), ('should replace other one', 'right')))
     assert f.dumps() == """["my table"]
-"another_dict" = true
+another_dict = true
 "should replace other one" = "right"
 
 """
@@ -361,7 +361,7 @@ cwd = "./handlers"
     #SYNCTHING_API_KEY = ""
     REDIS_ADDRESS = "localhost"
     REDIS_PORT = "6379"
-    "REDIS_PASSWORD" = "MYPASSWORD"
+    REDIS_PASSWORD = "MYPASSWORD"
     #REDIS_PASSWORD = ""
 """
 
