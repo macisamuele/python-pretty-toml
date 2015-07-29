@@ -11,6 +11,7 @@ from contoml import tokens
 import re
 from contoml.elements.metadata import NewlineElement
 from contoml.errors import TOMLError
+from contoml.tokens import Token
 
 
 class NotPrimitiveError(TOMLError):
@@ -123,3 +124,7 @@ def _break_long_text(text, maximum_length=75):
         lines += [line]
 
     return ''.join(lines)
+
+
+def create_whitespace(source_substring):
+    return Token(tokens.TYPE_WHITESPACE, source_substring)

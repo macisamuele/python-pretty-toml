@@ -1,7 +1,7 @@
 from contoml import tokens
 from contoml.tokens import toml2py
 from contoml.elements import common
-from contoml.elements.common import Element
+from contoml.elements.common import Element, TokenElement
 from contoml.elements.errors import InvalidElementError
 
 _opening_bracket_types = (tokens.TYPE_OP_SQUARE_LEFT_BRACKET, tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET)
@@ -13,7 +13,7 @@ _name_types = (
 )
 
 
-class TableHeaderElement(Element):
+class TableHeaderElement(TokenElement):
     """
     An element containing opening and closing single and double square brackets, strings and dots and ending with
     a newline.
@@ -22,9 +22,7 @@ class TableHeaderElement(Element):
     """
     
     def __init__(self, _tokens):
-        Element.__init__(self, common.TYPE_MARKUP)
-        TableHeaderElement._validate_tokens(_tokens)
-        self._tokens = _tokens
+        TokenElement.__init__(self, _tokens, common.TYPE_MARKUP)
         self._names = tuple(toml2py.deserialize(token) for token in self._tokens if token.type in _name_types)
 
     @property
@@ -57,8 +55,7 @@ class TableHeaderElement(Element):
         """
         return tuple(names) == self.names
 
-    @staticmethod
-    def _validate_tokens(_tokens):
+    def _validate_tokens(self, _tokens):
 
         opening_bracket_i = next((i for i, token in enumerate(_tokens)
                                   if token.type in _opening_bracket_types), float('-inf'))
