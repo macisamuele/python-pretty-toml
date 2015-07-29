@@ -90,7 +90,7 @@ def create_whitespace_element(length=1):
     """
     Creates and returns a WhitespaceElement containing spaces.
     """
-    ts = (tokens.Token(tokens.TYPE_WHITESPACE, ' ' * length),)
+    ts = (tokens.Token(tokens.TYPE_WHITESPACE, ' '),) * length
     return WhitespaceElement(ts)
 
 

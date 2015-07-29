@@ -1,5 +1,10 @@
+
+"""
+     The following predicates can be used in the traversal functions directly.
+"""
+
 from ..atomic import AtomicElement
-from ..metadata import PunctuationElement, CommentElement, NewlineElement
+from ..metadata import PunctuationElement, CommentElement, NewlineElement, WhitespaceElement
 from contoml import tokens
 from .. import common
 
@@ -38,3 +43,6 @@ def table(e):
 def table_header(e):
     from contoml.elements.tableheader import TableHeaderElement
     return isinstance(e, TableHeaderElement)
+
+
+whitespace = lambda e: isinstance(e, WhitespaceElement)
