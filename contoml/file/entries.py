@@ -1,6 +1,5 @@
 from contoml import elements
-from contoml.elements.table import TableElement
-from contoml.elements.tableheader import TableHeaderElement
+from contoml.elements import TableElement, TableHeaderElement
 from contoml.file.peekableit import PeekableIterator
 
 

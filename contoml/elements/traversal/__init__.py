@@ -1,6 +1,7 @@
 from contoml import tokens
 from contoml.elements import common
-from contoml.elements.metadata import PunctuationElement, NewlineElement, CommentElement
+from contoml.elements.metadata import PunctuationElement, NewlineElement
+from contoml.elements.traversal import predicates
 
 
 class TraversalMixin:
@@ -14,21 +15,17 @@ class TraversalMixin:
         Finds and returns the index of element in self.elements that evaluates the given predicate to True
         and whose index is higher than the given index, or returns -Infinity on failure.
         """
-        for i, element in tuple(enumerate(self.elements))[index+1:]:
-            if predicate(element):
-                return i
-        return float('-inf')
+        return find_following(self.elements, predicate, index)
 
     def __find_preceding_element(self, index, predicate):
         """
         Finds and returns the index of the element in self.elements that evaluates the given predicate to True
         and whose index is lower than the given index.
         """
-
-        for i, element in reversed(tuple(enumerate(self.elements))[:index]):
-            if predicate(element):
-                return i
-        return float('-inf')
+        i = find_previous(self.elements, predicate, index)
+        if i == float('inf'):
+            return float('-inf')
+        return i
 
     def __must_find_following_element(self, predicate):
         """
@@ -50,9 +47,7 @@ class TraversalMixin:
         """
         Returns the index of the preceding comma element to the given index, or -Infinity.
         """
-        def predicate(element):
-            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_COMMA
-        return self.__find_preceding_element(index, predicate)
+        return self.__find_preceding_element(index, predicates.op_comma)
 
     def _find_following_comma(self, index):
         """
@@ -72,7 +67,7 @@ class TraversalMixin:
         """
         Returns the index of the following comment element after the given index, or -Infinity.
         """
-        return self.__find_following_element(index, lambda e: isinstance(e, CommentElement))
+        return self.__find_following_element(index, predicates.comment)
 
     def _find_following_line_terminator(self, index):
         """
@@ -95,43 +90,38 @@ class TraversalMixin:
         """
         Returns the index of the preceding newline element to the given index, or -Infinity.
         """
-        return self.__find_preceding_element(index, lambda e: isinstance(e, NewlineElement))
+        return self.__find_preceding_element(index, predicates.newline)
 
     def _find_following_non_metadata(self, index):
         """
         Returns the index to the following non-metadata element after the given index, or -Infinity.
         """
-        return self.__find_following_element(index, lambda e: e.type != common.TYPE_METADATA)
+        return self.__find_following_element(index, predicates.non_metadata)
 
     def _find_closing_square_bracket(self):
         """
         Returns the index to the closing square bracket, or raises an Error.
         """
-        def predicate(element):
-            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_RIGHT_BRACKET
-        return self.__must_find_following_element(predicate)
+
+        return self.__must_find_following_element(predicates.closing_square_bracket)
 
     def _find_following_opening_square_bracket(self, index):
         """
         Returns the index to the opening square bracket, or -Infinity.
         """
-        def predicate(element):
-            return isinstance(element, PunctuationElement) and element.token.type == tokens.TYPE_OP_SQUARE_LEFT_BRACKET
-        return self.__find_following_element(index, predicate)
+        return self.__find_following_element(index, predicates.opening_square_bracket)
 
     def _find_following_table(self, index):
         """
         Returns the index to the next TableElement after the specified index, or -Infinity.
         """
-        from contoml.elements.table import TableElement
-        return self.__find_following_element(index, lambda e: isinstance(e, TableElement))
+        return self.__find_following_element(index, predicates.table)
 
     def _find_preceding_table(self, index):
         """
         Returns the index to the preceding TableElement to the specified index, or -Infinity.
         """
-        from contoml.elements.table import TableElement
-        return self.__find_preceding_element(index, lambda e: isinstance(e, TableElement))
+        return self.__find_preceding_element(index,predicates.table)
 
     def _find_closing_curly_bracket(self):
         """
@@ -145,5 +135,32 @@ class TraversalMixin:
         """
         Returns the index to the table header after the given element index, or -Infinity.
         """
-        from contoml.elements.tableheader import TableHeaderElement
-        return self.__find_following_element(index, lambda e: isinstance(e, TableHeaderElement))
+        return self.__find_following_element(index, predicates.table_header)
+
+
+def find_following(element_seq, predicate, index=None):
+    """
+    Finds and returns the index of the next element fulfilling the specified predicate after the specified
+    index, or -Infinity.
+
+    Starts searching linearly from the start_from index.
+    """
+
+    if index == float('-inf'):
+        index = None
+
+    for i, element in tuple(enumerate(element_seq))[index+1 if index is not None else None:]:
+        if predicate(element):
+            return i
+    return float('-inf')
+
+
+def find_previous(element_seq, predicate, index=None):
+    """
+    Finds and returns the index of the previous element fulfilling the specified predicate preceding to the specified
+    index, or Infinity.
+    """
+    for i, element in reversed(tuple(enumerate(element_seq))[:index]):
+        if predicate(element):
+            return i
+    return float('inf')

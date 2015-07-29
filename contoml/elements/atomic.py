@@ -1,6 +1,7 @@
-from contoml.tokens import py2toml, toml2py
-from contoml.elements import common, InvalidElementError
+from ..tokens import py2toml, toml2py
+from . import common
 from contoml.util import is_dict_like, is_sequence_like
+from .errors import InvalidElementError
 
 
 class AtomicElement(common.TokenElement):

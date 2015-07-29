@@ -3,6 +3,7 @@ from contoml.file import structurer, entries, raw
 from contoml.file.array import ArrayOfTables
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
+from contoml import prettifier
 
 
 class TOMLFile:
@@ -134,3 +135,10 @@ class TOMLFile:
         else:
             # It's an anonymous table
             self.prepend_elements([fresh_table, element_factory.create_newline_element()])
+
+    def prettify(self, prettifiers=prettifier.ALL):
+        """
+        Reformats this TOML file using the specified consistent set of formatting rules.
+        """
+        prettifier.prettify(self._elements, prettifiers)
+        self._recreate_navigable()
