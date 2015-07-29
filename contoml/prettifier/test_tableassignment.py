@@ -1,6 +1,7 @@
 
 import contoml
-from tableassignment import table_assignment_spacing
+from .tableassignment import table_assignment_spacing
+
 
 def test_table_assignment_spacing():
     toml_text = """
