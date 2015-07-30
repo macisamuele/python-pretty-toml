@@ -1,5 +1,4 @@
-from .tableassignment import table_assignment_spacing
-from .tableindent import table_entries_should_be_uniformly_indented
+from . import anontableindent, tableindent, tableassignment
 
 """
     TOMLFile prettifiers
@@ -9,13 +8,15 @@ from .tableindent import table_entries_should_be_uniformly_indented
 """
 
 
-UNIFORM_TABLE_INDENTATION = table_entries_should_be_uniformly_indented
-UNIFORM_TABLE_ASSIGNMENT_SPACING = table_assignment_spacing
+UNIFORM_TABLE_INDENTATION = tableindent.table_entries_should_be_uniformly_indented
+UNIFORM_TABLE_ASSIGNMENT_SPACING = tableassignment.table_assignment_spacing
+ANONYMOUS_TABLE_INDENTATION = anontableindent.anon_table_indent
 
 
 ALL = (
     UNIFORM_TABLE_INDENTATION,
     UNIFORM_TABLE_ASSIGNMENT_SPACING,
+    ANONYMOUS_TABLE_INDENTATION,
 )
 
 
