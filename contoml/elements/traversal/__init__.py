@@ -146,10 +146,10 @@ def find_following(element_seq, predicate, index=None):
     Starts searching linearly from the start_from index.
     """
 
-    if index == float('-inf'):
+    if isinstance(index, (int, float)) and index < 0:
         index = None
 
-    for i, element in tuple(enumerate(element_seq))[index+1 if index is not None else None:]:
+    for i, element in tuple(enumerate(element_seq))[index+1 if index is not None else index:]:
         if predicate(element):
             return i
     return float('-inf')
@@ -160,6 +160,9 @@ def find_previous(element_seq, predicate, index=None):
     Finds and returns the index of the previous element fulfilling the specified predicate preceding to the specified
     index, or Infinity.
     """
+    if isinstance(index, (int, float)) and index >= len(element_seq):
+        index = None
+
     for i, element in reversed(tuple(enumerate(element_seq))[:index]):
         if predicate(element):
             return i

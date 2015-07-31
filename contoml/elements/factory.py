@@ -86,11 +86,11 @@ def create_newline_element():
     return NewlineElement(ts)
 
 
-def create_whitespace_element(length=1):
+def create_whitespace_element(length=1, char=' '):
     """
     Creates and returns a WhitespaceElement containing spaces.
     """
-    ts = (tokens.Token(tokens.TYPE_WHITESPACE, ' '),) * length
+    ts = (tokens.Token(tokens.TYPE_WHITESPACE, char),) * length
     return WhitespaceElement(ts)
 
 
