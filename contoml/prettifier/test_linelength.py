@@ -42,3 +42,26 @@ id = 12
 
     assert f.primitive == pre_prettified_primitive
     assert all(len(line) < 120 for line in f.dumps().split('\n'))
+
+
+def test_splitting_array():
+    toml_text = """
+
+somethingweird = false
+
+[section]
+k = [4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42, 4, 8, 15, 16, 23, 42]
+
+
+[data]
+id = 12
+
+"""
+
+    f = contoml.loads(toml_text)
+    pre_prettified_primitive = f.primitive
+    f.prettify(prettifiers=[linelength.line_lingth_limiter])
+    f.prettify(prettifiers=[linelength.line_lingth_limiter])
+
+    assert f.primitive == pre_prettified_primitive
+    assert all(len(line) < 120 for line in f.dumps().split('\n'))

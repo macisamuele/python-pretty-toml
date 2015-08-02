@@ -111,6 +111,12 @@ class TraversalMixin:
         """
         return self.__find_following_element(index, predicates.opening_square_bracket)
 
+    def _find_following_closing_square_bracket(self, index):
+        """
+        Returns the index to the closing square bracket, or -Infinity.
+        """
+        return self.__find_following_element(index, predicates.closing_square_bracket)
+
     def _find_following_table(self, index):
         """
         Returns the index to the next TableElement after the specified index, or -Infinity.

@@ -1,6 +1,7 @@
 from contoml.elements import common, factory, traversal
 from contoml.elements.common import Element, ContainerElement
 from contoml.elements.factory import create_element
+from contoml.elements.metadata import NewlineElement
 
 
 class ArrayElement(ContainerElement, traversal.TraversalMixin):
@@ -89,12 +90,39 @@ class ArrayElement(ContainerElement, traversal.TraversalMixin):
             else:
                 end = following_comma
         else:
-            end = self._find_closing_square_bracket()
+            end = self._find_following_closing_square_bracket()
 
         self._sub_elements = self.sub_elements[:begin] + self._sub_elements[end:]
+
+    @property
+    def is_multiline(self):
+        return any(isinstance(e, (NewlineElement)) for e in self.elements)
 
     def turn_into_multiline(self):
         """
         Turns this array into a multi-line array with each element lying on its own line.
         """
-        raise NotImplementedError   # TODO
+        if self.is_multiline:
+            return
+
+        i = self._find_following_comma(-1)
+
+        def next_entry_i():
+            return self._find_following_non_metadata(i)
+
+        def next_newline_i():
+            return self._find_following_newline(i)
+
+        def next_closing_bracket_i():
+            return self._find_following_closing_square_bracket(i)
+
+        def next_comma_i():
+            return self._find_following_comma(i)
+
+        while i < len(self.elements)-1:
+            if next_newline_i() < next_entry_i():
+                self.elements.insert(i+1, factory.create_newline_element())
+                if float('-inf') < next_comma_i() < next_closing_bracket_i():
+                    i = next_comma_i()
+                else:
+                    i = next_closing_bracket_i()
