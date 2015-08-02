@@ -19,7 +19,7 @@ def loads(text):
     from .parser.tokenstream import TokenStream
     from .file import TOMLFile
 
-    tokens = lexer(text, is_top_level=True)
+    tokens = tuple(lexer(text, is_top_level=True))
     elements = parse_token_stream(TokenStream(tokens))
     return TOMLFile(elements)
 
