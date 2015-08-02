@@ -1,11 +1,12 @@
 import datetime
+import functools
 import six
 from contoml import tokens
 from contoml.tokens import py2toml
 from contoml.elements.atomic import AtomicElement
 from contoml.elements.metadata import PunctuationElement, WhitespaceElement, NewlineElement
 from contoml.elements.tableheader import TableHeaderElement
-from contoml.util import join_with
+from contoml.util import join_with, is_sequence_like
 
 
 def create_element(value):
@@ -94,13 +95,22 @@ def create_whitespace_element(length=1, char=' '):
     return WhitespaceElement(ts)
 
 
-def create_table_header_element(name):
-    return TableHeaderElement((
-        py2toml.operator_token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET),
-        py2toml.create_string_token(name, bare_string_allowed=True),
-        py2toml.operator_token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET),
-        py2toml.operator_token(tokens.TYPE_NEWLINE),
-    ))
+def create_table_header_element(names):
+
+    name_elements = []
+
+    if isinstance(names, six.string_types):
+        name_elements = [py2toml.create_string_token(names, bare_string_allowed=True)]
+    else:
+        for (i, name) in enumerate(names):
+            name_elements.append(py2toml.create_string_token(name, bare_string_allowed=True))
+            if i < (len(names)-1):
+                name_elements.append(py2toml.operator_token(tokens.TYPE_OPT_DOT))
+
+    return TableHeaderElement(
+        [py2toml.operator_token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET)] + name_elements +
+        [py2toml.operator_token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET), py2toml.operator_token(tokens.TYPE_NEWLINE)],
+    )
 
 
 def create_array_of_tables_header_element(name):

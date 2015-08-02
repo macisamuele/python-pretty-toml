@@ -26,6 +26,7 @@ _operator_tokens_by_type = {
     tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, ']]'),
     tokens.TYPE_OP_COMMA: tokens.Token(tokens.TYPE_OP_COMMA, ','),
     tokens.TYPE_NEWLINE: tokens.Token(tokens.TYPE_NEWLINE, '\n'),
+    tokens.TYPE_OPT_DOT: tokens.Token(tokens.TYPE_OPT_DOT, '.'),
 }
 
 
