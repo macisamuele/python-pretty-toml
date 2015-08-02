@@ -13,7 +13,7 @@ TokenSpec = namedtuple('TokenSpec', ('type', 're'))
 # Specs of all the valid tokens
 _LEXICAL_SPECS = (
     TokenSpec(tokens.TYPE_COMMENT, re.compile(r'^(#.*)\n')),
-    TokenSpec(tokens.TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|)")')),                       # Single line only
+    TokenSpec(tokens.TYPE_STRING, re.compile(r'^("(([^"]|\\")+?[^\\]|([^"]|\\")|)")')),                       # Single line only
     TokenSpec(tokens.TYPE_MULTILINE_STRING, re.compile(r'^(""".*?""")', re.DOTALL)),
     TokenSpec(tokens.TYPE_LITERAL_STRING, re.compile(r"^('.*?')")),
     TokenSpec(tokens.TYPE_MULTILINE_LITERAL_STRING, re.compile(r"^('''.*?''')", re.DOTALL)),

@@ -421,3 +421,12 @@ agent_controllers = []
 """
 
     contoml.loads(toml)
+
+
+def test_weird_edge_case_1():
+    toml_text = """l = "t"
+creativity = "on vacation"
+"""
+
+    f = contoml.loads(toml_text)
+    assert f['']['l'] == 't'

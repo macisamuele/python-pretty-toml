@@ -18,6 +18,8 @@ valid_tokens = {
             r'"I\'m a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF."'
         ),
         ('"ʎǝʞ" key', '"ʎǝʞ"'),
+        ('""', '""'),
+        ('"t"', '"t"'),
     ),
     tokens.TYPE_MULTILINE_STRING: (
         ('"""\nRoses are red\nViolets are blue""" """other text"""', '"""\nRoses are red\nViolets are blue"""'),
