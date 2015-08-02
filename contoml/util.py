@@ -1,3 +1,4 @@
+import math
 
 
 def is_sequence_like(x):
@@ -40,3 +41,30 @@ def join_with(iterable, separator):
         if i < len(inputs)-1:
             b += separator
     return b
+
+
+def chunkate_string(text, length):
+    """
+    Iterates over the given seq in chunks of at maximally the given length. Will never break a whole word.
+    """
+    iterator_index = 0
+
+    def next_newline():
+        try:
+            return next(i for (i, c) in enumerate(text) if i > iterator_index and c == '\n')
+        except StopIteration:
+            return len(text)
+
+    def next_breaker():
+        try:
+            return next(i for (i, c) in reversed(tuple(enumerate(text)))
+                        if i >= iterator_index and
+                        (i < iterator_index+length) and
+                        c in (' ', '\t'))
+        except StopIteration:
+            return len(text)
+
+    while iterator_index < len(text):
+        next_chunk = text[iterator_index:min(next_newline(), next_breaker()+1)]
+        iterator_index += len(next_chunk)
+        yield next_chunk
