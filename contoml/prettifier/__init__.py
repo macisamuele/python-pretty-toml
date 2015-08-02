@@ -1,5 +1,5 @@
 from . import anontableindent, tableindent, tableassignment
-from contoml.prettifier import tablesep, commentspace
+from contoml.prettifier import tablesep, commentspace, linelength
 
 """
     TOMLFile prettifiers
@@ -14,6 +14,7 @@ UNIFORM_TABLE_ASSIGNMENT_SPACING = tableassignment.table_assignment_spacing
 ANONYMOUS_TABLE_INDENTATION = anontableindent.anon_table_indent
 COMMENT_SPACING = commentspace.comment_space
 TABLE_SPACING = tablesep.table_separation
+LINE_LENGTH_ENFORCERS = linelength.line_lingth_limiter
 
 
 ALL = (
@@ -22,6 +23,7 @@ ALL = (
     UNIFORM_TABLE_INDENTATION,
     UNIFORM_TABLE_ASSIGNMENT_SPACING,
     ANONYMOUS_TABLE_INDENTATION,
+    LINE_LENGTH_ENFORCERS,
 )
 
 
