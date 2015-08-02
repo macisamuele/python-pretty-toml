@@ -1,4 +1,5 @@
 from . import anontableindent, tableindent, tableassignment
+from contoml.prettifier import tablesep, commentspace
 
 """
     TOMLFile prettifiers
@@ -11,9 +12,13 @@ from . import anontableindent, tableindent, tableassignment
 UNIFORM_TABLE_INDENTATION = tableindent.table_entries_should_be_uniformly_indented
 UNIFORM_TABLE_ASSIGNMENT_SPACING = tableassignment.table_assignment_spacing
 ANONYMOUS_TABLE_INDENTATION = anontableindent.anon_table_indent
+COMMENT_SPACING = commentspace.comment_space
+TABLE_SPACING = tablesep.table_separation
 
 
 ALL = (
+    TABLE_SPACING,      # Must be before COMMENT_SPACING
+    COMMENT_SPACING,    # Must be after TABLE_SPACING
     UNIFORM_TABLE_INDENTATION,
     UNIFORM_TABLE_ASSIGNMENT_SPACING,
     ANONYMOUS_TABLE_INDENTATION,
