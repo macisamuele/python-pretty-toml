@@ -2,11 +2,12 @@
 from contoml.elements import traversal as t, factory as element_factory
 
 
-def table_assignment_spacing(toml_file_elements):
+def table_assignment_spacing(toml_file):
     """
     Rule: Every key and value pair in any table should be separated the triplet
     (single space character, an assignment character =, single space character)
     """
+    toml_file_elements = toml_file.elements
     for table_element in (e for e in toml_file_elements if t.predicates.table(e)):
         _do_table(table_element)
 

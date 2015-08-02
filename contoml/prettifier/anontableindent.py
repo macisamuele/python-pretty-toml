@@ -2,10 +2,12 @@
 from contoml.elements import traversal as t
 
 
-def anon_table_indent(toml_file_elements):
+def anon_table_indent(toml_file):
     """
     Rule: Anonymous table should never be indented.
     """
+    toml_file_elements = toml_file.elements
+
     if not toml_file_elements or not t.predicates.table(toml_file_elements[0]):
         return
 

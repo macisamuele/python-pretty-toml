@@ -92,3 +92,9 @@ class ArrayElement(ContainerElement, traversal.TraversalMixin):
             end = self._find_closing_square_bracket()
 
         self._sub_elements = self.sub_elements[:begin] + self._sub_elements[end:]
+
+    def turn_into_multiline(self):
+        """
+        Turns this array into a multi-line array with each element lying on its own line.
+        """
+        raise NotImplementedError   # TODO

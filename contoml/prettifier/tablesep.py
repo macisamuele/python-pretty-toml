@@ -4,11 +4,11 @@ from contoml.elements.metadata import WhitespaceElement, NewlineElement
 from contoml.elements.table import TableElement
 
 
-def table_separation(toml_file_elements):
+def table_separation(toml_file):
     """
     Rule: Tables should always be separated by an empty line.
     """
-
+    toml_file_elements = toml_file.elements
     for element in toml_file_elements:
         if isinstance(element, TableElement):
             _do_table(element.sub_elements)

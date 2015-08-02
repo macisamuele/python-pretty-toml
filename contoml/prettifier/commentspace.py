@@ -3,10 +3,12 @@ from contoml.elements import traversal as t, factory as element_factory
 from contoml.elements.table import TableElement
 
 
-def comment_space(toml_file_elements):
+def comment_space(toml_file):
     """
     Rule: Line-terminating comments should always be prefixed by a single tab character whitespace only.
     """
+    toml_file_elements = toml_file.elements
+
     for element in toml_file_elements:
         if isinstance(element, TableElement):
             _do_table(element.sub_elements)

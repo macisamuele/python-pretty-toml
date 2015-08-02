@@ -140,5 +140,9 @@ class TOMLFile:
         """
         Reformats this TOML file using the specified consistent set of formatting rules.
         """
-        prettifier.prettify(self._elements, prettifiers)
+        prettifier.prettify(self, prettifiers)
         self._recreate_navigable()
+
+    @property
+    def elements(self):
+        return self._elements

@@ -3,11 +3,11 @@ from contoml.elements import traversal as t, factory as element_factory
 from contoml.tokens import py2toml
 
 
-def table_entries_should_be_uniformly_indented(toml_file_elements):
+def table_entries_should_be_uniformly_indented(toml_file):
     """
     Rule: Nth-level table sections should be indented by (N-1)*2 spaces
     """
-
+    toml_file_elements = toml_file.elements
     for (i, e) in enumerate(toml_file_elements):
         if t.predicates.table_header(e):
             table = toml_file_elements[t.find_following(toml_file_elements, t.predicates.table, i)]
