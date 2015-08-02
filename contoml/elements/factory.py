@@ -126,3 +126,7 @@ def create_table(dict_value):
         table_element[k] = create_element(v)
 
     return table_element
+
+
+def create_multiline_string(text, maximum_line_length):
+    return AtomicElement(_tokens=[py2toml.create_multiline_string(text, maximum_line_length)])

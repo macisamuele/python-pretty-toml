@@ -12,6 +12,7 @@ import re
 from contoml.elements.metadata import NewlineElement
 from contoml.errors import TOMLError
 from contoml.tokens import Token
+from contoml.util import chunkate_string
 
 
 class NotPrimitiveError(TOMLError):
@@ -128,3 +129,10 @@ def _break_long_text(text, maximum_length=75):
 
 def create_whitespace(source_substring):
     return Token(tokens.TYPE_WHITESPACE, source_substring)
+
+
+def create_multiline_string(text, maximum_line_length=120):
+    def escape(t):
+        return t.replace('"""', r'\"\"\"')
+    source_substring = '"""\n{}"""'.format('\\\n'.join(chunkate_string(escape(text), maximum_line_length)))
+    return Token(tokens.TYPE_MULTILINE_STRING, source_substring)
