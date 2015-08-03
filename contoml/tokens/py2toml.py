@@ -20,13 +20,13 @@ class NotPrimitiveError(TOMLError):
 
 
 _operator_tokens_by_type = {
-    tokens.TYPE_OP_SQUARE_LEFT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET, '['),
-    tokens.TYPE_OP_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET, ']'),
-    tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET: tokens.Token(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET, '[['),
-    tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, ']]'),
-    tokens.TYPE_OP_COMMA: tokens.Token(tokens.TYPE_OP_COMMA, ','),
-    tokens.TYPE_NEWLINE: tokens.Token(tokens.TYPE_NEWLINE, '\n'),
-    tokens.TYPE_OPT_DOT: tokens.Token(tokens.TYPE_OPT_DOT, '.'),
+    tokens.TYPE_OP_SQUARE_LEFT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_LEFT_BRACKET, u'['),
+    tokens.TYPE_OP_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_SQUARE_RIGHT_BRACKET, u']'),
+    tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET: tokens.Token(tokens.TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET, u'[['),
+    tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET: tokens.Token(tokens.TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, u']]'),
+    tokens.TYPE_OP_COMMA: tokens.Token(tokens.TYPE_OP_COMMA, u','),
+    tokens.TYPE_NEWLINE: tokens.Token(tokens.TYPE_NEWLINE, u'\n'),
+    tokens.TYPE_OPT_DOT: tokens.Token(tokens.TYPE_OPT_DOT, u'.'),
 }
 
 
@@ -48,11 +48,11 @@ def create_primitive_token(value):
     Raises NotPrimitiveError when the given value is not a primitive atomic value
     """
     if isinstance(value, bool):
-        return tokens.Token(tokens.TYPE_BOOLEAN, 'true' if value else 'false')
+        return tokens.Token(tokens.TYPE_BOOLEAN, u'true' if value else u'false')
     elif isinstance(value, int):
-        return tokens.Token(tokens.TYPE_INTEGER, '{}'.format(value))
+        return tokens.Token(tokens.TYPE_INTEGER, u'{}'.format(value))
     elif isinstance(value, float):
-        return tokens.Token(tokens.TYPE_FLOAT, '{}'.format(value))
+        return tokens.Token(tokens.TYPE_FLOAT, u'{}'.format(value))
     elif isinstance(value, (datetime.datetime, datetime.date, datetime.time)):
         ts = timestamp(value) // 1000
         return tokens.Token(tokens.TYPE_DATE, strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts))
@@ -94,11 +94,11 @@ def _escape_single_line_quoted_string(text):
 
 
 def _create_multiline_token(text):
-    escaped = text.replace('"""', '\"\"\"')
+    escaped = text.replace(u'"""', u'\"\"\"')
     if len(escaped) > 50:
-        return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""\n{}\\\n"""'.format(_break_long_text(escaped)))
+        return tokens.Token(tokens.TYPE_MULTILINE_STRING, u'"""\n{}\\\n"""'.format(_break_long_text(escaped)))
     else:
-        return tokens.Token(tokens.TYPE_MULTILINE_STRING, '"""{}"""'.format(escaped))
+        return tokens.Token(tokens.TYPE_MULTILINE_STRING, u'"""{}"""'.format(escaped))
 
 
 def _break_long_text(text, maximum_length=75):
@@ -134,6 +134,6 @@ def create_whitespace(source_substring):
 
 def create_multiline_string(text, maximum_line_length=120):
     def escape(t):
-        return t.replace('"""', r'\"\"\"')
-    source_substring = '"""\n{}"""'.format('\\\n'.join(chunkate_string(escape(text), maximum_line_length)))
+        return t.replace(u'"""', six.u(r'\"\"\"'))
+    source_substring = u'"""\n{}"""'.format(u'\\\n'.join(chunkate_string(escape(text), maximum_line_length)))
     return Token(tokens.TYPE_MULTILINE_STRING, source_substring)
