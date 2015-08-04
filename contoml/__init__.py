@@ -31,7 +31,7 @@ def load(file_path):
     return loads(open(file_path).read())
 
 
-def dumps(value):
+def dumps(value, prettify=False):
     """
     Dumps a data structure to TOML source code.
 
@@ -39,6 +39,8 @@ def dumps(value):
     """
 
     if isinstance(value, TOMLFile):
+        if prettify:
+            value.prettify()
         return value.dumps()
 
     if not isinstance(value, dict):
@@ -53,14 +55,17 @@ def dumps(value):
         else:
             f[''][k] = v
 
+    if prettify:
+        f.prettify()
+
     return f.dumps()
 
 
-def dump(obj, file_path):
+def dump(obj, file_path, prettify=False):
     """
     Dumps a data structure to the filesystem as TOML.
 
     The given value must be either a dict of dict values, a dict, or a TOML file constructed by this module.
     """
     with open(file_path, 'w') as fp:
-        fp.write(dumps(obj))
+        fp.write(dumps(obj, prettify=prettify))
