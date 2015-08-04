@@ -51,7 +51,7 @@ def _do_table(table_elements):
         return t.find_following(table_elements, t.predicates.non_metadata, next_key())
 
     def line_length():
-        elements = table_elements[it:next_newline()] if it > float('inf') else table_elements[:next_newline()]
+        elements = table_elements[it:next_newline()] if it > float('-inf') else table_elements[:next_newline()]
         return len(''.join(e.serialized() for e in elements))
 
     while next_newline() >= 0:

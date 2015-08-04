@@ -430,3 +430,20 @@ creativity = "on vacation"
 
     f = contoml.loads(toml_text)
     assert f['']['l'] == 't'
+
+
+def test_weird_edge_case_2():
+    toml_text = """telegram = "971507192009"
+description = ""
+firstname = "adnan"
+lastname = "fatayerji"
+git_aydo = ""
+emails = ["adnan@incubaid.com", "fatayera@incubaid.com", "adnan.fatayerji@incubaid.com", "adnan@greenitglobe.com", "fatayera@greenitglobe.com", "adnan.fatayerji@greenitglobe.com"]
+git_github = ""
+groups = ["sales", "dubai", "mgmt"]
+skype = ""
+id = "fatayera"
+mobiles = ["971507192009"]"""
+
+    f = contoml.loads(toml_text)
+    f.prettify()
