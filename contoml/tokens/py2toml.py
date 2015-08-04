@@ -34,13 +34,6 @@ def operator_token(token_type):
     return _operator_tokens_by_type[token_type]
 
 
-_newline = NewlineElement([operator_token(tokens.TYPE_NEWLINE)])
-
-
-def newline_element():
-    return _newline
-
-
 def create_primitive_token(value):
     """
     Creates and returns a single token for the given primitive atomic value.
