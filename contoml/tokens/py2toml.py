@@ -40,7 +40,9 @@ def create_primitive_token(value):
 
     Raises NotPrimitiveError when the given value is not a primitive atomic value
     """
-    if isinstance(value, bool):
+    if value is None:
+        return create_primitive_token('')
+    elif isinstance(value, bool):
         return tokens.Token(tokens.TYPE_BOOLEAN, u'true' if value else u'false')
     elif isinstance(value, int):
         return tokens.Token(tokens.TYPE_INTEGER, u'{}'.format(value))

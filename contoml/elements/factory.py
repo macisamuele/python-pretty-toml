@@ -17,7 +17,7 @@ def create_element(value):
     from contoml.elements.array import ArrayElement
     from contoml.elements.inlinetable import InlineTableElement
 
-    if isinstance(value, (int, float, bool, datetime.datetime, datetime.date) + six.string_types):
+    if isinstance(value, (int, float, bool, datetime.datetime, datetime.date) + six.string_types) or value is None:
         primitive_token = py2toml.create_primitive_token(value)
         return AtomicElement((primitive_token,))
 

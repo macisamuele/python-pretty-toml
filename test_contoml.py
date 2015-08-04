@@ -447,3 +447,20 @@ mobiles = ["971507192009"]"""
 
     f = contoml.loads(toml_text)
     f.prettify()
+
+
+def test_creating_toml_files_with_none_value():
+    data = {'description': None,
+            'emails': ['adnan@incubaid.com'],
+            'firstname': 'adnan',
+            'git_aydo': None,
+            'git_github': None,
+            'groups': [u'sales'],
+            'id': 'fatayera',
+            'lastname': 'fatayerji',
+            'mobiles': ['971507192009'],
+            'skype': None,
+            'telegram': '971507192009'}
+
+    toml_text = contoml.dumps(data)
+    assert contoml.loads(toml_text)['']['description'] == ''
