@@ -464,3 +464,25 @@ def test_creating_toml_files_with_none_value():
 
     toml_text = contoml.dumps(data)
     assert contoml.loads(toml_text)['']['description'] == ''
+
+
+def test_parsing_to_raw_primitive_and_dumping_back_to_toml_should_be_inverses():
+
+    data = {u'description': u'',
+            u'emails': [u'adnan@incubaid.com',
+                        u'fatayera@incubaid.com',
+                        u'adnan.fatayerji@incubaid.com',
+                        u'adnan@greenitglobe.com',
+                        u'fatayera@greenitglobe.com',
+                        u'adnan.fatayerji@greenitglobe.com'],
+            u'firstname': u'adnan',
+            u'git_aydo': u'',
+            u'git_github': u'',
+            u'groups': [u'sales', u'dubai', u'mgmt'],
+            u'id': u'fatayera',
+            u'lastname': u'fatayerji',
+            u'mobiles': [u'971507192009'],
+            u'skype': u'',
+            u'telegram': u'971507192009'}
+
+    assert contoml.loads(contoml.dumps(data)).primitive == data

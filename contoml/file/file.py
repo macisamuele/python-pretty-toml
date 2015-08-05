@@ -116,7 +116,14 @@ class TOMLFile:
 
         WARNING: The returned container does not contain any markup or formatting metadata.
         """
-        return raw.to_raw(self._navigable)
+        raw_container = raw.to_raw(self._navigable)
+
+        # Collapsing the anonymous table onto the top-level container is present
+        if '' in raw_container:
+            raw_container.update(raw_container[''])
+        del raw_container['']
+
+        return raw_container
 
     def append_fresh_table(self, fresh_table):
         """

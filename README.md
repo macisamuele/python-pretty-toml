@@ -42,7 +42,7 @@ pip install --upgrade contoml
 # At any moment, you can drop all the formatting metadata preserved in the 
 # lodaded TOML file and obtain a primive Python container out of it
 >>> toml_file.primitive
-{'': {'title': 'TOML Example'},
+{'title': 'TOML Example',
  'clients': {'data': [['gamma', 'delta'], [1, 2]],
   'hosts': ['alpha', 'omega'],
   'key3': 'The quick brown fox jumps over the lazy dog.',
