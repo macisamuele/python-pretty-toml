@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from _version import VERSION
+from contoml._version import VERSION
 
 setup(
     name='contoml',
