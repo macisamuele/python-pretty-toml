@@ -1,8 +1,7 @@
 from contoml.errors import InvalidValueError
-from contoml.file.file import TOMLFile
-import pkg_resources  # from setuptools
+from ._version import VERSION
 
-__version__ = pkg_resources.require("contoml")[0].version
+__version__ = VERSION
 
 
 def new():
@@ -40,6 +39,8 @@ def dumps(value, prettify=False):
 
     The given value must be either a dict of dict values, a dict, or a TOML file constructed by this module.
     """
+
+    from contoml.file.file import TOMLFile
 
     if isinstance(value, TOMLFile):
         if prettify:
