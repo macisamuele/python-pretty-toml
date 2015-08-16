@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
+from _version import VERSION
 
 setup(
     name='contoml',
     packages=find_packages(),
-    version='master',
+    version=VERSION,
     description='Consistent TOML for Python',
     author='Amr Hassan',
     author_email='amr.hassan@gmail.com',

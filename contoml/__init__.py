@@ -1,5 +1,6 @@
 from contoml.errors import InvalidValueError
 from contoml.file.file import TOMLFile
+from _version import VERSION as __version__
 
 
 def new():
