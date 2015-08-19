@@ -24,6 +24,9 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
     def items(self):
         for (key_i, key), (value_i, value) in self._enumerate_items():
             yield key.value, value.value
+        if self._fallback:
+            for key, value in self._fallback.items():
+                yield key, value
 
     def keys(self):
         for key, _ in self.items():
@@ -61,6 +64,13 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
             return self[key]
         except KeyError:
             return default
+
+    def set_fallback(self, fallback):
+        """
+        Sets a fallback dict-like instance to be used to look up values after they are not found
+        in this instance.
+        """
+        self._fallback = fallback
 
     @property
     def primitive_value(self):

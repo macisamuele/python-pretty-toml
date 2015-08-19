@@ -1,3 +1,8 @@
+"""
+    File entries are named top-level sections in a TOML file.
+"""
+
+
 from contoml import elements
 from contoml.elements import TableElement, TableHeaderElement
 from contoml.file.peekableit import PeekableIterator
@@ -16,7 +21,7 @@ class Entry:
     @property
     def name(self):
         """
-        Returns an instnace of EntryName.
+        The distinct name of a table entry as an EntryName instance.
         """
         return self._names
 
@@ -56,6 +61,10 @@ class EntryName:
             if name != self._names[i]:
                 return EntryName(self._names[i:])
         return EntryName(names=self.sub_names[len(names):])
+
+    @property
+    def is_relative(self):
+        return len(self._names) > 1
 
     def __str__(self):
         return '.'.join(self.sub_names)

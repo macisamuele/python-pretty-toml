@@ -131,7 +131,7 @@ def create_table(dict_value):
     if not isinstance(dict_value, dict):
         raise ValueError('input must be a dict instance.')
 
-    table_element = TableElement([])
+    table_element = TableElement([create_newline_element()])
     for k, v in dict_value.items():
         table_element[k] = create_element(v)
 

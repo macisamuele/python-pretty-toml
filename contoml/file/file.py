@@ -1,9 +1,12 @@
+from contoml.elements.table import TableElement
 from contoml.errors import NoArrayFoundError, InvalidValueError
 from contoml.file import structurer, entries, raw
 from contoml.file.array import ArrayOfTables
+from contoml.file.entries import TableEntry
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 from contoml import prettifier
+from contoml.file.peekableit import PeekableIterator
 
 
 class TOMLFile:
@@ -45,12 +48,35 @@ class TOMLFile:
                 if key:
                     self._elements.append(element_factory.create_table_header_element(key))
                 self._elements.append(element_factory.create_table(value))
-                self._elements.append(element_factory.create_newline_element())
+                # self._elements.append(element_factory.create_newline_element())
 
         else:
             raise InvalidValueError('Assigned value must be a dict or a sequence of dicts')
 
-        self._recreate_navigable()
+        self._on_element_change()
+
+    def _update_table_fallbacks(self):
+        """
+        Updates the fallbacks on all the table elements to make relative table access possible.
+        """
+
+        if len(self.elements) <= 1:
+            return
+
+        table_entries = tuple(e for e in entries.extract(self.elements) if isinstance(e, TableEntry))
+
+        def parent_of(entry):
+            # Returns an Entry parent of the given entry, or None.
+            for parent_entry in table_entries:
+                if entry.name.sub_names[:-1] == parent_entry.name.sub_names:
+                    return parent_entry
+
+        for entry in table_entries:
+            if entry.name.is_relative:
+                parent = parent_of(entry)
+                if parent:
+                    parent.table_element.set_fallback(
+                        {entry.name.without_prefix(parent.name).sub_names[0]: entry.table_element})
 
     def _recreate_navigable(self):
         if self._elements:
@@ -68,19 +94,23 @@ class TOMLFile:
         else:
             return ArrayOfTables(parent=self, name=name)
 
+    def _on_element_change(self):
+        self._recreate_navigable()
+        self._update_table_fallbacks()
+
     def append_elements(self, elements):
         """
         Appends more elements to the contained internal elements.
         """
         self._elements = self._elements + list(elements)
-        self._recreate_navigable()
+        self._on_element_change()
 
     def prepend_elements(self, elements):
         """
         Prepends more elements to the contained internal elements.
         """
         self._elements = list(elements) + self._elements
-        self._recreate_navigable()
+        self._on_element_change()
 
     def dumps(self):
         """

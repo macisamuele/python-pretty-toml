@@ -486,3 +486,37 @@ def test_parsing_to_raw_primitive_and_dumping_back_to_toml_should_be_inverses():
             u'telegram': u'971507192009'}
 
     assert contoml.loads(contoml.dumps(data)).primitive == data
+
+
+def test_accessing_deeply_nested_dicts():
+    t = """[cmds]
+    [cmds.sync]
+    #syncthing extension
+    binary = "python2.7"
+    cwd = "./extensions/sync"
+    script = "{name}.py"
+        [cmds.sync.env]
+        PYTHONPATH = "../"
+        JUMPSCRIPTS_HOME = "../../jumpscripts"
+        SYNCTHING_URL = "http://localhost:8384"
+"""
+
+    f = contoml.loads(t)
+
+    assert f['cmds']['sync']['env']['SYNCTHING_URL'] == 'http://localhost:8384'
+
+    f['cmds']['sync']['env']['SYNCTHING_URL'] = 'Nowhere'
+
+    expected_toml = """[cmds]
+    [cmds.sync]
+    #syncthing extension
+    binary = "python2.7"
+    cwd = "./extensions/sync"
+    script = "{name}.py"
+        [cmds.sync.env]
+        PYTHONPATH = "../"
+        JUMPSCRIPTS_HOME = "../../jumpscripts"
+        SYNCTHING_URL = "Nowhere"
+"""
+
+    assert expected_toml == f.dumps()
