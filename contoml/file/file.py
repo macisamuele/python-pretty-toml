@@ -182,3 +182,21 @@ class TOMLFile:
     @property
     def elements(self):
         return self._elements
+
+    def __str__(self):
+
+        is_empty = (not self['']) and (not tuple(k for k in self.keys() if k))
+
+        def key_name(key):
+            return '[ANONYMOUS]' if not key else key
+
+        def pair(key, value):
+            return '%s = %s' % (key_name(key), str(value))
+
+        content_text = '' if is_empty else \
+            '\n\t' + ',\n\t'.join(pair(k, v) for (k, v) in self.items() if v) + '\n'
+
+        return "TOMLFile{%s}" % content_text
+
+    def __repr__(self):
+        return str(self)

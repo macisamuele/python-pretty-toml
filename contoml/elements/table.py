@@ -125,3 +125,6 @@ class TableElement(abstracttable.AbstractTable):
 
     def value(self):
         return self
+
+    def __str__(self):
+        return str(self.primitive_value)

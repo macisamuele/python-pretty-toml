@@ -51,3 +51,6 @@ class CascadeDict:
     @property
     def primitive_value(self):
         return self.neutralized
+
+    def __repr__(self):
+        return repr(self.primitive_value)

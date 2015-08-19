@@ -85,7 +85,7 @@ class ContainerElement(Element):
         return ''.join(element.serialized() for element in self.sub_elements)
 
     def __repr__(self):
-        return repr(self.sub_elements)
+        return repr(self.primitive_value)
 
     @property
     def primitive_value(self):
