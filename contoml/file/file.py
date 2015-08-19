@@ -6,7 +6,6 @@ from contoml.file.entries import TableEntry
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 from contoml import prettifier
-from contoml.file.peekableit import PeekableIterator
 
 
 class TOMLFile:
