@@ -74,9 +74,9 @@ def create_string_token(text, bare_string_allowed=False):
         return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_single_line_quoted_string(text)))
     elif bare_string_allowed and _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
-    elif len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 50:
-        # If containing two or more newlines or is longer than 50 characaters we'll use the multiline string format
-        return _create_multiline_token(text)
+    elif len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 80:
+        # If containing two or more newlines or is longer than 80 characaters we'll use the multiline string format
+        return _create_multiline_string_token(text)
     else:
         return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_single_line_quoted_string(text)))
 
@@ -88,7 +88,7 @@ def _escape_single_line_quoted_string(text):
         return codecs.encode(text, 'unicode-escape').decode().replace('"', '\\"')
 
 
-def _create_multiline_token(text):
+def _create_multiline_string_token(text):
     escaped = text.replace(u'"""', u'\"\"\"')
     if len(escaped) > 50:
         return tokens.Token(tokens.TYPE_MULTILINE_STRING, u'"""\n{}\\\n"""'.format(_break_long_text(escaped)))
