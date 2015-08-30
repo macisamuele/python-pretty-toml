@@ -35,10 +35,12 @@ class TOMLFile:
 
     def __setitem__(self, key, value):
 
-        if key and isinstance(value, (tuple, list)) and all(isinstance(v, dict) for v in value):
+        # Setting an array-of-tables
+        if key and isinstance(value, (tuple, list)) and value and all(isinstance(v, dict) for v in value):
             for table in value:
                 self.array(key).append(table)
 
+        # Or setting a whole single table
         elif isinstance(value, dict):
             if key in self._navigable:
                 index = self._elements.index(self._navigable[key])
@@ -49,8 +51,10 @@ class TOMLFile:
                 self._elements.append(element_factory.create_table(value))
                 # self._elements.append(element_factory.create_newline_element())
 
+        # Or updating the anonymous section table
         else:
-            raise InvalidValueError('Assigned value must be a dict or a sequence of dicts')
+            # It's mea
+            self[''][key] = value
 
         self._on_element_change()
 

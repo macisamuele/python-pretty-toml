@@ -520,3 +520,21 @@ def test_accessing_deeply_nested_dicts():
 """
 
     assert expected_toml == f.dumps()
+
+
+def test_creating_empty_arrays():
+    d = {
+        "hash.service.actions.lua": "",
+        "hash.service.actions.py <http://hash.service.actions.py>": "",
+        "actions": [],
+    }
+
+    toml = contoml.dumps(d, prettify=True)
+    expected_toml = """actions = []
+"hash.service.actions.lua" = ""
+"hash.service.actions.py <http://hash.service.actions.py>" = ""
+
+
+"""
+
+    assert expected_toml == toml
