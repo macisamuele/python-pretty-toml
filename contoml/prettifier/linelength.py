@@ -56,7 +56,7 @@ def _do_table(table_elements):
 
     while next_newline() >= 0:
 
-        if line_length() > MAXIMUM_LINE_LENGTH:
+        if line_length() > MAXIMUM_LINE_LENGTH and next_value() >= 0:
             value_i = next_value()
             value = table_elements[value_i]
 

@@ -538,3 +538,135 @@ def test_creating_empty_arrays():
 """
 
     assert expected_toml == toml
+
+
+def test_issue_18():
+    toml_text = """[main]
+gid = 1
+nid = 1
+max_jobs = 100
+message_id_file = "./.mid"
+history_file = "./.history"
+roles = ["agent"]
+include = "./conf"
+
+[controllers]
+    [controllers.main]
+    url = "https://dev2/controller/"
+        [controllers.main.security]
+        client_certificate = "/opt/jumpscale7/hrd/apps/agent2__node1/client_node1.crt"
+        client_certificate_key = "/opt/jumpscale7/hrd/apps/agent2__node1/client_node1.key"
+        certificate_authority = "/opt/jumpscale7/hrd/apps/agent2__node1/server.crt"
+
+[channel]
+cmds = [] # empty for long polling from all defined controllers, or specif controllers keys
+
+[extensions]
+    #the very basic agent extensions. Also please check the toml files under
+    #the Main.Include folder for more extensions
+    [extensions.syncthing]
+    binary = "./syncthing"
+    cwd = "./extensions/syncthing"
+    args = ["-home", "./home", "-gui-address", "127.0.0.1:28384"]
+
+    [extensions.sync]
+    #syncthing extension
+    binary = "python2.7"
+    cwd = "./extensions/sync"
+    args = ["{name}.py"]
+        [extensions.sync.env]
+        PYTHONPATH = "../:/opt/jumpscale7/lib"
+        JUMPSCRIPTS_HOME = "/opt/jumpscale7/apps/agent2/jumpscripts/"
+        SYNCTHING_URL = "http://localhost:28384"
+
+    [extensions.jumpscript]
+    binary = "python2.7"
+    cwd = "./extensions/jumpscript"
+    args = ["wrapper.py", "modern", "{domain}", "{name}"]
+        [extensions.jumpscript.env]
+        SOCKET = "/tmp/jumpscript.sock"
+        PYTHONPATH = "../"
+
+    [extensions.legacy]
+    binary = "python2.7"
+    cwd = "./extensions/jumpscript"
+    args = ["wrapper.py", "legacy", "{domain}", "{name}"]
+        [extensions.legacy.env]
+        PYTHONPATH = "../" # for utils
+        SOCKET = "/tmp/jumpscript.sock"
+
+    [extensions.js_daemon]
+    binary = "python2.7"
+    cwd = "./extensions/jumpscript"
+    args = ["executor.py"]
+        [extensions.js_daemon.env]
+        SOCKET = "/tmp/jumpscript.sock"
+        PYTHONPATH = "../:/opt/jumpscale7/lib"
+        JUMPSCRIPTS_HOME = "/opt/jumpscale7/apps/agent2/jumpscripts/"
+        JUMPSCRIPTS_LEGACY_HOME = "/opt/jumpscale7/apps/agent2/legacy/"
+
+[logging]
+    [logging.db]
+    type = "DB"
+    log_dir = "./logs"
+    levels = [2, 4, 7, 8, 9, 11]  # (all error messages + debug) empty for all
+
+    [logging.ac]
+    type = "AC"
+    flush_int = 300 # seconds (5min)
+    batch_size = 1000 # max batch size, force flush if reached this count.
+    controllers = [] # empty for all controllers, or controllers keys
+    levels = [2, 4, 7, 8, 9, 11]  # (all error messages + debug) empty for all
+
+    [logging.console]
+    type = "console"
+    levels = [2, 4, 7, 8, 9]
+
+[stats]
+interval = 60 # seconds
+controllers = [] # empty for all controllers, or controllers keys
+
+[hubble]
+controllers = [] # accept forwarding commands and connections from all controllers. Or specific controllers by name
+
+[startup]
+    [startup.syncthing]
+    name = "syncthing"
+        [startup.syncthing.args]
+        loglevels_db = '*'
+        domain = "agent"
+        name = "syncthing"
+
+    [startup.legacy]
+    name = "js_legacy_daemon"
+        [startup.legacy.args]
+        max_restart = 10
+        domain = "agent"
+        name = "legacy"
+
+    [startup.jumpscript]
+    name = "js_daemon"
+        [startup.jumpscript.args]
+        max_restart = 10
+        domain = "agent"
+        name = "jumpscript"
+"""
+
+    toml = contoml.loads(toml_text)
+
+    toml['extensions']['redis'] = {
+            'binary': './redis-server',
+            'cwd': '/opt/jumpscale7/apps/redis',
+            'args': ['/opt/jumpscale7/var/redis/ovh4/redis.conf']
+        }
+    toml['startup']['redis'] = {
+            'name': 'redis',
+            'args': {
+                'max_restart': 1,
+                'domain': 'jumpscale',
+                'name': 'redis',
+            }
+        }
+
+    contoml.dumps(toml, prettify=True)
+    # No errors, test passed!
