@@ -1,7 +1,5 @@
 import re
-from datetime import datetime
-import pytz
-import strict_rfc3339
+import iso8601
 from contoml import tokens
 from contoml.tokens import TYPE_BOOLEAN, TYPE_INTEGER, TYPE_FLOAT, TYPE_DATE, \
     TYPE_MULTILINE_STRING, TYPE_BARE_STRING, TYPE_MULTILINE_LITERAL_STRING, TYPE_LITERAL_STRING, \
@@ -78,4 +76,4 @@ def _to_boolean(token):
     return token.source_substring == 'true'
 
 def _to_date(token):
-    return datetime.fromtimestamp(strict_rfc3339.rfc3339_to_timestamp(token.source_substring), tz=pytz.utc)
+    return iso8601.parse_date(token.source_substring)

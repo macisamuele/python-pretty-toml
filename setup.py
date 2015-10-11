@@ -17,6 +17,7 @@ setup(
     install_requires=[
         'six',
         'strict_rfc3339',
+        'iso8601',
         'pytz',
         'timestamp'
     ]
