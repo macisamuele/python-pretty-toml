@@ -29,12 +29,10 @@ class AbstractTable(ContainerElement, traversal.TraversalMixin):
                 yield key, value
 
     def keys(self):
-        for key, _ in self.items():
-            yield key
+        return tuple(key for (key, _) in self.items())
 
     def values(self):
-        for _, value in self.items():
-            yield value
+        return tuple(value for (_, value) in self.items())
 
     def __len__(self):
         return len(tuple(self._enumerate_items()))

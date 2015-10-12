@@ -1,4 +1,5 @@
 from contoml.elements import abstracttable, factory
+from contoml.elements.errors import InvalidElementError
 from contoml.elements.common import Element
 from contoml.elements.metadata import CommentElement, NewlineElement, WhitespaceElement
 from . import common
@@ -11,10 +12,18 @@ class TableElement(abstracttable.AbstractTable):
     Implements dict-like interface.
 
     Assumes input sub_elements are correct.
+
+    Raises InvalidElementError on duplicate keys.
     """
 
     def __init__(self, sub_elements):
         abstracttable.AbstractTable.__init__(self, sub_elements)
+
+        self._check_for_duplicate_keys()
+
+    def _check_for_duplicate_keys(self):
+        if len(set(self.keys())) < len(self.keys()):
+            raise InvalidElementError('Duplicate keys found')
 
     def __setitem__(self, key, value):
         if key in self:
