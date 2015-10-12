@@ -1,7 +1,6 @@
 from contoml import lexer, parser
-from contoml.file import entries
+from contoml.file import toplevels
 from contoml.parser import elementsanitizer
-from contoml.file.entries import EntryName
 from contoml.file.structurer import NamedDict, structure
 from contoml.parser.tokenstream import TokenStream
 
@@ -10,17 +9,17 @@ def test_NamedDict():
 
     d = NamedDict()
 
-    d[EntryName(('super', 'sub1', 'sub2'))] = {'sub3': 12}
-    d[EntryName(('super', 'sub1', 'sub2'))]['sub4'] = 42
+    d[toplevels.Name(('super', 'sub1', 'sub2'))] = {'sub3': 12}
+    d[toplevels.Name(('super', 'sub1', 'sub2'))]['sub4'] = 42
 
-    assert d[EntryName(('super', 'sub1', 'sub2', 'sub3'))] == 12
-    assert d[EntryName(('super', 'sub1', 'sub2', 'sub4'))] == 42
+    assert d[toplevels.Name(('super', 'sub1', 'sub2', 'sub3'))] == 12
+    assert d[toplevels.Name(('super', 'sub1', 'sub2', 'sub4'))] == 42
 
 
 def test_structure():
     tokens = TokenStream(lexer.tokenize(open('sample.toml').read()))
     elements = elementsanitizer.sanitize(parser.parse_token_stream(tokens))
-    entries_ = tuple(entries.extract(elements))
+    entries_ = tuple(toplevels.identify(elements))
 
     s = structure(entries_)
 
