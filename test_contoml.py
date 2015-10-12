@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import contoml
-from contoml.errors import TOMLError
+from contoml.errors import TOMLError, DuplicateKeysError
 
 
 def test_it_should_correctly_load_sample_file():
@@ -679,3 +679,18 @@ answer = 42"""
     parsed = contoml.loads(toml)
 
     assert parsed.primitive['key#group']['answer'] == 42
+
+
+def test_detects_duplicate_keys():
+    toml = """[fruit]
+type = "apple"
+
+[fruit.type]
+apple = "yes" """
+
+    try:
+        contoml.loads(toml)
+        assert False, "Parsing that TOML snippet should have thrown an exception"
+    except DuplicateKeysError:
+        pass
+

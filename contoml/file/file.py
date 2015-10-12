@@ -1,8 +1,6 @@
-from contoml.elements.table import TableElement
-from contoml.errors import NoArrayFoundError, InvalidValueError
-from contoml.file import structurer, entries, raw
+from contoml.errors import NoArrayFoundError, DuplicateKeysError
+from contoml.file import structurer, toplevels, raw
 from contoml.file.array import ArrayOfTables
-from contoml.file.entries import TableEntry
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 from contoml import prettifier
@@ -13,6 +11,8 @@ class TOMLFile:
     A TOMLFile object that tries its best to prserve formatting and order of mappings of the input source.
 
     Raises InvalidTOMLFileError on invalid input elements.
+
+    Raises DuplicateKeysError when duplicate keys are detected somewhere.
     """
 
     def __init__(self, _elements):
@@ -58,32 +58,46 @@ class TOMLFile:
 
         self._on_element_change()
 
+    @property
+    def _toplevels(self):
+        """
+        Returns a sequence of TopLevel instances for the current state of this table.
+        """
+        return tuple(e for e in toplevels.identify(self.elements) if isinstance(e, toplevels.Table))
+
     def _update_table_fallbacks(self):
         """
         Updates the fallbacks on all the table elements to make relative table access possible.
+
+        Raises DuplicateKeysError if appropriate.
         """
 
         if len(self.elements) <= 1:
             return
 
-        table_entries = tuple(e for e in entries.extract(self.elements) if isinstance(e, TableEntry))
+        table_toplevels = self._toplevels
 
-        def parent_of(entry):
-            # Returns an Entry parent of the given entry, or None.
-            for parent_entry in table_entries:
-                if entry.name.sub_names[:-1] == parent_entry.name.sub_names:
-                    return parent_entry
+        def parent_of(toplevel):
+            # Returns an TopLevel parent of the given entry, or None.
+            for parent_toplevel in table_toplevels:
+                if toplevel.name.sub_names[:-1] == parent_toplevel.name.sub_names:
+                    return parent_toplevel
 
-        for entry in table_entries:
-            if entry.name.is_relative:
+        for entry in table_toplevels:
+            if entry.name.is_qualified:
                 parent = parent_of(entry)
                 if parent:
-                    parent.table_element.set_fallback(
-                        {entry.name.without_prefix(parent.name).sub_names[0]: entry.table_element})
+                    child_name = entry.name.without_prefix(parent.name)
+
+                    # Check for duplicate keys
+                    if child_name in parent.table_element:
+                        raise DuplicateKeysError
+
+                    parent.table_element.set_fallback({child_name.sub_names[0]: entry.table_element})
 
     def _recreate_navigable(self):
         if self._elements:
-            self._navigable = structurer.structure(entries.extract(self._elements))
+            self._navigable = structurer.structure(toplevels.identify(self._elements))
 
     def array(self, name):
         """

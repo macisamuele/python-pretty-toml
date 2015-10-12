@@ -18,3 +18,9 @@ class NoArrayFoundError(TOMLError):
 
 class InvalidValueError(TOMLError):
     pass
+
+
+class DuplicateKeysError(TOMLError):
+    """
+    Duplicate keys detected in the parsed file.
+    """

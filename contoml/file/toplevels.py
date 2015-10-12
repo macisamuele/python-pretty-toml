@@ -1,18 +1,20 @@
 """
-    File entries are named top-level sections in a TOML file.
+    Top-level entries in a TOML file.
 """
-
 
 from contoml import elements
 from contoml.elements import TableElement, TableHeaderElement
 from contoml.file.peekableit import PeekableIterator
 
 
-class Entry:
+class TopLevel:
+    """
+    A abstract top-level entry.
+    """
 
     def __init__(self, names, table_element):
         self._table_element = table_element
-        self._names = EntryName(names)
+        self._names = Name(names)
 
     @property
     def table_element(self):
@@ -21,15 +23,12 @@ class Entry:
     @property
     def name(self):
         """
-        The distinct name of a table entry as an EntryName instance.
+        The distinct name of a table entry as an Name instance.
         """
         return self._names
 
 
-class EntryName:
-    """
-    An entry's name.
-    """
+class Name:
 
     def __init__(self, names):
         self._names = names
@@ -42,10 +41,10 @@ class EntryName:
         """
         Returns the name after dropping the first n entries of it.
         """
-        return EntryName(names=self._names[n:])
+        return Name(names=self._names[n:])
 
     def is_prefixed_with(self, names):
-        if isinstance(names, EntryName):
+        if isinstance(names, Name):
             return self.is_prefixed_with(names.sub_names)
 
         for i, name in enumerate(names):
@@ -54,16 +53,16 @@ class EntryName:
         return True
 
     def without_prefix(self, names):
-        if isinstance(names, EntryName):
+        if isinstance(names, Name):
             return self.without_prefix(names.sub_names)
 
         for i, name in enumerate(names):
             if name != self._names[i]:
-                return EntryName(self._names[i:])
-        return EntryName(names=self.sub_names[len(names):])
+                return Name(self._names[i:])
+        return Name(names=self.sub_names[len(names):])
 
     @property
-    def is_relative(self):
+    def is_qualified(self):
         return len(self._names) > 1
 
     def __str__(self):
@@ -79,48 +78,51 @@ class EntryName:
         return not self.__eq__(other)
 
 
-class AnonymousTableEntry(Entry):
+class AnonymousTable(TopLevel):
 
     def __init__(self, table_element):
-        Entry.__init__(self, ('',), table_element)
+        TopLevel.__init__(self, ('',), table_element)
 
 
-class TableEntry(Entry):
-
-    def __init__(self, names, table_element):
-        Entry.__init__(self, names=names, table_element=table_element)
-
-
-class ArrayOfTablesEntry(Entry):
+class Table(TopLevel):
 
     def __init__(self, names, table_element):
-        Entry.__init__(self, names=names, table_element=table_element)
+        TopLevel.__init__(self, names=names, table_element=table_element)
 
 
-def _anonymous_table(peekable_iter):
-    """
-    Returns the TableElement of the anonymous table, or raises a KeyError if not found.
-    """
-    try:
-        first_table = peekable_iter.peek()
-        if isinstance(first_table, TableElement):
-            return first_table
-        else:
-            raise KeyError
-    except StopIteration:
-        raise KeyError
+class ArrayOfTables(TopLevel):
+
+    def __init__(self, names, table_element):
+        TopLevel.__init__(self, names=names, table_element=table_element)
+
+
+# def _anonymous_table(peekable_iter):
+#     """
+#     Returns the TableElement of the anonymous table, or raises a KeyError if not found.
+#     """
+#     try:
+#         first_table = peekable_iter.peek()
+#         if isinstance(first_table, TableElement):
+#             return first_table
+#         else:
+#             raise KeyError
+#     except StopIteration:
+#         raise KeyError
 
 
 def _validate_file_elements(file_elements):
     pass
 
 
-def extract(file_elements):
+def identify(file_elements):
     """
-    Outputs an ordered sequence of instances of Entry types.
+    Outputs an ordered sequence of instances of TopLevel types.
 
     Elements start with an optional TableElement, followed by zero or more pairs of (TableHeaderElement, TableElement).
     """
+
+    if not file_elements:
+        return tuple()
 
     _validate_file_elements(file_elements)
 
@@ -132,7 +134,7 @@ def extract(file_elements):
         _, first_element = iterator.peek()
         if isinstance(first_element, TableElement):
             iterator.next()
-            yield AnonymousTableEntry(first_element)
+            yield AnonymousTable(first_element)
     except KeyError:
         pass
     except StopIteration:
@@ -146,9 +148,9 @@ def extract(file_elements):
         # If TableHeader of a regular table, return Table following it
         if not element.is_array_of_tables:
             table_element_i, table_element = next(iterator)
-            yield TableEntry(names=element.names, table_element=table_element)
+            yield Table(names=element.names, table_element=table_element)
 
         # If TableHeader of an array of tables, do your thing
         else:
             table_element_i, table_element = next(iterator)
-            yield ArrayOfTablesEntry(names=element.names, table_element=table_element)
+            yield ArrayOfTables(names=element.names, table_element=table_element)

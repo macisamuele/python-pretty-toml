@@ -1,10 +1,10 @@
-from contoml.file.entries import TableEntry, EntryName, AnonymousTableEntry
+from contoml.file import toplevels
 from contoml.file.cascadedict import CascadeDict
 
 
 class NamedDict(dict):
     """
-    A dict that can use EntryName instances as keys.
+    A dict that can use Name instances as keys.
     """
 
     def __init__(self, other_dict=None):
@@ -15,14 +15,14 @@ class NamedDict(dict):
 
     def __setitem__(self, key, value):
         """
-        key can be an EntryName instance.
+        key can be an Name instance.
 
-        When key is a path in the form of an EntryName instance, all the parents and grandparents of the value are
+        When key is a path in the form of an Name instance, all the parents and grandparents of the value are
         created along the way as instances of NamedDict. If the parent of the value exists, it is replaced with a
         CascadeDict() that cascades the old parent value with a new NamedDict that contains the given child name
         and value.
         """
-        if isinstance(key, EntryName):
+        if isinstance(key, toplevels.Name):
 
             if len(key.sub_names) == 1:
                 name = key.sub_names[0]
@@ -62,7 +62,7 @@ class NamedDict(dict):
 
     def __getitem__(self, item):
 
-        if isinstance(item, EntryName):
+        if isinstance(item, toplevels.Name):
             d = self
             for name in item.sub_names:
                 d = d[name]
@@ -73,21 +73,21 @@ class NamedDict(dict):
 
 def structure(entries):
     """
-    Accepts an ordered sequence of Entry instances and returns a navigable object structure representation of the
+    Accepts an ordered sequence of TopLevel instances and returns a navigable object structure representation of the
     TOML file.
     """
 
     entries = tuple(entries)
     obj = NamedDict()
 
-    last_array_of_tables = None         # The EntryName of the last array-of-tables header
+    last_array_of_tables = None         # The Name of the last array-of-tables header
 
     for entry in entries:
 
-        if isinstance(entry, AnonymousTableEntry):
+        if isinstance(entry, toplevels.AnonymousTable):
             obj[''] = entry.table_element
 
-        elif isinstance(entry, TableEntry):
+        elif isinstance(entry, toplevels.Table):
             if last_array_of_tables and entry.name.is_prefixed_with(last_array_of_tables):
                 seq = obj[last_array_of_tables]
                 unprefixed_name = entry.name.without_prefix(last_array_of_tables)
@@ -95,7 +95,7 @@ def structure(entries):
                 seq[-1] = CascadeDict(seq[-1], NamedDict({unprefixed_name: entry.table_element}))
             else:
                 obj[entry.name] = entry.table_element
-        else:    # It's an ArrayOfTablesEntry
+        else:    # It's an ArrayOfTables
 
             if last_array_of_tables and entry.name != last_array_of_tables and \
                     entry.name.is_prefixed_with(last_array_of_tables):
