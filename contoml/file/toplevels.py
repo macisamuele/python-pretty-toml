@@ -122,7 +122,7 @@ def identify(file_elements):
     """
 
     if not file_elements:
-        return tuple()
+        return
 
     _validate_file_elements(file_elements)
 
