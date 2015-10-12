@@ -670,3 +670,12 @@ controllers = [] # accept forwarding commands and connections from all controlle
 
     contoml.dumps(toml, prettify=True)
     # No errors, test passed!
+
+
+def test_table_with_pound_in_title():
+    toml = """["key#group"]
+answer = 42"""
+
+    parsed = contoml.loads(toml)
+
+    assert parsed.primitive['key#group']['answer'] == 42

@@ -154,7 +154,7 @@ class TOMLFile:
         # Collapsing the anonymous table onto the top-level container is present
         if '' in raw_container:
             raw_container.update(raw_container[''])
-        del raw_container['']
+            del raw_container['']
 
         return raw_container
 
