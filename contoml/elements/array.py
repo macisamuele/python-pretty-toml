@@ -2,6 +2,7 @@ from contoml.elements import common, factory, traversal
 from contoml.elements.common import Element, ContainerElement
 from contoml.elements.factory import create_element
 from contoml.elements.metadata import NewlineElement
+from contoml.elements.errors import InvalidElementError
 
 
 class ArrayElement(ContainerElement, traversal.TraversalMixin):
@@ -11,10 +12,17 @@ class ArrayElement(ContainerElement, traversal.TraversalMixin):
     Implements list-like interface.
 
     Assumes input sub_elements are correct for an array element.
+
+    Raises an InvalidElementError if contains heterogeneous values.
     """
 
     def __init__(self, sub_elements):
         common.ContainerElement.__init__(self, sub_elements)
+        self._check_homogeneity()
+
+    def _check_homogeneity(self):
+        if len(set(type(v) for v in self.primitive_value)) > 1:
+            raise InvalidElementError('Array should be homogeneous')
 
     def __len__(self):
         return len(tuple(self._enumerate_non_metadata_sub_elements()))
