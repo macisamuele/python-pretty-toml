@@ -4,6 +4,7 @@ import pytz
 
 from contoml import tokens
 from contoml.tokens import toml2py
+from contoml.tokens.errors import BadEscapeCharacter
 
 
 def test_integer():
@@ -12,6 +13,7 @@ def test_integer():
 
     assert toml2py.deserialize(t1) == 42
     assert toml2py.deserialize(t2) == 10012
+
 
 def test_float():
     tokens_and_values = (
@@ -23,6 +25,7 @@ def test_float():
     for token_string, value in tokens_and_values:
         token = tokens.Token(tokens.TYPE_FLOAT, token_string)
         assert toml2py.deserialize(token) == value
+
 
 def test_string():
 
@@ -51,9 +54,20 @@ def test_string():
     assert toml2py.deserialize(t6) == 'The first newline is\ntrimmed in raw strings.\n   All' \
                                       ' other whitespace\n   is preserved.\n'
 
+
 def test_date():
     t0 = tokens.Token(tokens.TYPE_DATE, '1979-05-27T07:32:00Z')
     assert toml2py.deserialize(t0) == datetime(1979, 5, 27, 7, 32, tzinfo=pytz.utc)
 
     t1 = tokens.Token(tokens.TYPE_DATE, '1979-05-27T00:32:00-07:00')
     assert toml2py.deserialize(t1) == datetime(1979, 5, 27, 7, 32, tzinfo=pytz.utc)
+
+
+def test_unescaping_a_string():
+    source = r"This string has a bad \a escape character."
+    # Should complain about bad escape jobs
+    try:
+        toml2py._unescape_str(source)
+        assert False, "Should have thrown an exception"
+    except BadEscapeCharacter:
+        pass

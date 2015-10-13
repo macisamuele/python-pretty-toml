@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import contoml
-from contoml.errors import TOMLError, DuplicateKeysError, DuplicateTablesError
+from contoml.errors import TOMLError, DuplicateKeysError, DuplicateTablesError, InvalidTOMLFileError
 
 
 def test_it_should_correctly_load_sample_file():
@@ -712,3 +712,16 @@ def test_detects_duplicate_tables():
 #     parsed = contoml.loads(toml)
 #
 #     assert len(parsed['']['thevoid']) == 1
+
+
+def test_fails_to_parse_bad_escape_characters():
+    toml = r"""
+invalid-escape = r"This string has a bad \a escape character."
+"""
+    try:
+        contoml.loads(toml)
+        assert False, "Should raise an exception before getting here"
+    except TOMLError:
+        pass
+
+

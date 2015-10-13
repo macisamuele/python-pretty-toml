@@ -6,6 +6,7 @@ from contoml.tokens import TYPE_BOOLEAN, TYPE_INTEGER, TYPE_FLOAT, TYPE_DATE, \
     TYPE_STRING
 import codecs
 import six
+from .errors import BadEscapeCharacter
 
 
 def deserialize(token):
@@ -29,6 +30,16 @@ def deserialize(token):
 
 
 def _unescape_str(unescaped):
+    """
+    Unescapes a string according the TOML spec. Raises BadEscapeCharacter when appropriate.
+    """
+
+    # Detect bad escape jobs
+    bad_escape_regexp = re.compile(r'[^\\]\\[^btnfr"\\uU]')
+    if bad_escape_regexp.findall(unescaped):
+        raise BadEscapeCharacter
+
+    # Do the unescaping
     if six.PY2:
         return unescaped.decode('string-escape').decode('unicode-escape')
     else:
@@ -67,13 +78,16 @@ def _to_string(token):
 def _to_int(token):
     return int(token.source_substring.replace('_', ''))
 
+
 def _to_float(token):
     assert token.type == tokens.TYPE_FLOAT
     string = token.source_substring.replace('_', '')
     return float(string)
 
+
 def _to_boolean(token):
     return token.source_substring == 'true'
+
 
 def _to_date(token):
     return iso8601.parse_date(token.source_substring)
