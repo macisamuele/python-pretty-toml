@@ -702,3 +702,13 @@ def test_detects_duplicate_tables():
         assert False, "Parsing that TOML snippet should have thrown an exception"
     except DuplicateTablesError:
         pass
+
+
+# There is no simple way to make this work since [[ is a token as well as [ and we're doing
+# maximal-munch tokenizing
+# def test_parsing_empty_arrays():
+#     toml = """thevoid = [[[[[]]]]]"""
+#
+#     parsed = contoml.loads(toml)
+#
+#     assert len(parsed['']['thevoid']) == 1

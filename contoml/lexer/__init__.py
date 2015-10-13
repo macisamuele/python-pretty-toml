@@ -37,6 +37,7 @@ _LEXICAL_SPECS = (
     TokenSpec(tokens.TYPE_NEWLINE, re.compile('^(\n|\r\n)')),
 )
 
+
 def _next_token_candidates(source):
     matches = []
     for token_spec in _LEXICAL_SPECS:
@@ -44,6 +45,7 @@ def _next_token_candidates(source):
         if match:
             matches.append(tokens.Token(token_spec.type, match.group(1)))
     return matches
+
 
 def _choose_from_next_token_candidates(candidates):
 
