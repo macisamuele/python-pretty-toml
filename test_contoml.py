@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import json
 import contoml
-from contoml.errors import TOMLError, DuplicateKeysError
+from contoml.errors import TOMLError, DuplicateKeysError, DuplicateTablesError
 
 
 def test_it_should_correctly_load_sample_file():
@@ -694,3 +694,11 @@ apple = "yes" """
     except DuplicateKeysError:
         pass
 
+
+def test_detects_duplicate_tables():
+    toml = "[a]\n[a]"
+    try:
+        contoml.loads(toml)
+        assert False, "Parsing that TOML snippet should have thrown an exception"
+    except DuplicateTablesError:
+        pass

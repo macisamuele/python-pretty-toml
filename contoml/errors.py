@@ -24,3 +24,9 @@ class DuplicateKeysError(TOMLError):
     """
     Duplicate keys detected in the parsed file.
     """
+
+
+class DuplicateTablesError(TOMLError):
+    """
+    Duplicate tables detected in the parsed file.
+    """

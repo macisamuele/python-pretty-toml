@@ -1,4 +1,4 @@
-from contoml.errors import NoArrayFoundError, DuplicateKeysError
+from contoml.errors import NoArrayFoundError, DuplicateKeysError, DuplicateTablesError
 from contoml.file import structurer, toplevels, raw
 from contoml.file.array import ArrayOfTables
 from contoml.file.freshtable import FreshTable
@@ -12,7 +12,7 @@ class TOMLFile:
 
     Raises InvalidTOMLFileError on invalid input elements.
 
-    Raises DuplicateKeysError when duplicate keys are detected somewhere.
+    Raises DuplicateKeysError, DuplicateTableError when appropriate.
     """
 
     def __init__(self, _elements):
@@ -58,14 +58,13 @@ class TOMLFile:
 
         self._on_element_change()
 
-    @property
-    def _toplevels(self):
+    def _detect_toplevels(self):
         """
         Returns a sequence of TopLevel instances for the current state of this table.
         """
         return tuple(e for e in toplevels.identify(self.elements) if isinstance(e, toplevels.Table))
 
-    def _update_table_fallbacks(self):
+    def _update_table_fallbacks(self, table_toplevels):
         """
         Updates the fallbacks on all the table elements to make relative table access possible.
 
@@ -74,8 +73,6 @@ class TOMLFile:
 
         if len(self.elements) <= 1:
             return
-
-        table_toplevels = self._toplevels
 
         def parent_of(toplevel):
             # Returns an TopLevel parent of the given entry, or None.
@@ -113,7 +110,16 @@ class TOMLFile:
 
     def _on_element_change(self):
         self._recreate_navigable()
-        self._update_table_fallbacks()
+
+        table_toplevels = self._detect_toplevels()
+
+        self._detect_duplicate_tables(table_toplevels)
+        self._update_table_fallbacks(table_toplevels)
+
+    def _detect_duplicate_tables(self, table_toplevels):
+        names = frozenset(toplevel.name for toplevel in table_toplevels)
+        if len(names) < len(table_toplevels):
+            raise DuplicateTablesError
 
     def append_elements(self, elements):
         """
