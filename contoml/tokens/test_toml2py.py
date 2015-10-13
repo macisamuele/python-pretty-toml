@@ -64,10 +64,16 @@ def test_date():
 
 
 def test_unescaping_a_string():
-    source = r"This string has a bad \a escape character."
-    # Should complain about bad escape jobs
-    try:
-        toml2py._unescape_str(source)
-        assert False, "Should have thrown an exception"
-    except BadEscapeCharacter:
-        pass
+
+    bad_escapes = (
+        r"This string has a bad \a escape character.",
+        r'\x33',
+    )
+
+    for source in bad_escapes:
+        # Should complain about bad escape jobs
+        try:
+            toml2py._unescape_str(source)
+            assert False, "Should have thrown an exception for: " + source
+        except BadEscapeCharacter:
+            pass

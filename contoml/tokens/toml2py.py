@@ -35,7 +35,7 @@ def _unescape_str(unescaped):
     """
 
     # Detect bad escape jobs
-    bad_escape_regexp = re.compile(r'[^\\]\\[^btnfr"\\uU]')
+    bad_escape_regexp = re.compile(r'([^\\]|^)\\[^btnfr"\\uU]')
     if bad_escape_regexp.findall(unescaped):
         raise BadEscapeCharacter
 
