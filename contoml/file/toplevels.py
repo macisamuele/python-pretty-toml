@@ -96,20 +96,6 @@ class ArrayOfTables(TopLevel):
         TopLevel.__init__(self, names=names, table_element=table_element)
 
 
-# def _anonymous_table(peekable_iter):
-#     """
-#     Returns the TableElement of the anonymous table, or raises a KeyError if not found.
-#     """
-#     try:
-#         first_table = peekable_iter.peek()
-#         if isinstance(first_table, TableElement):
-#             return first_table
-#         else:
-#             raise KeyError
-#     except StopIteration:
-#         raise KeyError
-
-
 def _validate_file_elements(file_elements):
     pass
 

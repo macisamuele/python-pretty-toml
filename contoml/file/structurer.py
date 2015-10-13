@@ -71,46 +71,46 @@ class NamedDict(dict):
             return dict.__getitem__(self, item)
 
 
-def structure(entries):
+def structure(table_toplevels):
     """
     Accepts an ordered sequence of TopLevel instances and returns a navigable object structure representation of the
     TOML file.
     """
 
-    entries = tuple(entries)
+    table_toplevels = tuple(table_toplevels)
     obj = NamedDict()
 
     last_array_of_tables = None         # The Name of the last array-of-tables header
 
-    for entry in entries:
+    for toplevel in table_toplevels:
 
-        if isinstance(entry, toplevels.AnonymousTable):
-            obj[''] = entry.table_element
+        if isinstance(toplevel, toplevels.AnonymousTable):
+            obj[''] = toplevel.table_element
 
-        elif isinstance(entry, toplevels.Table):
-            if last_array_of_tables and entry.name.is_prefixed_with(last_array_of_tables):
+        elif isinstance(toplevel, toplevels.Table):
+            if last_array_of_tables and toplevel.name.is_prefixed_with(last_array_of_tables):
                 seq = obj[last_array_of_tables]
-                unprefixed_name = entry.name.without_prefix(last_array_of_tables)
+                unprefixed_name = toplevel.name.without_prefix(last_array_of_tables)
 
-                seq[-1] = CascadeDict(seq[-1], NamedDict({unprefixed_name: entry.table_element}))
+                seq[-1] = CascadeDict(seq[-1], NamedDict({unprefixed_name: toplevel.table_element}))
             else:
-                obj[entry.name] = entry.table_element
+                obj[toplevel.name] = toplevel.table_element
         else:    # It's an ArrayOfTables
 
-            if last_array_of_tables and entry.name != last_array_of_tables and \
-                    entry.name.is_prefixed_with(last_array_of_tables):
+            if last_array_of_tables and toplevel.name != last_array_of_tables and \
+                    toplevel.name.is_prefixed_with(last_array_of_tables):
 
                 seq = obj[last_array_of_tables]
-                unprefixed_name = entry.name.without_prefix(last_array_of_tables)
+                unprefixed_name = toplevel.name.without_prefix(last_array_of_tables)
 
                 if unprefixed_name in seq[-1]:
-                    seq[-1][unprefixed_name].append(entry.table_element)
+                    seq[-1][unprefixed_name].append(toplevel.table_element)
                 else:
-                    cascaded_with = NamedDict({unprefixed_name: [entry.table_element]})
+                    cascaded_with = NamedDict({unprefixed_name: [toplevel.table_element]})
                     seq[-1] = CascadeDict(seq[-1], cascaded_with)
 
             else:
-                obj.append(entry.name, entry.table_element)
-                last_array_of_tables = entry.name
+                obj.append(toplevel.name, toplevel.table_element)
+                last_array_of_tables = toplevel.name
 
     return obj
