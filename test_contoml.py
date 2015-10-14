@@ -725,3 +725,34 @@ invalid-escape = r"This string has a bad \a escape character."
         pass
 
 
+def test_parsing_multiline_strings_correctly():
+
+    toml = r'''multiline_empty_one = """"""
+multiline_empty_two = """
+"""
+multiline_empty_three = """\
+    """
+multiline_empty_four = """\
+   \
+   \
+   """
+
+equivalent_one = "The quick brown fox jumps over the lazy dog."
+equivalent_two = """
+The quick brown \
+
+
+  fox jumps over \
+    the lazy dog."""
+
+equivalent_three = """\
+       The quick brown \
+       fox jumps over \
+       the lazy dog.\
+       """
+'''
+
+    parsed = contoml.loads(toml)
+
+    assert parsed['']['multiline_empty_one'] == parsed['']['multiline_empty_two'] == \
+           parsed['']['multiline_empty_three'] == parsed['']['multiline_empty_four']

@@ -56,11 +56,13 @@ def _to_string(token):
 
     elif token.type == tokens.TYPE_MULTILINE_STRING:
         escaped = token.source_substring[3:-3]
-        if escaped[0] == '\n':
+
+        # Drop the first newline if existed
+        if escaped and escaped[0] == '\n':
             escaped = escaped[1:]
 
-        # Remove all occurrences of a slash-newline-one-or-more-whitespace patterns
-        escaped = re.sub('\\\\\n\\s*', repl='', string=escaped, flags=re.DOTALL)
+        # Remove all occurrences of a slash-newline-zero-or-more-whitespace patterns
+        escaped = re.sub(r'\\\n\s*', repl='', string=escaped, flags=re.DOTALL)
         return _unescape_str(escaped)
 
     elif token.type == tokens.TYPE_LITERAL_STRING:
