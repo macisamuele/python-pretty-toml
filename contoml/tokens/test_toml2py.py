@@ -4,7 +4,7 @@ import pytz
 
 from contoml import tokens
 from contoml.tokens import toml2py
-from contoml.tokens.errors import BadEscapeCharacter
+from contoml.tokens.errors import BadEscapeCharacter, DeserializationError
 
 
 def test_integer():
@@ -61,6 +61,13 @@ def test_date():
 
     t1 = tokens.Token(tokens.TYPE_DATE, '1979-05-27T00:32:00-07:00')
     assert toml2py.deserialize(t1) == datetime(1979, 5, 27, 7, 32, tzinfo=pytz.utc)
+
+    t3 = tokens.Token(tokens.TYPE_DATE, '1987-07-05T17:45:00')
+    try:
+        toml2py.deserialize(t3)
+        assert False, 'Should detect malformed date'
+    except DeserializationError:
+        pass
 
 
 def test_unescaping_a_string():

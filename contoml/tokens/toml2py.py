@@ -6,12 +6,15 @@ from contoml.tokens import TYPE_BOOLEAN, TYPE_INTEGER, TYPE_FLOAT, TYPE_DATE, \
     TYPE_STRING
 import codecs
 import six
+from contoml.tokens.errors import MalformedDateError
 from .errors import BadEscapeCharacter
 
 
 def deserialize(token):
     """
     Deserializes the value of a single tokens.Token instance based on its type.
+
+    Raises DeserializationError when appropriate.
     """
     
     if token.type == TYPE_BOOLEAN:
@@ -91,5 +94,10 @@ def _to_boolean(token):
     return token.source_substring == 'true'
 
 
+_correct_date_format = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|(\+|-)\d{2}:\d{2})')
+
+
 def _to_date(token):
+    if not _correct_date_format.match(token.source_substring):
+        raise MalformedDateError
     return iso8601.parse_date(token.source_substring)
