@@ -764,3 +764,15 @@ def test_unicode_string_literals():
     toml = u'answer = "δ"\n'
     parsed = contoml.loads(toml)
     assert parsed['']['answer'] == u"δ"
+
+
+def test_one_entry_array_of_tables():
+    t = '''[[people]]
+first_name = "Bruce"
+last_name = "Springsteen"
+'''
+
+    parsed = contoml.loads(t)
+
+    assert parsed['people'][0]['first_name'] == 'Bruce'
+    assert parsed['people'][0]['last_name'] == 'Springsteen'
