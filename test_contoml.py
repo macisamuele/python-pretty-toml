@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from collections import OrderedDict
 import json
 import contoml
@@ -756,3 +758,9 @@ equivalent_three = """\
 
     assert parsed['']['multiline_empty_one'] == parsed['']['multiline_empty_two'] == \
            parsed['']['multiline_empty_three'] == parsed['']['multiline_empty_four']
+
+
+def test_unicode_string_literals():
+    toml = u'answer = "δ"\n'
+    parsed = contoml.loads(toml)
+    assert parsed['']['answer'] == u"δ"

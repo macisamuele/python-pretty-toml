@@ -1,4 +1,5 @@
 import re
+import string
 import iso8601
 from contoml import tokens
 from contoml.tokens import TYPE_BOOLEAN, TYPE_INTEGER, TYPE_FLOAT, TYPE_DATE, \
@@ -8,6 +9,8 @@ import codecs
 import six
 from contoml.tokens.errors import MalformedDateError
 from .errors import BadEscapeCharacter
+import functools
+import operator
 
 
 def deserialize(token):
@@ -32,21 +35,46 @@ def deserialize(token):
         raise Exception('This should never happen!')
 
 
-def _unescape_str(unescaped):
+def _unescape_str(text):
     """
     Unescapes a string according the TOML spec. Raises BadEscapeCharacter when appropriate.
     """
 
     # Detect bad escape jobs
     bad_escape_regexp = re.compile(r'([^\\]|^)\\[^btnfr"\\uU]')
-    if bad_escape_regexp.findall(unescaped):
+    if bad_escape_regexp.findall(text):
         raise BadEscapeCharacter
 
     # Do the unescaping
     if six.PY2:
-        return unescaped.decode('string-escape').decode('unicode-escape')
+        return _unicode_escaped_string(text).decode('string-escape').decode('unicode-escape')
     else:
-        return codecs.decode(unescaped, 'unicode-escape')
+        return codecs.decode(_unicode_escaped_string(text), 'unicode-escape')
+
+
+def _unicode_escaped_string(text):
+    """
+    Escapes all unicode characters in the given string
+    """
+
+    if six.PY2:
+        text = unicode(text)
+
+    def is_unicode(c):
+        return c.lower() not in string.ascii_letters + string.whitespace + string.punctuation + string.digits
+
+    def escape_unicode_char(x):
+        if six.PY2:
+            return x.encode('unicode-escape')
+        else:
+            return codecs.encode(x, 'unicode-escape')
+
+    if any(is_unicode(c) for c in text):
+        homogeneous_chars = tuple(escape_unicode_char(c) if is_unicode(c) else c.encode() for c in text)
+        homogeneous_bytes = functools.reduce(operator.add, homogeneous_chars)
+        return homogeneous_bytes.decode()
+    else:
+        return text
 
 
 def _to_string(token):
