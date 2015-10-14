@@ -21,7 +21,7 @@ def python_to_test_json(python_value):
         elif isinstance(value, (list, tuple)):
             return {TYPE: 'array', VALUE: [convert(v) for v in value]}
         elif isinstance(value, datetime.datetime):
-            return {TYPE: 'datetime', VALUE: strict_rfc3339.now_to_rfc3339_utcoffset(int(value.timestamp()))}
+            return {TYPE: 'datetime', VALUE: strict_rfc3339.timestamp_to_rfc3339_utcoffset(int(value.timestamp()))}
         elif isinstance(value, six.string_types):
             return {TYPE: 'string', VALUE: value}
         elif isinstance(value, bool):
