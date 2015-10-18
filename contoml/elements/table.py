@@ -100,28 +100,6 @@ class TableElement(abstracttable.AbstractTable):
         self._sub_elements = \
             self.sub_elements[:insertion_index] + inserted_elements + self.sub_elements[insertion_index:]
 
-        # if self:    # If not empty
-        #     insertion_index = len(self.sub_elements)   # Index of last value + 1
-        #     elements = [
-        #         factory.create_newline_element(),
-        #         factory.create_element(key),
-        #         factory.create_whitespace_element(),
-        #         factory.create_operator_element('='),
-        #         factory.create_whitespace_element(),
-        #         value_element,
-        #         factory.create_newline_element(),
-        #     ]
-        #     self._sub_elements = self.sub_elements[:insertion_index] + elements + self.sub_elements[insertion_index:]
-        # else:
-        #     self._sub_elements = [
-        #         factory.create_element(key),
-        #         factory.create_whitespace_element(),
-        #         factory.create_operator_element('='),
-        #         factory.create_whitespace_element(),
-        #         value_element,
-        #         factory.create_newline_element(),
-        #     ]
-
     def __delitem__(self, key):
         begin, _ = self._find_key_and_value(key)
         preceding_newline = self._find_preceding_newline(begin)
