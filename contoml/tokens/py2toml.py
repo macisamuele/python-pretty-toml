@@ -34,7 +34,7 @@ def operator_token(token_type):
     return _operator_tokens_by_type[token_type]
 
 
-def create_primitive_token(value):
+def create_primitive_token(value, multiline_strings_allowed=True):
     """
     Creates and returns a single token for the given primitive atomic value.
 
@@ -52,7 +52,7 @@ def create_primitive_token(value):
         ts = timestamp(value) // 1000
         return tokens.Token(tokens.TYPE_DATE, strict_rfc3339.timestamp_to_rfc3339_utcoffset(ts))
     elif isinstance(value, six.string_types):
-        return create_string_token(value)
+        return create_string_token(value, multiline_strings_allowed=multiline_strings_allowed)
 
     raise NotPrimitiveError("{} of type {}".format(value, type(value)))
 
@@ -60,7 +60,7 @@ def create_primitive_token(value):
 _bare_string_regex = re.compile('^[a-zA-Z0-9_-]*$')
 
 
-def create_string_token(text, bare_string_allowed=False):
+def create_string_token(text, bare_string_allowed=False, multiline_strings_allowed=True):
     """
     Creates and returns a single string token.
 
@@ -74,8 +74,8 @@ def create_string_token(text, bare_string_allowed=False):
         return tokens.Token(tokens.TYPE_STRING, '""'.format(_escape_single_line_quoted_string(text)))
     elif bare_string_allowed and _bare_string_regex.match(text):
         return tokens.Token(tokens.TYPE_BARE_STRING, text)
-    elif len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 80:
-        # If containing two or more newlines or is longer than 80 characaters we'll use the multiline string format
+    elif multiline_strings_allowed and (len(tuple(c for c in text if c == '\n')) >= 2 or len(text) > 80):
+        # If containing two or more newlines or is longer than 80 characters we'll use the multiline string format
         return _create_multiline_string_token(text)
     else:
         return tokens.Token(tokens.TYPE_STRING, '"{}"'.format(_escape_single_line_quoted_string(text)))

@@ -9,7 +9,7 @@ from contoml.elements.tableheader import TableHeaderElement
 from contoml.util import join_with, is_sequence_like
 
 
-def create_element(value):
+def create_element(value, multiline_strings_allowed=True):
     """
     Creates and returns the appropriate elements.Element instance from the given Python primitive, sequence-like,
     or dict-like value.
@@ -18,7 +18,7 @@ def create_element(value):
     from contoml.elements.inlinetable import InlineTableElement
 
     if isinstance(value, (int, float, bool, datetime.datetime, datetime.date) + six.string_types) or value is None:
-        primitive_token = py2toml.create_primitive_token(value)
+        primitive_token = py2toml.create_primitive_token(value, multiline_strings_allowed=multiline_strings_allowed)
         return AtomicElement((primitive_token,))
 
     elif isinstance(value, (list, tuple)):
@@ -40,7 +40,7 @@ def create_element(value):
                 create_whitespace_element(),
                 create_operator_element('='),
                 create_whitespace_element(),
-                create_element(v)
+                create_element(v, multiline_strings_allowed=False)
             ) for (k, v) in value.items())
 
         spaced_elements = join_with(stuffing_elements,

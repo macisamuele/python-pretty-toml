@@ -776,3 +776,14 @@ last_name = "Springsteen"
 
     assert parsed['people'][0]['first_name'] == 'Bruce'
     assert parsed['people'][0]['last_name'] == 'Springsteen'
+
+
+def test_should_not_create_multiline_string_in_inline_map():
+    t = contoml.new()
+    t['']['inline_map'] = {
+        'app': 'Redis',
+        'Enabled': True,
+        'key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem'
+    }
+
+    assert len(tuple(filter(bool, t.dumps().split('\n')))) == 1
