@@ -779,9 +779,7 @@ last_name = "Springsteen"
 
 
 def test_should_not_create_multiline_string_in_inline_map():
-    t = contoml.loads('''
-inline_map = {}
-''')
+    t = contoml.new()
     t['']['inline_map'] = {
         'app': 'Redis',
         'Enabled': True,

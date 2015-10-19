@@ -29,11 +29,7 @@ class TableElement(abstracttable.AbstractTable):
         if key in self:
             self._update(key, value)
         else:
-            if isinstance(value, dict):         # If setting a dict, create table sections instead of an inline map
-                for k, v in value.items():
-                    self[k] = v
-            else:
-                self._insert(key, value)
+            self._insert(key, value)
 
     def _update(self, key, value):
         _, value_i = self._find_key_and_value(key)
