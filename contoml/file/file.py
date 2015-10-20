@@ -1,9 +1,11 @@
+from contoml.elements import traversal
 from contoml.errors import NoArrayFoundError, DuplicateKeysError, DuplicateTablesError
 from contoml.file import structurer, toplevels, raw
 from contoml.file.array import ArrayOfTables
 from contoml.file.freshtable import FreshTable
 import contoml.elements.factory as element_factory
 from contoml import prettifier
+import contoml.util as util
 
 
 class TOMLFile:
@@ -33,6 +35,40 @@ class TOMLFile:
     def __contains__(self, item):
         return item in self.keys()
 
+    def _setitem_with_key_seq(self, key_seq, value):
+        """
+        Sets a the value in the TOML file located by the given key sequence.
+
+        Example:
+        self._setitem(('key1', 'key2', 'key3'), 'text_value')
+        is equivalent to doing
+        self['key1']['key2']['key3'] = 'text_value'
+        """
+        table = self
+        key_so_far = tuple()
+        for key in key_seq[:-1]:
+            key_so_far += (key,)
+            self._make_sure_table_exists(key_so_far)
+            table = table[key]
+        table[key_seq[-1]] = value
+
+    def _make_sure_table_exists(self, name_seq):
+        """
+        Makes sure the table with the full name comprising of name_seq exists.
+        """
+        t = self
+        for key in name_seq[:-1]:
+            t = t[key]
+        name = name_seq[-1]
+        if name not in t:
+            self.append_elements([element_factory.create_table_header_element(name_seq),
+                                  element_factory.create_table({})])
+
+    def __delitem__(self, key):
+        table_element_index = self._elements.index(self._navigable[key])
+        self._elements[table_element_index] = element_factory.create_table({})
+        self._on_element_change()
+
     def __setitem__(self, key, value):
 
         # Setting an array-of-tables
@@ -42,14 +78,22 @@ class TOMLFile:
 
         # Or setting a whole single table
         elif isinstance(value, dict):
-            if key in self._navigable:
-                index = self._elements.index(self._navigable[key])
-                self._elements = self._elements[:index] + [element_factory.create_table(value)] + self._elements[index+1:]
-            else:
-                if key:
-                    self._elements.append(element_factory.create_table_header_element(key))
-                self._elements.append(element_factory.create_table(value))
-                # self._elements.append(element_factory.create_newline_element())
+
+            if key and key in self:
+                del self[key]
+
+            for key_seq, child_value in util.flatten_nested_dicts({key: value}).items():
+                self._setitem_with_key_seq(key_seq, child_value)
+
+            # if key in self._navigable:
+            #     del self[key]
+            #     index = self._elements.index(self._navigable[key])
+            #     self._elements = self._elements[:index] + [element_factory.create_table(value)] + self._elements[index+1:]
+            # else:
+            #     if key:
+            #         self._elements.append(element_factory.create_table_header_element(key))
+            #     self._elements.append(element_factory.create_table(value))
+
 
         # Or updating the anonymous section table
         else:
@@ -85,11 +129,6 @@ class TOMLFile:
                 parent = parent_of(entry)
                 if parent:
                     child_name = entry.name.without_prefix(parent.name)
-
-                    # Check for duplicate keys
-                    if child_name in parent.table_element:
-                        raise DuplicateKeysError
-
                     parent.table_element.set_fallback({child_name.sub_names[0]: entry.table_element})
 
     def _recreate_navigable(self):
@@ -224,3 +263,6 @@ class TOMLFile:
 
     def __repr__(self):
         return str(self)
+
+
+
