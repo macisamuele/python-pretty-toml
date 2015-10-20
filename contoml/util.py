@@ -68,3 +68,34 @@ def chunkate_string(text, length):
         next_chunk = text[iterator_index:min(next_newline(), next_breaker()+1)]
         iterator_index += len(next_chunk)
         yield next_chunk
+
+
+def flatten_nested_dicts(nested_dicts):
+    """
+    Flattens dicts into one dict with tuples of keys representing the nested keys.
+
+    Example
+    >>> dd = { \
+        'dict1': {'name': 'Jon', 'id': 42}, \
+        'dict2': {'name': 'Sam', 'id': 41}, \
+    }
+
+    >>> flatten_nested_dicts(dd) == { \
+        ('dict1', 'name'): 'Jon', ('dict1', 'id'): 42, \
+        ('dict2', 'name'): 'Sam', ('dict2', 'id'): 41}
+    True
+    """
+    assert isinstance(nested_dicts, dict), 'Only works with a dict parameter'
+
+    def flatten(dd):
+        output = {}
+        for k, v in dd.items():
+            if isinstance(v, dict):
+                for child_key, child_value in flatten(v).items():
+                    output[(k,) + child_key] = child_value
+            else:
+                output[(k,)] = v
+        return output
+
+    # return flatten({(k,): v for k, v in nested_dicts.items()})
+    return flatten(nested_dicts)
