@@ -115,7 +115,7 @@ class TOMLFile:
             if key and key in self:
                 del self[key]
 
-            for key_seq, child_value in util.flatten_nested_dicts({key: value}).items():
+            for key_seq, child_value in util.flatten_nested({key: value}).items():
                 self._setitem_with_key_seq(key_seq, child_value)
 
             # if key in self._navigable:

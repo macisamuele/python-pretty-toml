@@ -70,32 +70,42 @@ def chunkate_string(text, length):
         yield next_chunk
 
 
-def flatten_nested_dicts(nested_dicts):
+def flatten_nested(nested_dicts):
     """
-    Flattens dicts into one dict with tuples of keys representing the nested keys.
+    Flattens dicts and sequences into one dict with tuples of keys representing the nested keys.
 
     Example
     >>> dd = { \
         'dict1': {'name': 'Jon', 'id': 42}, \
         'dict2': {'name': 'Sam', 'id': 41}, \
-    }
+        'seq1': [{'one': 1, 'two': 2}] \
+        }
 
-    >>> flatten_nested_dicts(dd) == { \
+    >>> flatten_nested(dd) == { \
         ('dict1', 'name'): 'Jon', ('dict1', 'id'): 42, \
-        ('dict2', 'name'): 'Sam', ('dict2', 'id'): 41}
+        ('dict2', 'name'): 'Sam', ('dict2', 'id'): 41, \
+        ('seq1', 0, 'one'): 1, ('seq1', 0, 'two'): 2, \
+        }
     True
     """
-    assert isinstance(nested_dicts, dict), 'Only works with a dict parameter'
+    assert isinstance(nested_dicts, (dict, list, tuple)), 'Only works with a collection parameter'
+
+    def items(c):
+        if isinstance(c, dict):
+            return c.items()
+        elif isinstance(c, (list, tuple)):
+            return enumerate(c)
+        else:
+            raise RuntimeError('c must be a collection')
 
     def flatten(dd):
         output = {}
-        for k, v in dd.items():
-            if isinstance(v, dict):
+        for k, v in items(dd):
+            if isinstance(v, (dict, list, tuple)):
                 for child_key, child_value in flatten(v).items():
                     output[(k,) + child_key] = child_value
             else:
                 output[(k,)] = v
         return output
 
-    # return flatten({(k,): v for k, v in nested_dicts.items()})
     return flatten(nested_dicts)
