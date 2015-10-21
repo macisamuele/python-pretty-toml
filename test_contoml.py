@@ -786,8 +786,8 @@ def test_setting_dict_value_should_not_create_inline_table():
         'app': 'Redis',
         'Enabled': True,
         'nested': {'one': 1, 'two': 2},
-        # 'key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem',
-        # 'other_key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem'
+        'key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem',
+        'other_key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem'
     }
 
     assert t.primitive == {
@@ -795,8 +795,8 @@ def test_setting_dict_value_should_not_create_inline_table():
             'app': 'Redis',
             'Enabled': True,
             'nested': {'one': 1, 'two': 2},
-            # 'key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem',
-            # 'other_key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem'
+            'key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem',
+            'other_key_path': '/opt/code/github/jumpscale/ays2/services/agentcontroller2!main/tls/verylongname/cert.pem'
         }
     }
 

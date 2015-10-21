@@ -108,7 +108,7 @@ def _break_long_text(text, maximum_length=75):
         if '\n' in remaining_text and remaining_text.index('\n') < maximum_length:
             i = remaining_text.index('\n')
             return remaining_text[:i+1], remaining_text[i+2:]
-        elif len(remaining_text) > maximum_length:
+        elif len(remaining_text) > maximum_length and ' ' in remaining_text:
             i = remaining_text[:maximum_length].rfind(' ')
             return remaining_text[:i+1] + '\\\n', remaining_text[i+2:]
         else:
