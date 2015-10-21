@@ -28,6 +28,9 @@ class FreshTable(TableElement):
         return self._is_array
 
     def _append_to_parent(self):
+        """
+        Causes this ephemeral table to be persisted on the TOMLFile.
+        """
 
         if self.__appended:
             return

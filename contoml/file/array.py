@@ -5,11 +5,11 @@ from contoml.file.freshtable import FreshTable
 
 class ArrayOfTables(list):
 
-    def __init__(self, parent, name, iterable=None):
+    def __init__(self, toml_file, name, iterable=None):
         if iterable:
             list.__init__(self, iterable)
         self._name = name
-        self._parent = parent
+        self._toml_file = toml_file
 
     def append(self, value):
         if isinstance(value, dict):
@@ -30,5 +30,5 @@ class ArrayOfTables(list):
 
     def append_fresh_table(self, fresh_table):
         list.append(self, fresh_table)
-        if self._parent:
-            self._parent.append_fresh_table(fresh_table)
+        if self._toml_file:
+            self._toml_file.append_fresh_table(fresh_table)

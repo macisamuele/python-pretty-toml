@@ -26,7 +26,7 @@ class TOMLFile:
         try:
             value = self._navigable[item]
             if isinstance(value, (list, tuple)):
-                return ArrayOfTables(parent=self, name=item, iterable=value)
+                return ArrayOfTables(toml_file=self, name=item, iterable=value)
             else:
                 return value
         except KeyError:
@@ -145,7 +145,7 @@ class TOMLFile:
             else:
                 raise NoArrayFoundError
         else:
-            return ArrayOfTables(parent=self, name=name)
+            return ArrayOfTables(toml_file=self, name=name)
 
     def _on_element_change(self):
         self._recreate_navigable()
