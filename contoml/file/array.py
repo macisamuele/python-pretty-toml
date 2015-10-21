@@ -1,7 +1,7 @@
 from contoml.elements.table import TableElement
 from contoml.errors import InvalidValueError
 from contoml.file.freshtable import FreshTable
-
+from contoml import util
 
 class ArrayOfTables(list):
 
@@ -14,8 +14,13 @@ class ArrayOfTables(list):
     def append(self, value):
         if isinstance(value, dict):
             table = FreshTable(parent=self, name=self._name, is_array=True)
-            for k, v in value.items():
-                table[k] = v
+            table._append_to_parent()
+            index = len(self._toml_file[self._name]) - 1
+            for key_seq, value in util.flatten_nested_dicts(value).items():
+                # self._toml_file._setitem_with_key_seq((self._name, index) + key_seq, value)
+                self._toml_file._array_setitem_with_key_seq(self._name, index, key_seq, value)
+            # for k, v in value.items():
+            #     table[k] = v
         else:
             raise InvalidValueError('Can only append a dict to an array of tables')
 

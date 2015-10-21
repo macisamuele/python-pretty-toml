@@ -145,23 +145,15 @@ def test_appending_to_an_array_of_tables():
 
     f.array('person').append(OrderedDict([('name', 'Chuck'), ('id', 12)]))
 
-    assert f.dumps() == """[[person]]
-name = "Chuck"
-id = 12
-
-"""
+    assert contoml.loads(f.dumps()).primitive == {
+        'person': [{'name': 'Chuck', 'id': 12}]
+    }
 
     f['person'].append(OrderedDict([('name', 'Kcuhc'), ('id', 21)]))
 
-    assert f.dumps() == """[[person]]
-name = "Chuck"
-id = 12
-
-[[person]]
-name = "Kcuhc"
-id = 21
-
-"""
+    assert contoml.loads(f.dumps()).primitive == {
+        'person': [{'name': 'Chuck', 'id': 12}, {'name': 'Kcuhc', 'id': 21}]
+    }
 
 
 def test_creating_an_array_of_tables_all_at_once():
@@ -174,19 +166,11 @@ def test_creating_an_array_of_tables_all_at_once():
         OrderedDict((('Name', "Third Guy"), ('id', 2))),
     ]
 
-    assert f.dumps() == """[[person]]
-Name = "First Guy"
-id = 0
-
-[[person]]
-Name = "Second Guy"
-id = 1
-
-[[person]]
-Name = "Third Guy"
-id = 2
-
-"""
+    assert contoml.loads(f.dumps()).primitive == {'person': [
+        {'Name': 'First Guy', 'id': 0},
+        {'Name': 'Second Guy', 'id': 1},
+        {'Name': 'Third Guy', 'id': 2}
+    ]}
 
 
 def test_creating_an_array_of_tables_all_at_once_via_dump():
@@ -199,19 +183,11 @@ def test_creating_an_array_of_tables_all_at_once_via_dump():
             ]
     }
 
-    assert contoml.dumps(d) == """[[person]]
-Name = "First Guy"
-id = 0
-
-[[person]]
-Name = "Second Guy"
-id = 1
-
-[[person]]
-Name = "Third Guy"
-id = 2
-
-"""
+    assert contoml.loads(contoml.dumps(d)).primitive == {'person': [
+        {'Name': 'First Guy', 'id': 0},
+        {'Name': 'Second Guy', 'id': 1},
+        {'Name': 'Third Guy', 'id': 2}
+    ]}
 
 
 def test_creating_an_anonymous_table():
@@ -684,13 +660,14 @@ answer = 42"""
 #         pass
 
 
-def test_detects_duplicate_tables():
-    toml = "[a]\n[a]"
-    try:
-        contoml.loads(toml)
-        assert False, "Parsing that TOML snippet should have thrown an exception"
-    except DuplicateTablesError:
-        pass
+# Comment: Feature was dropped
+# def test_detects_duplicate_tables():
+#     toml = "[a]\n[a]"
+#     try:
+#         contoml.loads(toml)
+#         assert False, "Parsing that TOML snippet should have thrown an exception"
+#     except DuplicateTablesError:
+#         pass
 
 
 # There is no simple way to make this work since [[ is a token as well as [ and we're doing

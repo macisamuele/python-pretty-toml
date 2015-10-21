@@ -52,6 +52,26 @@ class TOMLFile:
             table = table[key]
         table[key_seq[-1]] = value
 
+    def _array_setitem_with_key_seq(self, array_name, index, key_seq, value):
+        """
+        Sets a the array value in the TOML file located by the given key sequence.
+
+        Example:
+        self._array_setitem(array_name, index, ('key1', 'key2', 'key3'), 'text_value')
+        is equivalent to doing
+        self.array(array_name)[index]['key1']['key2']['key3'] = 'text_value'
+        """
+        table = self.array(array_name)[index]
+        key_so_far = tuple()
+        for key in key_seq[:-1]:
+            key_so_far += (key,)
+            new_table = self._array_make_sure_table_exists(array_name, index, key_so_far)
+            if new_table is not None:
+                table = new_table
+            else:
+                table = table[key]
+        table[key_seq[-1]] = value
+
     def _make_sure_table_exists(self, name_seq):
         """
         Makes sure the table with the full name comprising of name_seq exists.
@@ -63,6 +83,19 @@ class TOMLFile:
         if name not in t:
             self.append_elements([element_factory.create_table_header_element(name_seq),
                                   element_factory.create_table({})])
+
+    def _array_make_sure_table_exists(self, array_name, index, name_seq):
+        """
+        Makes sure the table with the full name comprising of name_seq exists.
+        """
+        t = self[array_name][index]
+        for key in name_seq[:-1]:
+            t = t[key]
+        name = name_seq[-1]
+        if name not in t:
+            new_table = element_factory.create_table({})
+            self.append_elements([element_factory.create_table_header_element((array_name,) + name_seq), new_table])
+            return new_table
 
     def __delitem__(self, key):
         table_element_index = self._elements.index(self._navigable[key])
@@ -151,14 +184,7 @@ class TOMLFile:
         self._recreate_navigable()
 
         table_toplevels = self._detect_toplevels()
-
-        self._detect_duplicate_tables(table_toplevels)
         self._update_table_fallbacks(table_toplevels)
-
-    def _detect_duplicate_tables(self, table_toplevels):
-        names = frozenset(toplevel.name for toplevel in table_toplevels)
-        if len(names) < len(table_toplevels):
-            raise DuplicateTablesError
 
     def append_elements(self, elements):
         """
