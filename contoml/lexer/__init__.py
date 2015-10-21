@@ -21,7 +21,7 @@ _LEXICAL_SPECS = (
     TokenSpec(tokens.TYPE_DATE, re.compile(
         r'^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)')),
     TokenSpec(tokens.TYPE_WHITESPACE, re.compile(r'^( |\t)', re.DOTALL)),
-    TokenSpec(tokens.TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([1-9][0-9_]*))')),
+    TokenSpec(tokens.TYPE_INTEGER, re.compile(r'^(((\+|-)[0-9_]+)|([0-9][0-9_]*))')),
     TokenSpec(tokens.TYPE_FLOAT,
               re.compile(r'^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(\.[0-9_]+)?([eE](\+|-)?[0-9_]+)?)')),
     TokenSpec(tokens.TYPE_BOOLEAN, re.compile(r'^(true|false)')),
