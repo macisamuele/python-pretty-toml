@@ -7,3 +7,17 @@
 
 
 A formatter for [TOML](https://github.com/toml-lang/toml) files.
+
+## Installation ##
+```bash
+pip install --upgrade prettytoml
+```
+
+## Usage ##
+
+```python
+>>> import prettytoml
+>>> prettified_content = prettytoml.prettify_from_file('sample.toml')
+>>> with open('sample-prettified.toml', 'w') as fp:
+      fp.write(prettified_content)
+```
