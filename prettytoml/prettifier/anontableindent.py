@@ -7,12 +7,12 @@ def anon_table_indent(toml_file_elements):
     Rule: Anonymous table should never be indented.
     """
 
-    elements = toml_file_elements[:]
+    all_elements = toml_file_elements[:]
 
-    if not elements or not t.predicates.table(elements[0]):
+    if not all_elements or not t.predicates.table(all_elements[0]):
         return
 
-    elements = elements[0].sub_elements
+    elements = all_elements[0].sub_elements
 
     # Must delete zero-length whitespaces first
     _drop_empty_whitespace_element(elements)
@@ -33,7 +33,7 @@ def anon_table_indent(toml_file_elements):
             del elements[first_indent():next_non_metadata()]
         i = next_newline()
 
-    return elements
+    return all_elements
 
 
 def _drop_empty_whitespace_element(table_elements):

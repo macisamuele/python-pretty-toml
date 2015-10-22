@@ -14,7 +14,7 @@ def prettify(toml_text):
     tokens = tokenize(toml_text, is_top_level=True)
     elements = parse_tokens(tokens)
     prettified = element_prettify(elements)
-    return [''.join(pretty_element.serialized) for pretty_element in prettified]
+    return ''.join(pretty_element.serialized() for pretty_element in prettified)
 
 
 def prettify_from_file(file_path):
