@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 import importlib
 
 setup(
-    name='contoml',
+    name='prettytoml',
     packages=find_packages(),
-    version=importlib.import_module('contoml._version').VERSION,
-    description='Consistent TOML for Python',
+    version=importlib.import_module('prettytoml._version').VERSION,
+    description='TOML Prettifier for Python',
     author='Amr Hassan',
     author_email='amr.hassan@gmail.com',
-    url='https://github.com/Jumpscale/python-consistent-toml',
+    url='https://github.com/Jumpscale/python-prettytoml',
     keywords=['toml'],
     classifiers=[
         'Programming Language :: Python :: 2.7',
