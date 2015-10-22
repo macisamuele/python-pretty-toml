@@ -1,7 +1,6 @@
 
-import prettytoml
-
 from .tableindent import table_entries_should_be_uniformly_indented
+from .common import assert_prettifier_works
 
 
 def test_table_entries_should_be_uniformly_indented():
@@ -23,6 +22,4 @@ my_id = 12
   my_truth = False
 """
 
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[table_entries_should_be_uniformly_indented])
-    assert expected_toml_text == f.dumps()
+    assert_prettifier_works(toml_text, expected_toml_text, table_entries_should_be_uniformly_indented)

@@ -3,10 +3,12 @@ from prettytoml.elements.table import TableElement
 from prettytoml.elements import traversal as t, factory as element_factory
 
 
-def sort_table_entries(toml_file):
-    for element in toml_file.elements:
+def sort_table_entries(toml_file_elements):
+    elements = toml_file_elements[:]
+    for element in elements:
         if isinstance(element, TableElement):
             __do_table(element)
+    return elements
 
 
 def __do_table(table):

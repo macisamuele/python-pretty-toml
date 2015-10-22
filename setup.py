@@ -20,6 +20,7 @@ setup(
         'strict_rfc3339',
         'iso8601',
         'pytz',
-        'timestamp'
+        'timestamp',
+        'pytoml',
     ]
 )

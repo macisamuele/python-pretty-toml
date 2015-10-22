@@ -1,5 +1,6 @@
-import prettytoml
-from prettytoml.prettifier import tablesep
+
+from .tablesep import table_separation
+from .common import assert_prettifier_works
 
 
 def test_table_separation():
@@ -30,7 +31,4 @@ creativity = "on vacation"
 
 """
 
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[tablesep.table_separation])
-
-    assert expected_toml_text == f.dumps()
+    assert_prettifier_works(toml_text, expected_toml_text, table_separation)

@@ -1,5 +1,10 @@
-import prettytoml
-from prettytoml.prettifier import anontableindent
+
+"""
+    This testing module depends on all the other modules.
+"""
+
+from .anontableindent import anon_table_indent
+from .common import assert_prettifier_works
 
 
 def test_anon_table_indent():
@@ -14,7 +19,4 @@ key=value
 another_key =44
 noname = me
 """
-
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[anontableindent.anon_table_indent])
-    assert expected_toml_text == f.dumps()
+    assert_prettifier_works(toml_text, expected_toml_text, anon_table_indent)

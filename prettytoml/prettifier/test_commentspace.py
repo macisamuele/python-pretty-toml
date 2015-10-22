@@ -1,5 +1,6 @@
-import prettytoml
-from prettytoml.prettifier import commentspace
+
+from .common import assert_prettifier_works
+from .commentspace import comment_space
 
 
 def test_comment_space():
@@ -24,6 +25,4 @@ headerk = false
 other_key = "value"
 """
 
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[commentspace.comment_space])
-    assert expected_toml_text == f.dumps()
+    assert_prettifier_works(toml_text, expected_toml_text, comment_space)

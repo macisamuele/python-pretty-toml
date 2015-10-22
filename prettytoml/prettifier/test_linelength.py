@@ -1,6 +1,6 @@
-import prettytoml
-from prettytoml.elements import traversal as t, factory as element_factory
-from prettytoml.prettifier import linelength
+from .linelength import line_lingth_limiter
+from .common import assert_prettifier_works, elements_to_text, text_to_elements
+import pytoml
 
 
 def test_splitting_string():
@@ -16,10 +16,7 @@ maximus eu quam. Praesent vehicula mauris vestibulum, mattis turpis sollicitudin
 pharetra purus vel finibus. Vestibulum sed tempus dui. Maecenas auctor sit amet diam et porta. Morbi id libero at elit \\
 ultricies porta vel vitae nullam. \"\"\"
 """
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[linelength.line_lingth_limiter])
-
-    assert expected_toml_text == f.dumps()
+    assert_prettifier_works(toml_text, expected_toml_text, line_lingth_limiter)
 
 
 def test_splitting_inline_table():
@@ -36,12 +33,10 @@ id = 12
 
 """
 
-    f = prettytoml.loads(toml_text)
-    pre_prettified_primitive = f.primitive
-    f.prettify(prettifiers=[linelength.line_lingth_limiter])
+    prettified = elements_to_text(line_lingth_limiter(text_to_elements(toml_text)))
 
-    assert f.primitive == pre_prettified_primitive
-    assert all(len(line) < 120 for line in f.dumps().split('\n'))
+    assert pytoml.loads(prettified) == pytoml.loads(toml_text)
+    assert all(len(line) < 120 for line in prettified.split('\n'))
 
 
 def test_splitting_array():
@@ -58,10 +53,7 @@ id = 12
 
 """
 
-    f = prettytoml.loads(toml_text)
-    pre_prettified_primitive = f.primitive
-    f.prettify(prettifiers=[linelength.line_lingth_limiter])
-    f.prettify(prettifiers=[linelength.line_lingth_limiter])
+    prettified = elements_to_text(line_lingth_limiter(text_to_elements(toml_text)))
 
-    assert f.primitive == pre_prettified_primitive
-    assert all(len(line) < 120 for line in f.dumps().split('\n'))
+    assert pytoml.loads(prettified) == pytoml.loads(toml_text)
+    assert all(len(line) < 120 for line in prettified.split('\n'))

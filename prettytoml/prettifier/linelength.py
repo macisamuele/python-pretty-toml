@@ -9,27 +9,31 @@ from prettytoml.elements.table import TableElement
 MAXIMUM_LINE_LENGTH = 120
 
 
-def line_lingth_limiter(toml_file):
+def line_lingth_limiter(toml_file_elements):
     """
     Rule: Lines whose lengths exceed 120 characters whose values are strings, arrays, or inline tables
     should have the array or string value broken onto multiple lines and the inline table turned into
     a multiline table section so as to try to maintain a maximum line length of 120.
     """
+    elements = toml_file_elements[:]
+
     all_new_tables = dict()
 
-    for (i, element) in enumerate(toml_file.elements):
+    for (i, element) in enumerate(elements):
         if isinstance(element, TableElement):
             new_tables = _do_table(element.sub_elements)
             if i > 0 and new_tables:
-                table_names = toml_file.elements[i-1].names if i > 0 else tuple()
+                table_names = elements[i-1].names if i > 0 else tuple()
                 all_new_tables[table_names] = new_tables
-                toml_file.elements[i-1] = element_factory.create_whitespace_element(length=0)
+                elements[i-1] = element_factory.create_whitespace_element(length=0)
 
     for (names, mapping) in all_new_tables.items():
         for name, value in mapping.items():
             names = list(names) + [name]
-            toml_file.elements.append(element_factory.create_table_header_element(names))
-            toml_file.elements.append(element_factory.create_table(value))
+            elements.append(element_factory.create_table_header_element(names))
+            elements.append(element_factory.create_table(value))
+
+    return elements
 
 
 def _do_table(table_elements):

@@ -2,7 +2,7 @@ from prettytoml import elements
 from prettytoml.elements.table import TableElement
 from prettytoml.elements.tableheader import TableHeaderElement
 from prettytoml.errors import InvalidTOMLFileError
-from prettytoml.file.peekableit import PeekableIterator
+from prettytoml.util import PeekableIterator
 
 
 def sanitize(_elements):

@@ -2,16 +2,17 @@
 from prettytoml.elements import traversal as t
 
 
-def anon_table_indent(toml_file):
+def anon_table_indent(toml_file_elements):
     """
     Rule: Anonymous table should never be indented.
     """
-    toml_file_elements = toml_file.elements
 
-    if not toml_file_elements or not t.predicates.table(toml_file_elements[0]):
+    elements = toml_file_elements[:]
+
+    if not elements or not t.predicates.table(elements[0]):
         return
 
-    elements = toml_file_elements[0].sub_elements
+    elements = elements[0].sub_elements
 
     # Must delete zero-length whitespaces first
     _drop_empty_whitespace_element(elements)
@@ -31,6 +32,8 @@ def anon_table_indent(toml_file):
         if first_indent() < next_non_metadata() < next_newline():
             del elements[first_indent():next_non_metadata()]
         i = next_newline()
+
+    return elements
 
 
 def _drop_empty_whitespace_element(table_elements):

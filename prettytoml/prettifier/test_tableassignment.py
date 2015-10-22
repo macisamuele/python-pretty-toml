@@ -1,6 +1,6 @@
 
-import prettytoml
 from .tableassignment import table_assignment_spacing
+from .common import assert_prettifier_works
 
 
 def test_table_assignment_spacing():
@@ -26,6 +26,4 @@ def test_table_assignment_spacing():
     keys = [4, 5,1]
 """
 
-    f = prettytoml.loads(toml_text)
-    f.prettify(prettifiers=[table_assignment_spacing])
-    assert expected_prettified == f.dumps()
+    assert_prettifier_works(toml_text, expected_prettified, table_assignment_spacing)

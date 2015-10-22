@@ -4,14 +4,15 @@ from prettytoml.elements.metadata import WhitespaceElement, NewlineElement
 from prettytoml.elements.table import TableElement
 
 
-def table_separation(toml_file):
+def table_separation(toml_file_elements):
     """
     Rule: Tables should always be separated by an empty line.
     """
-    toml_file_elements = toml_file.elements
-    for element in toml_file_elements:
+    elements = toml_file_elements[:]
+    for element in elements:
         if isinstance(element, TableElement):
             _do_table(element.sub_elements)
+    return elements
 
 
 def _do_table(table_elements):

@@ -1,5 +1,6 @@
-import prettytoml
-from prettytoml.prettifier import tablesort
+
+from .tablesort import sort_table_entries
+from .common import assert_prettifier_works
 
 
 def test_table_sorting():
@@ -41,8 +42,4 @@ skype = ""
 telegram = "971507192009"
 """
 
-    f = prettytoml.loads(toml_text)
-    print(f.dumps())
-    f.prettify(prettifiers=[tablesort.sort_table_entries])
-
-    assert prettified == f.dumps()
+    assert_prettifier_works(toml_text, prettified, sort_table_entries)

@@ -4,8 +4,8 @@ from prettytoml.prettifier import tablesep, commentspace, linelength, tablesort
 """
     TOMLFile prettifiers
 
-    Each prettifier is a function that accepts the list of Element instances that make up the
-    TOMLFile and it is allowed to modify it as it pleases.
+    Each prettifier is a function that accepts a sequence of Element instances that make up a
+    TOML file and it is allowed to modify it as it pleases.
 """
 
 
@@ -29,9 +29,11 @@ ALL = (
 )
 
 
-def prettify(toml_file, prettifiers=ALL):
+def prettify(toml_file_elements, prettifiers=ALL):
     """
-    Prettifies a TOMLFile instance according to pre-defined set of formatting rules.
+    Prettifies a sequence of element instances according to pre-defined set of formatting rules.
     """
+    elements = toml_file_elements[:]
     for prettifier in prettifiers:
-        prettifier(toml_file)
+        elements = prettifier(elements)
+    return elements

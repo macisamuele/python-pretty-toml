@@ -7,7 +7,17 @@
 from prettytoml.parser.errors import ParsingError
 
 
-def parse_token_stream(token_stream):
+def parse_tokens(tokens):
+    """
+    Parses the given token sequence into a sequence of top-level TOML elements.
+
+    Raises ParserError on invalid TOML input.
+    """
+    from .tokenstream import TokenStream
+    return _parse_token_stream(TokenStream(tokens))
+
+
+def _parse_token_stream(token_stream):
     """
     Parses the given token_stream into a sequence of top-level TOML elements.
 
