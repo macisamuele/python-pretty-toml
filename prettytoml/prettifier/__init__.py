@@ -1,4 +1,4 @@
-from . import anontableindent, tableindent, tableassignment
+from . import deindentanonymoustable, tableindent, tableassignment
 from prettytoml.prettifier import tablesep, commentspace, linelength, tableentrysort
 
 """
@@ -11,7 +11,7 @@ from prettytoml.prettifier import tablesep, commentspace, linelength, tableentry
 
 UNIFORM_TABLE_INDENTATION = tableindent.table_entries_should_be_uniformly_indented
 UNIFORM_TABLE_ASSIGNMENT_SPACING = tableassignment.table_assignment_spacing
-ANONYMOUS_TABLE_INDENTATION = anontableindent.deindent_anonymous_tables
+ANONYMOUS_TABLE_INDENTATION = deindentanonymoustable.deindent_anonymous_table
 COMMENT_SPACING = commentspace.comment_space
 TABLE_SPACING = tablesep.table_separation
 LINE_LENGTH_ENFORCERS = linelength.line_lingth_limiter
