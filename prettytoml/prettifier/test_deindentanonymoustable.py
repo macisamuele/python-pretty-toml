@@ -3,7 +3,7 @@
     This testing module depends on all the other modules.
 """
 
-from .anontableindent import anon_table_indent
+from .anontableindent import deindent_anonymous_tables
 from .common import assert_prettifier_works
 
 
@@ -19,4 +19,4 @@ key=value
 another_key =44
 noname = me
 """
-    assert_prettifier_works(toml_text, expected_toml_text, anon_table_indent)
+    assert_prettifier_works(toml_text, expected_toml_text, deindent_anonymous_tables)

@@ -42,3 +42,13 @@ def non_empty_elements(elements):
     Filters out TokenElement instances with zero tokens.
     """
     return filter(lambda e: not (isinstance(e, TokenElement) and not e.tokens), elements)
+
+
+def index(predicate, seq):
+    """
+    Returns the index of the element satisfying the given predicate, or None.
+    """
+    try:
+        return next(i for (i, e) in enumerate(seq) if predicate(e))
+    except StopIteration:
+        return None
