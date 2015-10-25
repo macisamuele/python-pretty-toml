@@ -21,3 +21,13 @@ pip install --upgrade prettytoml
 >>> with open('sample-prettified.toml', 'w') as fp:
       fp.write(prettified_content)
 ```
+
+## Formatting Rules ##
+
+* Entries within a single table should be ordered lexicographically by key
+* Every key and value pair in any table should be separated by the triplet (single space character, an assignment character `=`, single space character)
+* Anonymous table should never be indented
+* Nth-level table sections should be indented by `(N-1)*2` spaces
+* Line-terminating comments should always be prefixed by a single tab character whitespace only
+* Lines whose lengths exceed `120` characters whose values are strings, arrays, or inline tables should have the array or string value broken onto multiple lines and the inline table turned into a multiline table section so as to try to maintain a maximum line length of `120`
+* Tables should always be separated by an empty newline
