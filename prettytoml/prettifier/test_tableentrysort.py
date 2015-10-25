@@ -1,5 +1,5 @@
 
-from .tablesort import sort_table_entries
+from .tableentrysort import sort_table_entries
 from .common import assert_prettifier_works
 
 
