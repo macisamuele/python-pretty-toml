@@ -72,6 +72,17 @@ def is_operator(token):
         TYPE_OPT_DOT,
     )
 
+
+def is_string(token):
+    return token.type in (
+        TYPE_STRING,
+        TYPE_MULTILINE_STRING,
+        TYPE_LITERAL_STRING,
+        TYPE_BARE_STRING,
+        TYPE_MULTILINE_LITERAL_STRING
+    )
+
+
 class Token:
     """
     A token/lexeme in a TOML source file.

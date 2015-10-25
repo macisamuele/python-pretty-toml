@@ -46,6 +46,10 @@ class TokenElement(Element):
     def tokens(self):
         return self._tokens
 
+    @property
+    def first_token(self):
+        return self._tokens[0]
+
     @abstractmethod
     def _validate_tokens(self, _tokens):
         raise NotImplementedError
