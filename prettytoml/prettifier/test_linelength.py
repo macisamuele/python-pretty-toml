@@ -1,4 +1,4 @@
-from .linelength import line_lingth_limiter
+from .linelength import line_length_limiter
 from .common import assert_prettifier_works, elements_to_text, text_to_elements
 import pytoml
 
@@ -16,27 +16,7 @@ maximus eu quam. Praesent vehicula mauris vestibulum, mattis turpis sollicitudin
 pharetra purus vel finibus. Vestibulum sed tempus dui. Maecenas auctor sit amet diam et porta. Morbi id libero at elit \\
 ultricies porta vel vitae nullam. \"\"\"
 """
-    assert_prettifier_works(toml_text, expected_toml_text, line_lingth_limiter)
-
-
-def test_splitting_inline_table():
-    toml_text = """
-
-somethingweird = false
-
-[section]
-k = {a=1, b=2, c = 3, d = 4, e = 5, f = 6, g = 7, h = 8, i = 9, j = 10, k = 11, l = 12, m = 13, n = 14, o = 15, p = 16, q = 17}
-
-
-[data]
-id = 12
-
-"""
-
-    prettified = elements_to_text(line_lingth_limiter(text_to_elements(toml_text)))
-
-    assert pytoml.loads(prettified) == pytoml.loads(toml_text)
-    assert all(len(line) < 120 for line in prettified.split('\n'))
+    assert_prettifier_works(toml_text, expected_toml_text, line_length_limiter)
 
 
 def test_splitting_array():
@@ -53,7 +33,7 @@ id = 12
 
 """
 
-    prettified = elements_to_text(line_lingth_limiter(text_to_elements(toml_text)))
+    prettified = elements_to_text(line_length_limiter(text_to_elements(toml_text)))
 
     assert pytoml.loads(prettified) == pytoml.loads(toml_text)
     assert all(len(line) < 120 for line in prettified.split('\n'))

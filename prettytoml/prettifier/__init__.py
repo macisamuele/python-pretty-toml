@@ -14,7 +14,7 @@ UNIFORM_TABLE_ASSIGNMENT_SPACING = tableassignment.table_assignment_spacing
 ANONYMOUS_TABLE_INDENTATION = deindentanonymoustable.deindent_anonymous_table
 COMMENT_SPACING = commentspace.comment_space
 TABLE_SPACING = tablesep.table_separation
-LINE_LENGTH_ENFORCERS = linelength.line_lingth_limiter
+LINE_LENGTH_ENFORCERS = linelength.line_length_limiter
 TABLE_ENTRY_SORTING = tableentrysort.sort_table_entries
 
 

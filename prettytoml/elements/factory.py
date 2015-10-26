@@ -15,7 +15,6 @@ def create_element(value, multiline_strings_allowed=True):
     or dict-like value.
     """
     from prettytoml.elements.array import ArrayElement
-    from prettytoml.elements.inlinetable import InlineTableElement
 
     if isinstance(value, (int, float, bool, datetime.datetime, datetime.date) + six.string_types) or value is None:
         primitive_token = py2toml.create_primitive_token(value, multiline_strings_allowed=multiline_strings_allowed)
@@ -31,25 +30,36 @@ def create_element(value, multiline_strings_allowed=True):
         return ArrayElement(preamble + spaced_stuffing + postable)
 
     elif isinstance(value, dict):
-        preamble = [create_operator_element('{')]
-        postable = [create_operator_element('}')]
-
-        stuffing_elements = (
-            (
-                create_string_element(k, bare_allowed=True),
-                create_whitespace_element(),
-                create_operator_element('='),
-                create_whitespace_element(),
-                create_element(v, multiline_strings_allowed=False)
-            ) for (k, v) in value.items())
-
-        spaced_elements = join_with(stuffing_elements,
-                                    separator=[create_operator_element(','), create_whitespace_element()])
-
-        return InlineTableElement(preamble + spaced_elements + postable)
+        return create_inline_table(value, multiline_table=False, multiline_strings_allowed=multiline_strings_allowed)
 
     else:
         raise RuntimeError('Value type unaccounted for: {} of type {}'.format(value, type(value)))
+
+
+def create_inline_table(from_dict, multiline_table=False, multiline_strings_allowed=True):
+    """
+    Creates an InlineTable element from the given dict instance.
+    """
+
+    from prettytoml.elements.inlinetable import InlineTableElement
+
+    preamble = [create_operator_element('{')]
+    postable = [create_operator_element('}')]
+
+    stuffing_elements = (
+        (
+            create_string_element(k, bare_allowed=True),
+            create_whitespace_element(),
+            create_operator_element('='),
+            create_whitespace_element(),
+            create_element(v, multiline_strings_allowed=False)
+        ) for (k, v) in from_dict.items())
+
+    pair_separator = [create_operator_element(','),
+                      create_newline_element() if multiline_table else create_whitespace_element()]
+    spaced_elements = join_with(stuffing_elements, separator=pair_separator)
+
+    return InlineTableElement(preamble + spaced_elements + postable)
 
 
 def create_string_element(value, bare_allowed=False):

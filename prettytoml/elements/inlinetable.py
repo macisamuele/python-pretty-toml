@@ -70,6 +70,9 @@ class InlineTableElement(abstracttable.AbstractTable):
 
         self._sub_elements = self.sub_elements[:begin] + self.sub_elements[end:]
 
+    def multiline_equivalent(self):
+        return factory.create_inline_table(self.primitive_value, multiline_table=True, multiline_strings_allowed=True)
+
     @property
     def value(self):
         return self     # self is a dict-like value that is perfectly usable
